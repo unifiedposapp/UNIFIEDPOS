@@ -1,0 +1,28 @@
+# Line-ending policy for a cross-platform repo deployed to Linux containers.
+#
+# `* text=auto` stores text files with LF in the repository. The explicit rules
+# below force LF in the WORKING COPY too for files that must never carry CRLF:
+#   • docker-entrypoint.sh — a CRLF shebang (#!/bin/sh\r) makes the Linux
+#     container fail with "bad interpreter" after a Windows checkout.
+#   • *.sql (Prisma migrations) — keep byte-stable for `migrate deploy`.
+* text=auto
+
+*.sh text eol=lf
+docker-entrypoint.sh text eol=lf
+*.sql text eol=lf
+
+# Windows-only scripts keep CRLF.
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Binary assets — never touch line endings.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.docx binary
