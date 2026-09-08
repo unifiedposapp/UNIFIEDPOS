@@ -1,0 +1,6 @@
+# Unified POS — crawler policy
+# The SPA is a signed-in application; deep routes render client-side only. Allow
+# public/marketing and legal pages, but keep the API surface out of every index.
+User-agent: *
+Allow: /
+Disallow: /api/

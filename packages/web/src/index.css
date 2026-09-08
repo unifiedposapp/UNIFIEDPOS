@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Luxury base ───────────────────────────────────────────────
+   A refined, warm canvas + premium typography applied globally so
+   every page inherits the upscale feel without per-page edits.   */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #1f2430;
+  background-color: #f6f5f2;
+  background-image:
+    radial-gradient(1100px 560px at 100% -10%, rgba(198, 166, 100, 0.12), transparent 60%),
+    radial-gradient(900px 480px at -10% 110%, rgba(37, 99, 235, 0.07), transparent 55%);
+  background-attachment: fixed;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Tighten display headings for a more tailored look. */
+h1, h2, h3 {
+  letter-spacing: -0.015em;
+}
+
+/* Champagne-gold text selection. */
+::selection {
+  background: rgba(198, 166, 100, 0.30);
+  color: #141929;
+}
+
+/* Elegant, thin scrollbars. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(20, 25, 41, 0.18);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(198, 166, 100, 0.55);
+  background-clip: content-box;
+}
+
+@layer components {
+  /* Serif wordmark / special headings. */
+  .font-display {
+    font-family: Marcellus, 'Plus Jakarta Sans', Georgia, serif;
+  }
+  /* Hairline gold rule used as a luxury divider. */
+  .gold-rule {
+    height: 2px;
+    width: 2.5rem;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, #c6a664, rgba(198, 166, 100, 0));
+  }
+}

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Unified POS">
+  <!-- Maskable: full-bleed background, artwork kept inside the central 80% safe zone. -->
+  <rect width="512" height="512" fill="#0a0d18"/>
+  <rect x="128" y="176" width="256" height="160" rx="20" fill="none" stroke="#d4af37" stroke-width="16"/>
+  <rect x="164" y="210" width="120" height="22" rx="11" fill="#d4af37"/>
+  <rect x="164" y="252" width="186" height="16" rx="8" fill="#f0e6c8" opacity="0.75"/>
+  <rect x="164" y="284" width="156" height="16" rx="8" fill="#f0e6c8" opacity="0.5"/>
+  <circle cx="344" cy="220" r="20" fill="#d4af37"/>
+</svg>

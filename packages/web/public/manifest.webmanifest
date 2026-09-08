@@ -1,0 +1,25 @@
+{
+  "name": "Unified POS — Luxury Commerce Platform",
+  "short_name": "Unified POS",
+  "description": "Multi-tenant, offline-first point-of-sale and business operating system.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#0a0d18",
+  "theme_color": "#0a0d18",
+  "categories": ["business", "finance", "productivity"],
+  "lang": "en",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" },
+    { "src": "/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "POS Terminal", "short_name": "POS", "url": "/pos", "description": "Open the register" },
+    { "name": "Orders", "url": "/orders", "description": "View orders" },
+    { "name": "Offline & Sync", "url": "/sync", "description": "Sync queued transactions" }
+  ]
+}

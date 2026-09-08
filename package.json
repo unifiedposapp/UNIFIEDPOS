@@ -1,0 +1,48 @@
+{
+  "name": "unified-pos-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Unified Point of Sale Application",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:web\"",
+    "dev:server": "npm run dev --workspace=packages/server",
+    "dev:web": "npm run dev --workspace=packages/web",
+    "build": "npm run build --workspace=packages/shared && npm run build --workspace=packages/server && npm run build --workspace=packages/web",
+    "build:shared": "npm run build --workspace=packages/shared",
+    "build:server": "npm run build --workspace=packages/server",
+    "build:web": "npm run build --workspace=packages/web",
+    "lint": "eslint packages/*/src --ext .ts,.tsx",
+    "start": "npm run start --workspace=packages/server",
+    "db:generate": "npm run db:generate --workspace=packages/server",
+    "db:push": "npm run db:push --workspace=packages/server",
+    "db:migrate": "npm run db:migrate --workspace=packages/server",
+    "db:deploy": "npm run db:deploy --workspace=packages/server",
+    "db:seed": "npm run db:seed --workspace=packages/server",
+    "db:studio": "npm run db:studio --workspace=packages/server",
+    "docker:build": "docker build -t unified-pos:latest .",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "smoke": "node scripts/smoke-test.mjs"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^5.0.0",
+    "concurrently": "^9.1.0",
+    "typescript": "^5.6.3",
+    "vitest": "^5.0.0"
+  },
+  "allowScripts": {
+    "@prisma/client@5.22.0": true,
+    "@prisma/engines@5.22.0": true,
+    "prisma@5.22.0": true,
+    "esbuild@0.28.2": true
+  },
+  "overrides": {
+    "qs": "^6.16.0"
+  }
+}

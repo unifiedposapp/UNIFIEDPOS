@@ -1,0 +1,61 @@
+# Keep the Docker build context small, reproducible and secret-free.
+# Anything listed here is NOT sent to the Docker daemon during `docker build`.
+
+# ─── Dependencies (rebuilt inside the image) ──────────────────────────────
+node_modules
+**/node_modules
+npm-debug.log*
+yarn-error.log*
+
+# ─── Build output (regenerated in the builder stage) ──────────────────────
+**/dist
+**/build
+packages/web/dist
+packages/server/dist
+packages/shared/dist
+
+# ─── Environment & secrets — NEVER bake these into an image ───────────────
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+
+# ─── Version control & CI ─────────────────────────────────────────────────
+.git
+.gitignore
+.github
+.husky
+
+# ─── Docker artifacts (avoid recursive context) ───────────────────────────
+# NOTE: docker-entrypoint.sh is deliberately NOT ignored — the runner stage COPYs
+# it into the image, so it MUST stay in the build context. Ignoring it breaks the
+# build with "not found in build context or excluded by .dockerignore".
+Dockerfile
+docker-compose.yml
+docker-compose.yaml
+.dockerignore
+
+# ─── Logs, coverage, caches, editor/OS cruft ──────────────────────────────
+*.log
+logs
+coverage
+.nyc_output
+.cache
+.parcel-cache
+.turbo
+.vscode
+.idea
+*.swp
+.DS_Store
+Thumbs.db
+
+# ─── Prisma local dev artifacts ───────────────────────────────────────────
+packages/server/prisma/*.db
+packages/server/prisma/dev.db*
+
+# ─── Docs & spec (not needed at runtime) ──────────────────────────────────
+*.docx
+spec_extract.txt
+extract_spec.ps1
+IMPLEMENTATION_STATUS.md

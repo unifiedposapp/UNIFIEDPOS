@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Unified POS">
+  <rect width="512" height="512" rx="96" fill="#0a0d18"/>
+  <rect x="96" y="150" width="320" height="212" rx="24" fill="none" stroke="#d4af37" stroke-width="18"/>
+  <rect x="140" y="196" width="150" height="26" rx="13" fill="#d4af37"/>
+  <rect x="140" y="248" width="232" height="18" rx="9" fill="#f0e6c8" opacity="0.75"/>
+  <rect x="140" y="286" width="196" height="18" rx="9" fill="#f0e6c8" opacity="0.5"/>
+  <circle cx="356" cy="205" r="24" fill="#d4af37"/>
+</svg>

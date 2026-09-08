@@ -1,0 +1,117 @@
+name: CI
+
+# Runs on every push to main and on pull requests targeting it. Two jobs:
+#   • verify      — reproducible install, full type check across all three
+#                   packages, the unit + coverage gate, and a production image build.
+#   • db-validate — applies the committed Prisma migration to a throwaway Postgres
+#                   and asserts the schema has not drifted from the migration.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel superseded runs on the same ref to save CI minutes.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '20'
+  PRISMA_SCHEMA: packages/server/prisma/schema.prisma
+
+jobs:
+  verify:
+    name: Build · test · package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      # Reproducible install straight from the committed lockfile. Fails loudly if
+      # package.json and package-lock.json drift — which is exactly what we want.
+      - name: Install dependencies
+        run: npm ci
+
+      # The server tsc build needs the generated Prisma client types. `generate`
+      # needs no database, and neither do the type check nor the pure unit tests.
+      - name: Generate Prisma client
+        run: npx prisma generate --schema=${{ env.PRISMA_SCHEMA }}
+
+      # shared (tsc) → server (tsc) → web (tsc -b + vite build): the authoritative
+      # compile gate for all three packages.
+      - name: Build
+        run: npm run build
+
+      # Vitest suite + the scoped coverage gate (money-math, crypto, currencies,
+      # payment methods/providers, escpos, email). Exits non-zero under threshold.
+      - name: Test + coverage gate
+        run: npm run test:coverage
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage
+          retention-days: 7
+
+      # Prove the production image builds from a clean context (also validates the
+      # .dockerignore + `npm ci` reproducibility inside the image).
+      - name: Build Docker image
+        run: docker build -t unified-pos:ci .
+
+  db-validate:
+    name: Prisma migration validation
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: pos
+          POSTGRES_PASSWORD: pos
+          POSTGRES_DB: unified_pos_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pos"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://pos:pos@localhost:5432/unified_pos_ci?schema=public
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Apply the committed baseline migration to a fresh database. This proves the
+      # migration SQL is valid and complete against real Postgres 16.
+      - name: Apply migrations (migrate deploy)
+        run: npx prisma migrate deploy --schema=${{ env.PRISMA_SCHEMA }}
+
+      # Fail (exit 2) if schema.prisma contains changes with no matching migration,
+      # so a forgotten `migrate dev` can never reach production undetected.
+      - name: Assert no schema drift
+        run: >-
+          npx prisma migrate diff
+          --from-url "${{ env.DATABASE_URL }}"
+          --to-schema-datamodel ${{ env.PRISMA_SCHEMA }}
+          --exit-code

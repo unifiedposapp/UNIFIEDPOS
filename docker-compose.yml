@@ -1,0 +1,134 @@
+# Full-stack deploy: PostgreSQL 16 + the Unified POS app (API + SPA in one image).
+#
+# Usage:
+#   1. Copy .env.example to .env and set strong POSTGRES_PASSWORD, JWT_SECRET,
+#      ENCRYPTION_KEY, and CORS_ORIGIN (your public URL).
+#   2. docker compose up --build -d
+#   3. Open http://localhost:3001 and create your first account via Register.
+#
+# Compose reads the root .env for the ${VAR} substitutions below.
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-pos}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-unified_pos}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-pos} -d ${POSTGRES_DB:-unified_pos}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # Bound to localhost only. Remove this block to keep the DB private to the
+    # compose network (recommended for production behind the app).
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  app:
+    build:
+      context: .
+    image: unified-pos:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      # Keep POSTGRES_PASSWORD URL-safe (no @ : / ?) or percent-encode it here.
+      DATABASE_URL: postgresql://${POSTGRES_USER:-pos}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-unified_pos}?schema=public
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-8h}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?Set ENCRYPTION_KEY in .env}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001}
+      TRUST_PROXY: "1"
+      WEB_DIST: /app/packages/web/dist
+      SKIP_MIGRATIONS: ${SKIP_MIGRATIONS:-false}
+    ports:
+      - "${APP_PORT:-3001}:3001"
+
+  # ─── One-off migration job (profile "migrate") ──────────────────────
+  # Decouples schema migrations from container boot. Run it explicitly at deploy,
+  # then start the app with SKIP_MIGRATIONS=true so rolling restarts never race
+  # each other on `migrate deploy`:
+  #   docker compose run --rm migrate
+  migrate:
+    build:
+      context: .
+    image: unified-pos:latest
+    profiles: ["migrate"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-pos}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-unified_pos}?schema=public
+    # Override the image ENTRYPOINT so this container only applies migrations and
+    # exits (the default entrypoint would also start the server).
+    entrypoint: ["node", "node_modules/prisma/build/index.js", "migrate", "deploy", "--schema=packages/server/prisma/schema.prisma"]
+    restart: "no"
+
+  # ─── On-demand logical backup (profile "backup") ─────────────────────
+  # pg_dump in custom format into the `backups` volume. Run manually or from a
+  # host cron / scheduled task:
+  #   docker compose run --rm backup
+  # Restore: pg_restore -U <user> -d <db> --clean --if-exists /backups/<file>.dump
+  backup:
+    image: postgres:16-alpine
+    profiles: ["backup"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGHOST: db
+      PGPORT: "5432"
+      PGUSER: ${POSTGRES_USER:-pos}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB:-unified_pos}
+    volumes:
+      - backups:/backups
+    entrypoint:
+      - sh
+      - -c
+      - |
+        set -e
+        ts="$$(date +%Y%m%d_%H%M%S)"
+        out="/backups/unified_pos_$$ts.dump"
+        echo "[backup] pg_dump -> $$out"
+        pg_dump -Fc -f "$$out"
+        echo "[backup] complete: $$out"
+    restart: "no"
+
+  # ─── OPTIONAL connection pooler (profile "pooling") ───────────────────
+  # Caps Postgres connections under load or across many app replicas. To use it,
+  # point the app's DATABASE_URL at `pgbouncer:6432` instead of `db:5432` and run:
+  #   docker compose --profile pooling up -d
+  # Transaction pooling mode suits Prisma. Pin the image tag for production.
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    profiles: ["pooling"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: ${POSTGRES_DB:-unified_pos}
+      DB_USER: ${POSTGRES_USER:-pos}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      POOL_MODE: transaction
+      MAX_CLIENT_CONN: "200"
+      DEFAULT_POOL_SIZE: "20"
+      RESERVE_POOL_SIZE: "5"
+      RESERVE_POOL_TIMEOUT: "3"
+      AUTH_TYPE: scram-sha-256
+    ports:
+      - "127.0.0.1:6432:5432"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  backups:
