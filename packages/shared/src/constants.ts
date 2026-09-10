@@ -79,6 +79,30 @@ export const PAYMENT_METHOD_LABELS: Record<string, string> = {
   OTHER: 'Other',
 };
 
+// ─── Product Types ────────────────────────────────────────────
+
+// A product's type drives whether stock is tracked for it and how it is
+// fulfilled. PHYSICAL is the default (stock-tracked); the others are not
+// tracked in the inventory engine. Mirrors the `Product.type` column and the
+// server-side product schema.
+export const PRODUCT_TYPES = {
+  PHYSICAL: 'PHYSICAL',
+  SERVICE: 'SERVICE',
+  DIGITAL: 'DIGITAL',
+  GIFT_CARD: 'GIFT_CARD',
+  NON_INVENTORY: 'NON_INVENTORY',
+} as const;
+
+export const PRODUCT_TYPE_LABELS: Record<string, string> = {
+  PHYSICAL: 'Physical',
+  SERVICE: 'Service',
+  DIGITAL: 'Digital',
+  GIFT_CARD: 'Gift Card',
+  NON_INVENTORY: 'Non-inventory',
+};
+
+export const DEFAULT_PRODUCT_TYPE = 'PHYSICAL';
+
 // ─── Register Status ──────────────────────────────────────────
 
 export const REGISTER_STATUS = {

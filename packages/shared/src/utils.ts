@@ -1,5 +1,7 @@
 // ─── Currency Formatting ──────────────────────────────────────
 
+import { PRODUCT_TYPE_LABELS, DEFAULT_PRODUCT_TYPE } from './constants';
+
 // Formats an amount in any ISO 4217 currency. Intl handles the correct minor
 // unit automatically (0 decimals for JPY, 3 for BHD, etc.). Falls back to a
 // plain grouped number suffixed with the code for special/non-circulating
@@ -87,4 +89,25 @@ export function calculateTax(subtotal: number, taxRate: number): number {
 
 export function calculateChange(amountPaid: number, total: number): number {
   return Math.max(0, amountPaid - total);
+}
+
+// ─── Product Type Helpers ─────────────────────────────────────
+
+// Types whose quantity is tracked by the inventory engine. Only physical goods
+// are stocked; services, digital downloads, gift cards and non-inventory items
+// are sold but never counted in stock.
+const STOCK_TRACKED_PRODUCT_TYPES = new Set<string>([DEFAULT_PRODUCT_TYPE]);
+
+// Human-readable label for a product type. Falls back to the raw value for
+// unknown types and to the default label when none is set.
+export function productTypeLabel(type?: string | null): string {
+  if (!type) return PRODUCT_TYPE_LABELS[DEFAULT_PRODUCT_TYPE];
+  return PRODUCT_TYPE_LABELS[type] ?? type;
+}
+
+// Whether a product of this type should have its stock tracked. A missing type
+// is treated as the default (physical), which is stock-tracked.
+export function isStockTracked(type?: string | null): boolean {
+  if (!type) return true;
+  return STOCK_TRACKED_PRODUCT_TYPES.has(type);
 }

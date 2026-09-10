@@ -46,6 +46,9 @@ export interface PrinterSettings {
   baudRate: number;
   /** Paper width in characters — 32 (58mm) or 42/48 (80mm). */
   width: 32 | 42 | 48;
+  /** ISO 4217 code of the receipt currency (any world currency). */
+  currencyCode: string;
+  /** Symbol prefixed to amounts; derived from `currencyCode`. */
   currencySymbol: string;
   /** Cash-drawer pin: 0 = drawer 1, 1 = drawer 2. */
   drawerPin: 0 | 1;
@@ -60,6 +63,7 @@ const SETTINGS_KEY = 'pos.hardware.settings';
 export const DEFAULT_PRINTER_SETTINGS: PrinterSettings = {
   baudRate: 9600,
   width: 42,
+  currencyCode: 'USD',
   currencySymbol: '$',
   drawerPin: 0,
   autoOpenDrawer: true,

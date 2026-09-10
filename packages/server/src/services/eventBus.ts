@@ -1,4 +1,6 @@
 import { prisma } from '../db/client.js';
+import { publishRealtime } from './realtime.js';
+import { notifySubscribers } from './webpush.js';
 
 export interface BusinessEvent {
   organizationId: string;
@@ -45,6 +47,10 @@ export async function emitEvent(event: BusinessEvent): Promise<void> {
 
     // Fan out notable events to the Notification center (§5 Notification domain)
     await notifyFromEvent(event);
+
+    // Stream the event to connected browsers over SSE (real-time UI updates).
+    // In-process + non-blocking: a dropped socket never affects business logic.
+    publishRealtime(event.organizationId, event.event, event.data);
   } catch (error) {
     console.error('Failed to emit event:', error);
     // Don't throw - event failures shouldn't break business operations
@@ -71,6 +77,7 @@ async function notifyFromEvent(event: BusinessEvent): Promise<void> {
     const rule = NOTIFICATION_RULES[event.event];
     if (!rule) return;
     const data = event.data || {};
+    const message = rule.message(data);
     await prisma.notification.create({
       data: {
         organizationId: event.organizationId,
@@ -78,11 +85,14 @@ async function notifyFromEvent(event: BusinessEvent): Promise<void> {
         type: rule.type,
         severity: rule.severity,
         title: rule.title,
-        message: rule.message(data),
+        message,
         data: event.data ?? undefined,
         sourceEvent: event.event,
       },
     });
+    // Mirror high-signal notifications to web push (env-gated no-op when VAPID
+    // is not configured). Org-wide since the in-app notification is org-wide.
+    await notifySubscribers(event.organizationId, { title: rule.title, body: message, tag: rule.type, url: '/notifications' });
   } catch (error) {
     console.error('Failed to create notification from event:', error);
   }

@@ -19,6 +19,7 @@ const productSchema = z.object({
   sku: z.string().min(1),
   barcode: z.string().optional(),
   description: z.string().optional(),
+  type: z.enum(['PHYSICAL', 'SERVICE', 'DIGITAL', 'GIFT_CARD', 'NON_INVENTORY']).optional(),
   price: z.number().positive(),
   costPrice: z.number().positive(),
   categoryId: z.string().uuid().optional().or(z.literal('')),
@@ -72,7 +73,7 @@ router.delete('/categories/:id', authMiddleware, async (req: AuthRequest, res: R
 
 router.get('/products', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { search, categoryId, page = '1', pageSize = '20' } = req.query;
+    const { search, categoryId, type, page = '1', pageSize = '20' } = req.query;
     const where: any = { organizationId: req.user!.organizationId };
 
     if (search) {
@@ -83,6 +84,7 @@ router.get('/products', authMiddleware, async (req: AuthRequest, res: Response) 
       ];
     }
     if (categoryId) where.categoryId = String(categoryId);
+    if (type) where.type = String(type);
 
     const skip = (Number(page) - 1) * Number(pageSize);
     const [products, total] = await Promise.all([

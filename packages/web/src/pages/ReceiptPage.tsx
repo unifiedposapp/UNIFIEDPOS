@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { Printer, ArrowLeft, CheckCircle, Usb } from 'lucide-react';
 import { hardware } from '../services/hardware';
+import { currencySymbol as symbolForCurrency } from '../data/currencies';
 import type { ReceiptData as EscposReceipt } from '../services/escpos';
 
 interface ReceiptData {
@@ -83,7 +84,7 @@ export default function ReceiptPage() {
     register: r.registerName,
     location: r.locationName,
     createdAt: r.orderDate,
-    currencySymbol: (r.currency || 'USD') === 'USD' ? '$' : `${r.currency} `,
+    currencySymbol: symbolForCurrency(r.currency || hardware.settings.currencyCode || 'USD'),
     items: r.items.map((i) => ({
       name: i.variant ? `${i.name} (${i.variant})` : i.name,
       quantity: i.quantity,

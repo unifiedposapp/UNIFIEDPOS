@@ -37,6 +37,11 @@ import {
   RefreshCw,
   Bell,
   Printer,
+  Link2,
+  UtensilsCrossed,
+  Images,
+  LineChart,
+  ShieldAlert,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
@@ -45,6 +50,7 @@ import CookieConsent from './CookieConsent';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useI18n } from '../i18n/I18nProvider';
 import type { TranslationKey } from '../i18n/translations';
+import { useRealtime, useRealtimeStatus } from '../hooks/useRealtime';
 
 // Navigation grouped into luxury "collections" so the deep feature set stays elegant.
 // Labels are i18n keys resolved at render via `t()` (see i18n/translations.ts).
@@ -55,9 +61,11 @@ const navGroups: { labelKey: TranslationKey; items: { to: string; labelKey: Tran
       { to: '/pos', labelKey: 'nav.pos', icon: ShoppingCart },
       { to: '/orders', labelKey: 'nav.orders', icon: ClipboardList },
       { to: '/restaurant', labelKey: 'nav.restaurant', icon: Armchair },
+      { to: '/restaurant-ops', labelKey: 'nav.restaurantOps', icon: UtensilsCrossed },
       { to: '/retail', labelKey: 'nav.retail', icon: Gift },
       { to: '/commerce', labelKey: 'nav.commerce', icon: Globe },
       { to: '/payments', labelKey: 'nav.payments', icon: CreditCard },
+      { to: '/payment-links', labelKey: 'nav.paymentLinks', icon: Link2 },
     ],
   },
   {
@@ -65,6 +73,7 @@ const navGroups: { labelKey: TranslationKey; items: { to: string; labelKey: Tran
     items: [
       { to: '/inventory', labelKey: 'nav.inventory', icon: Package },
       { to: '/catalog', labelKey: 'nav.catalog', icon: Boxes },
+      { to: '/media', labelKey: 'nav.media', icon: Images },
       { to: '/transfers', labelKey: 'nav.transfers', icon: ArrowRightLeft },
       { to: '/purchasing', labelKey: 'nav.purchasing', icon: ShoppingBag },
       { to: '/suppliers', labelKey: 'nav.suppliers', icon: Truck },
@@ -77,6 +86,7 @@ const navGroups: { labelKey: TranslationKey; items: { to: string; labelKey: Tran
       { to: '/loyalty', labelKey: 'nav.loyalty', icon: Star },
       { to: '/marketing', labelKey: 'nav.marketing', icon: Megaphone },
       { to: '/ai', labelKey: 'nav.ai', icon: Brain },
+      { to: '/analytics', labelKey: 'nav.analytics', icon: LineChart },
       { to: '/copilot', labelKey: 'nav.copilot', icon: MessageSquare },
     ],
   },
@@ -112,6 +122,7 @@ const navGroups: { labelKey: TranslationKey; items: { to: string; labelKey: Tran
     items: [
       { to: '/notifications', labelKey: 'nav.notifications', icon: Bell },
       { to: '/audit', labelKey: 'nav.audit', icon: FileText },
+      { to: '/fraud', labelKey: 'nav.fraud', icon: ShieldAlert },
       { to: '/compliance', labelKey: 'nav.compliance', icon: ShieldCheck },
       { to: '/settings', labelKey: 'nav.settings', icon: Settings },
     ],
@@ -134,9 +145,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Real-time: refresh the badge the instant the server emits a business event
+  // (order/payment/inventory/notification). SSE replaces the old 30s poll; a
+  // slow 2-minute fallback poll remains in case the stream is unavailable.
+  useRealtime(() => refreshUnread());
+  const realtimeStatus = useRealtimeStatus();
+
   useEffect(() => {
     refreshUnread();
-    const interval = setInterval(refreshUnread, 30000);
+    const interval = setInterval(refreshUnread, 120000);
     return () => clearInterval(interval);
   }, [refreshUnread]);
 
@@ -262,7 +279,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <Menu size={22} />
           </button>
           <div className="hidden items-center gap-2 text-xs text-ink-400 sm:flex">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+            <span
+              className={clsx(
+                'h-1.5 w-1.5 animate-pulse rounded-full',
+                realtimeStatus === 'open' ? 'bg-emerald-400' : 'bg-amber-400'
+              )}
+              title={realtimeStatus === 'open' ? 'Live real-time connection' : 'Reconnecting…'}
+            />
             <span className="font-medium tracking-wide">{t('app.status.operational')}</span>
           </div>
           <div className="flex-1" />

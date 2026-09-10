@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../api/client';
 import { Search, Plus, Edit, Trash2, X, AlertTriangle, Layers, Calendar } from 'lucide-react';
 import clsx from 'clsx';
+import { PRODUCT_TYPE_LABELS, productTypeLabel } from '@pos/shared';
 
 export default function InventoryPage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -22,16 +23,18 @@ export default function InventoryPage() {
 
   const [formData, setFormData] = useState({
     name: '', sku: '', barcode: '', description: '', price: '', costPrice: '',
-    categoryId: '', imageUrl: '',
+    categoryId: '', imageUrl: '', type: 'PHYSICAL',
   });
+  const [typeFilter, setTypeFilter] = useState('');
   const [catFormData, setCatFormData] = useState({ name: '', description: '', color: '#3B82F6' });
 
-  useEffect(() => { loadData(); }, [search]);
+  useEffect(() => { loadData(); }, [search, typeFilter]);
 
   async function loadData() {
     try {
       const params: Record<string, string> = {};
       if (search) params.search = search;
+      if (typeFilter) params.type = typeFilter;
       const [prodRes, catRes, lowRes, batchRes, serialRes, locRes] = await Promise.all([
         api.getProducts(params),
         api.getCategories(),
@@ -92,7 +95,7 @@ export default function InventoryPage() {
   }
 
   function resetForm() {
-    setFormData({ name: '', sku: '', barcode: '', description: '', price: '', costPrice: '', categoryId: '', imageUrl: '' });
+    setFormData({ name: '', sku: '', barcode: '', description: '', price: '', costPrice: '', categoryId: '', imageUrl: '', type: 'PHYSICAL' });
   }
 
   function startEdit(product: any) {
@@ -101,7 +104,7 @@ export default function InventoryPage() {
       name: product.name, sku: product.sku, barcode: product.barcode || '',
       description: product.description || '', price: String(product.price),
       costPrice: String(product.costPrice), categoryId: product.categoryId || '',
-      imageUrl: product.imageUrl || '',
+      imageUrl: product.imageUrl || '', type: product.type || 'PHYSICAL',
     });
     setShowProductForm(true);
   }
@@ -178,12 +181,19 @@ export default function InventoryPage() {
 
       {tab === 'products' && (
         <>
-          <div className="mb-4">
-            <div className="relative">
+          <div className="mb-4 flex gap-3">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
               <input type="text" placeholder="Search products..." value={search} onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none" />
             </div>
+            <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}
+              className="px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-sm">
+              <option value="">All types</option>
+              {Object.entries(PRODUCT_TYPE_LABELS).map(([value, label]) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </select>
           </div>
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <table className="w-full">
@@ -192,6 +202,7 @@ export default function InventoryPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SKU</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
@@ -203,6 +214,7 @@ export default function InventoryPage() {
                     <td className="px-6 py-4 text-sm font-medium">{p.name}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">{p.sku}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">{p.category?.name}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{productTypeLabel(p.type)}</td>
                     <td className="px-6 py-4 text-sm">${Number(p.price).toFixed(2)}</td>
                     <td className="px-6 py-4">
                       <span className={clsx('text-sm font-medium', (p.stock || 0) <= 5 ? 'text-red-600' : 'text-green-600')}>
@@ -463,6 +475,15 @@ export default function InventoryPage() {
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none" required>
                   <option value="">Select category</option>
                   {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Type</label>
+                <select value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none">
+                  {Object.entries(PRODUCT_TYPE_LABELS).map(([value, label]) => (
+                    <option key={value} value={value}>{label}</option>
+                  ))}
                 </select>
               </div>
               <div>

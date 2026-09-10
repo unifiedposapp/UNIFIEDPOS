@@ -375,6 +375,7 @@ export const api = {
   },
 
   // Marketing
+  getMarketingOverview: () => request<any>('/marketing/overview'),
   getPromotions: () => request<any>('/marketing/promotions'),
   createPromotion: (data: any) =>
     request<any>('/marketing/promotions', { method: 'POST', body: JSON.stringify(data) }),
@@ -385,13 +386,25 @@ export const api = {
   getCoupons: () => request<any>('/marketing/coupons'),
   createCoupon: (data: any) =>
     request<any>('/marketing/coupons', { method: 'POST', body: JSON.stringify(data) }),
+  updateCoupon: (id: string, data: any) =>
+    request<any>(`/marketing/coupons/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteCoupon: (id: string) =>
+    request<any>(`/marketing/coupons/${id}`, { method: 'DELETE' }),
+  redeemCoupon: (id: string) =>
+    request<any>(`/marketing/coupons/${id}/redeem`, { method: 'POST' }),
   validateCoupon: (code: string, orderTotal?: number) =>
     request<any>('/marketing/coupons/validate', { method: 'POST', body: JSON.stringify({ code, orderTotal }) }),
   getCampaigns: () => request<any>('/marketing/campaigns'),
   createCampaign: (data: any) =>
     request<any>('/marketing/campaigns', { method: 'POST', body: JSON.stringify(data) }),
-  launchCampaign: (id: string) =>
-    request<any>(`/marketing/campaigns/${id}/launch`, { method: 'POST' }),
+  updateCampaign: (id: string, data: any) =>
+    request<any>(`/marketing/campaigns/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  launchCampaign: (id: string, segmentKey?: string) =>
+    request<any>(`/marketing/campaigns/${id}/launch`, { method: 'POST', body: JSON.stringify({ segmentKey }) }),
+  engageCampaign: (id: string, type: 'open' | 'convert') =>
+    request<any>(`/marketing/campaigns/${id}/engage`, { method: 'POST', body: JSON.stringify({ type }) }),
+  cancelCampaign: (id: string) =>
+    request<any>(`/marketing/campaigns/${id}/cancel`, { method: 'POST' }),
   getSegments: () => request<any>('/marketing/segments'),
 
   // AI Copilot
@@ -448,9 +461,9 @@ export const api = {
   createLayaway: (data: any) =>
     request<any>('/retail/layaways', { method: 'POST', body: JSON.stringify(data) }),
   payLayaway: (id: string, amount: number) =>
-    request<any>(`/retail/layaways/${id}/pay`, { method: 'POST', body: JSON.stringify({ amount }) }),
-  cancelLayaway: (id: string) =>
-    request<any>(`/retail/layaways/${id}/cancel`, { method: 'POST' }),
+    request<any>(`/retail/layaways/${id}/pay`, { method: 'PUT', body: JSON.stringify({ amount }) }),
+  cancelLayaway: (id: string, cancellationFee?: number) =>
+    request<any>(`/retail/layaways/${id}/cancel`, { method: 'PUT', body: JSON.stringify({ cancellationFee }) }),
 
   // Exchanges
   processExchange: (data: any) =>
@@ -794,4 +807,94 @@ export const api = {
   setPayoutStatus: (id: string, status: string) =>
     request<any>(`/payments/payouts/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
   getSettlements: () => request<any>('/payments/settlements'),
+
+  // ── Payment Links (§9) ─────────────────────────────────────
+  getPaymentLinks: () => request<any>('/payment-links'),
+  createPaymentLink: (data: { amount: number; currency?: string; description?: string; customerId?: string; orderId?: string; maxPayments?: number; expiresAt?: string }) =>
+    request<any>('/payment-links', { method: 'POST', body: JSON.stringify(data) }),
+  getPaymentLink: (id: string) => request<any>(`/payment-links/${id}`),
+  cancelPaymentLink: (id: string) =>
+    request<any>(`/payment-links/${id}/cancel`, { method: 'PUT' }),
+  deletePaymentLink: (id: string) =>
+    request<any>(`/payment-links/${id}`, { method: 'DELETE' }),
+  // Public (unauthenticated) checkout — used by the /pay/:token page.
+  getPublicPaymentLink: (token: string) => request<any>(`/payment-links/public/${token}`),
+  payPublicPaymentLink: (token: string, data: { paymentMethodId?: string; method?: string }) =>
+    request<any>(`/payment-links/public/${token}/pay`, { method: 'POST', body: JSON.stringify(data) }),
+
+  // ── Fraud Detection (§37) ──────────────────────────────────
+  getFraudAlerts: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/fraud${query}`);
+  },
+  getFraudStats: () => request<any>('/fraud/stats'),
+  getFraudAlert: (id: string) => request<any>(`/fraud/${id}`),
+  updateFraudAlertStatus: (id: string, status: string, note?: string) =>
+    request<any>(`/fraud/${id}/status`, { method: 'PUT', body: JSON.stringify({ status, note }) }),
+
+  // ── Restaurant extensions (§17): QR ordering, catering, food-cost ──
+  getTableQrToken: (tableId: string) => request<any>(`/restaurant/tables/${tableId}/qr-token`),
+  createTableQrToken: (tableId: string) =>
+    request<any>(`/restaurant/tables/${tableId}/qr-token`, { method: 'POST' }),
+  revokeTableQrToken: (tableId: string) =>
+    request<any>(`/restaurant/tables/${tableId}/qr-token`, { method: 'DELETE' }),
+  getCateringOrders: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/restaurant/catering${query}`);
+  },
+  createCateringOrder: (data: any) =>
+    request<any>('/restaurant/catering', { method: 'POST', body: JSON.stringify(data) }),
+  getCateringOrder: (id: string) => request<any>(`/restaurant/catering/${id}`),
+  updateCateringStatus: (id: string, status: string) =>
+    request<any>(`/restaurant/catering/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+  getFoodCostAnalysis: (target?: number) =>
+    request<any>(`/restaurant/menu/food-cost${target ? `?target=${target}` : ''}`),
+
+  // Public guest QR ordering (no auth) — used by the /order/:token guest page.
+  getPublicQrTable: (token: string) => request<any>(`/public/qr/${token}`),
+  submitPublicQrOrder: (token: string, data: { items: { productId: string; quantity: number; notes?: string }[]; customerName?: string; phone?: string }) =>
+    request<any>(`/public/qr/${token}/order`, { method: 'POST', body: JSON.stringify(data) }),
+  getPublicQrOrder: (token: string, orderId: string) =>
+    request<any>(`/public/qr/${token}/order/${orderId}`),
+
+  // ── Web Push (VAPID) ───────────────────────────────────────
+  getPushConfig: () => request<any>('/push/config'),
+  subscribePush: (data: { endpoint: string; keys: { p256dh: string; auth: string }; userAgent?: string }) =>
+    request<any>('/push/subscribe', { method: 'POST', body: JSON.stringify(data) }),
+  unsubscribePush: (endpoint: string) =>
+    request<any>('/push/subscribe', { method: 'DELETE', body: JSON.stringify({ endpoint }) }),
+  getPushSubscriptions: () => request<any>('/push/subscriptions'),
+  sendTestPush: (data?: { title?: string; body?: string }) =>
+    request<any>('/push/test', { method: 'POST', body: JSON.stringify(data || {}) }),
+  generateVapidKeys: () => request<any>('/push/vapid-keys'),
+
+  // ── Real-time (SSE) status ─────────────────────────────────
+  getRealtimeStatus: () => request<any>('/realtime/status'),
+
+  // ── AI analytics depth (forecast / anomalies / RFM) ────────
+  getAIForecast: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/ai/forecast${query}`);
+  },
+  getAIAnomalies: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/ai/anomalies${query}`);
+  },
+  getAISegments: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/ai/segments${query}`);
+  },
+  getCopilotSummary: (metrics?: any) =>
+    request<any>('/ai/copilot-summary', { method: 'POST', body: JSON.stringify({ metrics }) }),
+
+  // ── Media asset library (S3/DB) ────────────────────────────
+  getMediaBackend: () => request<any>('/media/backend'),
+  getMedia: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/media${query}`);
+  },
+  uploadMedia: (data: { name?: string; mimeType: string; dataUrl: string; folder?: string; width?: number; height?: number }) =>
+    request<any>('/media', { method: 'POST', body: JSON.stringify(data) }),
+  getMediaAsset: (id: string) => request<any>(`/media/${id}`),
+  deleteMediaAsset: (id: string) => request<any>(`/media/${id}`, { method: 'DELETE' }),
 };

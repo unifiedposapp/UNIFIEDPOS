@@ -11,6 +11,7 @@ const productSchema = z.object({
   sku: z.string().min(1),
   barcode: z.string().optional(),
   description: z.string().optional(),
+  type: z.enum(['PHYSICAL', 'SERVICE', 'DIGITAL', 'GIFT_CARD', 'NON_INVENTORY']).optional(),
   price: z.number(),
   costPrice: z.number().optional(),
   categoryId: z.string().optional(),
@@ -23,11 +24,12 @@ const productSchema = z.object({
 // GET /api/products
 router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { search, categoryId, isActive } = req.query;
+    const { search, categoryId, type, isActive } = req.query;
     const where: any = { organizationId: req.user!.organizationId };
     
     if (search) where.name = { contains: String(search), mode: 'insensitive' };
     if (categoryId) where.categoryId = String(categoryId);
+    if (type) where.type = String(type);
     if (isActive !== undefined) where.isActive = isActive === 'true';
     
     const products = await prisma.product.findMany({

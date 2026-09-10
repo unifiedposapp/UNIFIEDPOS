@@ -16,6 +16,7 @@ import {
   paymentMethodsForCountry,
 } from '../data/paymentMethods.js';
 import { createCharge, refundCharge, activeProvider, isStripeConfigured } from '../services/paymentProvider.js';
+import { evaluateFraud } from '../services/fraud.js';
 
 const router = Router();
 
@@ -358,6 +359,22 @@ router.post('/process', authMiddleware, validateRequest(processPaymentSchema), a
       return res.status(400).json({ success: false, message: 'Payment exceeds order total' });
     }
 
+    // §37 Fraud detection — score the attempt before authorising. BLOCK stops the
+    // charge (the FraudAlert is already persisted by evaluateFraud); REVIEW
+    // proceeds but the response is flagged for manual follow-up.
+    const fraud = await evaluateFraud({
+      organizationId: orgId,
+      amount,
+      currency: order.currency || 'USD',
+      method,
+      customerId: order.customerId,
+      orderId,
+    });
+    if (fraud.action === 'BLOCK') {
+      await createAuditEvent({ organizationId: orgId, actorId: req.user!.employeeId, action: 'PAYMENT_BLOCKED_FRAUD', resourceType: 'ORDER', resourceId: orderId, newValue: { amount, method, score: fraud.score, rules: fraud.rules.map((r) => r.rule) } });
+      return res.status(403).json({ success: false, message: 'Payment blocked by fraud detection', fraud: { score: fraud.score, level: fraud.level, action: fraud.action, rules: fraud.rules } });
+    }
+
     const currency = order.currency || 'USD';
     const isCardLike = isGatewayMethod(method);
 
@@ -448,7 +465,7 @@ router.post('/process', authMiddleware, validateRequest(processPaymentSchema), a
       newValue: { orderId, amount, method },
     });
 
-    res.status(201).json({ success: true, data: payment, requiresAction: status === 'AUTHORIZED', clientSecret });
+    res.status(201).json({ success: true, data: payment, requiresAction: status === 'AUTHORIZED', clientSecret, fraud: { score: fraud.score, level: fraud.level, action: fraud.action, review: fraud.action === 'REVIEW' } });
   } catch (error) {
     handleError(error, res);
   }

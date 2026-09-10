@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Printer, Usb, Barcode, CheckCircle, XCircle, Save, Trash2, Power,
 } from 'lucide-react';
@@ -8,6 +8,7 @@ import {
   loadPrinterSettings,
   type PrinterSettings,
 } from '../services/hardware';
+import { CURRENCIES, currencySymbol } from '../data/currencies';
 import type { ReceiptData } from '../services/escpos';
 
 // A representative sample used by the "Test print" button.
@@ -38,7 +39,21 @@ export default function HardwarePage() {
   const [msg, setMsg] = useState('');
   const [lastScan, setLastScan] = useState('');
   const [scanning, setScanning] = useState(false);
+  const [currFilter, setCurrFilter] = useState('');
   const detachRef = useRef<(() => void) | null>(null);
+
+  // Every ISO 4217 currency in the world, optionally narrowed by the filter
+  // box (matches code, name or symbol). Nothing is ever omitted.
+  const currencyOptions = useMemo(() => {
+    const q = currFilter.trim().toLowerCase();
+    if (!q) return CURRENCIES;
+    return CURRENCIES.filter((c) =>
+      c.code.toLowerCase().includes(q) ||
+      c.name.toLowerCase().includes(q) ||
+      (c.symbol || '').toLowerCase().includes(q));
+  }, [currFilter]);
+
+  const activeCode = settings.currencyCode || 'USD';
 
   useEffect(() => () => detachRef.current?.(), []);
 
@@ -197,9 +212,27 @@ export default function HardwarePage() {
             </select>
           </label>
           <label className="block">
-            <span className="text-sm text-gray-600">Currency symbol</span>
-            <input className={inputCls} value={settings.currencySymbol} maxLength={4}
-              onChange={(e) => setSettings({ ...settings, currencySymbol: e.target.value })} />
+            <span className="text-sm text-gray-600">Receipt currency</span>
+            <input className={inputCls} placeholder="Search code, name or symbol…" value={currFilter}
+              onChange={(e) => setCurrFilter(e.target.value)} />
+            <select className={`${inputCls} mt-2`} value={activeCode}
+              onChange={(e) => {
+                const code = e.target.value;
+                setSettings({ ...settings, currencyCode: code, currencySymbol: currencySymbol(code) });
+              }}>
+              {!currencyOptions.some((c) => c.code === activeCode) && (
+                <option value={activeCode}>{activeCode} — {currencySymbol(activeCode)}</option>
+              )}
+              {currencyOptions.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.symbol || c.code}  ·  {c.code} — {c.name}
+                </option>
+              ))}
+            </select>
+            <span className="text-xs text-gray-500 mt-1 block">
+              {currencyOptions.length} currencies listed · Receipt preview:{' '}
+              <span className="font-mono font-medium text-gray-700">{currencySymbol(activeCode)}1,234.50</span>
+            </span>
           </label>
           <label className="block">
             <span className="text-sm text-gray-600">Cash drawer pin</span>

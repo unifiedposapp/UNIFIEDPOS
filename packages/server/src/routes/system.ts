@@ -3,6 +3,7 @@ import { prisma } from '../db/client.js';
 import { AuthRequest, authMiddleware } from '../middleware/auth.js';
 import { handleError } from '../middleware/error.js';
 import { getMetricsSnapshot } from '../services/observability.js';
+import { listJobs, isSchedulerRunning } from '../services/scheduler.js';
 
 const router = Router();
 
@@ -83,12 +84,16 @@ router.get('/metrics', authMiddleware, async (req: AuthRequest, res: Response) =
       prisma.customer.count({ where: { organizationId: orgId } }),
       prisma.employee.count({ where: { organizationId: orgId } }),
       prisma.location.count({ where: { organizationId: orgId } }),
-      prisma.inventoryBalance.count({
-        where: {
-          product: { organizationId: orgId },
-          quantity: { lte: prisma.inventoryBalance.fields.reorderPoint },
-        },
-      }).catch(() => 0),
+      // Low-stock = on-hand quantity at or below the per-row reorder point.
+      // Prisma cannot compare two columns in a `where`, so use a raw count
+      // scoped to the organization (best-effort; degrades to 0 on any error).
+      prisma.$queryRaw<{ low: number }[]>`
+        SELECT COUNT(*)::int AS low
+        FROM inventory_balances ib
+        JOIN products p ON p.id = ib."productId"
+        WHERE p."organizationId" = ${orgId}
+          AND ib.quantity <= ib."reorderPoint"
+      `.then((rows) => Number(rows[0]?.low ?? 0)).catch(() => 0),
       prisma.businessEvent.count({ where: { organizationId: orgId, status: 'PENDING' } }),
       prisma.webhook.count({ where: { organizationId: orgId, failureCount: { gt: 0 } } }),
     ]);
@@ -151,14 +156,19 @@ router.get('/observability', authMiddleware, async (req: AuthRequest, res: Respo
     const mem = process.memoryUsage();
 
     // Event queue depth
-    const [pendingEvents, failedEvents, recentDeliveries] = await Promise.all([
+    const [pendingEvents, failedEvents, recentDeliveries, recentJobRuns] = await Promise.all([
       prisma.businessEvent.count({ where: { organizationId: orgId, status: 'PENDING' } }),
       prisma.businessEvent.count({ where: { organizationId: orgId, status: 'FAILED' } }),
       prisma.webhookDelivery.findMany({
         where: { webhook: { organizationId: orgId } },
         orderBy: { createdAt: 'desc' },
         take: 20,
-        select: { event: true, success: true, responseStatus: true, createdAt: true },
+        select: { event: true, success: true, responseStatus: true, attempts: true, nextRetryAt: true, createdAt: true },
+      }),
+      prisma.jobRun.findMany({
+        orderBy: { startedAt: 'desc' },
+        take: 20,
+        select: { jobName: true, status: true, recordsProcessed: true, durationMs: true, error: true, startedAt: true },
       }),
     ]);
 
@@ -202,8 +212,16 @@ router.get('/observability', authMiddleware, async (req: AuthRequest, res: Respo
             event: d.event,
             success: d.success,
             status: d.responseStatus,
+            attempts: d.attempts,
+            nextRetryAt: d.nextRetryAt,
             time: d.createdAt,
           })),
+        },
+        // Background job scheduler (§19/§10/§29/§37): live registry + recent runs.
+        scheduler: {
+          running: isSchedulerRunning(),
+          jobs: listJobs(),
+          recentRuns: recentJobRuns,
         },
         payments: {
           total24h: totalPayments,
@@ -323,6 +341,7 @@ router.get('/nfr', authMiddleware, async (_req: AuthRequest, res: Response) => {
           idempotency: { implemented: true, description: 'Idempotency keys for orders, payments, refunds, sync, webhooks (§36)' },
           financialIntegrity: { implemented: true, description: 'Immutable records with corrective entries (§34)' },
           referentialIntegrity: { implemented: true, description: 'Foreign keys enforced across all tables' },
+          backgroundJobs: { implemented: isSchedulerRunning(), description: 'In-process scheduler drives campaigns, payouts, webhook retry, stored-value/loyalty expiry, retention purge + reconciliation', registeredJobs: listJobs().length },
         },
         security: {
           authentication: { implemented: true, methods: ['JWT Bearer Token', 'Device Credentials'] },
@@ -333,8 +352,8 @@ router.get('/nfr', authMiddleware, async (_req: AuthRequest, res: Response) => {
           deviceAuthentication: { implemented: true, description: 'Device credentials with revocation (§38)' },
         },
         extensibility: {
-          publicApi: { implemented: true, versioning: '/api/v1/...' },
-          webhooks: { implemented: true, description: 'Configurable event subscriptions with retry' },
+          publicApi: { implemented: true, versioning: '/api/v1/...', description: 'Every route is served at both /api/* and the versioned /api/v1/* alias (§28)' },
+          webhooks: { implemented: true, description: 'Configurable event subscriptions with scheduler-driven retry + exponential backoff (§29)' },
           oauth: { implemented: true, description: 'OAuth 2.0 authorization code flow (§30)' },
           appMarketplace: { implemented: true, description: 'Pre-built integration listings' },
           sdkSupport: { implemented: false, description: 'SDKs planned for future phase' },

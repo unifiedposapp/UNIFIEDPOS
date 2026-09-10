@@ -1,5 +1,5 @@
 import { useEffect, lazy, Suspense } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
 import Layout from './components/Layout';
 
@@ -51,6 +51,15 @@ const SystemPage = lazy(() => import('./pages/SystemPage'));
 const EnterprisePage = lazy(() => import('./pages/EnterprisePage'));
 const DeveloperPage = lazy(() => import('./pages/DeveloperPage'));
 const CompliancePage = lazy(() => import('./pages/CompliancePage'));
+// §9 payment links, §17 restaurant ops, §12 AI depth, §37 fraud, media
+const PaymentLinksPage = lazy(() => import('./pages/PaymentLinksPage'));
+const RestaurantOpsPage = lazy(() => import('./pages/RestaurantOpsPage'));
+const AIAnalyticsPage = lazy(() => import('./pages/AIAnalyticsPage'));
+const FraudPage = lazy(() => import('./pages/FraudPage'));
+const MediaPage = lazy(() => import('./pages/MediaPage'));
+// Public, unauthenticated guest pages (payment checkout + scan-to-order)
+const PayLinkPage = lazy(() => import('./pages/PayLinkPage'));
+const GuestOrderPage = lazy(() => import('./pages/GuestOrderPage'));
 
 /** Centered spinner shown while a lazy route chunk is being fetched. */
 function RouteFallback() {
@@ -64,10 +73,25 @@ function RouteFallback() {
 
 function App() {
   const { isAuthenticated, loadFromStorage } = useAuthStore();
+  const location = useLocation();
 
   useEffect(() => {
     loadFromStorage();
   }, [loadFromStorage]);
+
+  // Public guest surfaces (§9 payment-link checkout, §17 scan-to-order) render
+  // regardless of auth state and never mount the authenticated shell — a customer
+  // scanning a QR code or clicking a pay link has no account in this system.
+  if (/^\/(pay|order)\//.test(location.pathname)) {
+    return (
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
+          <Route path="/pay/:token" element={<PayLinkPage />} />
+          <Route path="/order/:token" element={<GuestOrderPage />} />
+        </Routes>
+      </Suspense>
+    );
+  }
 
   if (!isAuthenticated) {
     return (
@@ -93,6 +117,7 @@ function App() {
           <Route path="/customers" element={<CustomersPage />} />
           <Route path="/registers" element={<RegistersPage />} />
           <Route path="/restaurant" element={<RestaurantPage />} />
+          <Route path="/restaurant-ops" element={<RestaurantOpsPage />} />
           <Route path="/employees" element={<EmployeesPage />} />
           <Route path="/suppliers" element={<SuppliersPage />} />
           <Route path="/purchasing" element={<PurchasingPage />} />
@@ -100,7 +125,11 @@ function App() {
           <Route path="/accounting" element={<AccountingPage />} />
           <Route path="/webhooks" element={<WebhooksPage />} />
           <Route path="/ai" element={<AIInsightsPage />} />
+          <Route path="/analytics" element={<AIAnalyticsPage />} />
           <Route path="/payments" element={<PaymentsPage />} />
+          <Route path="/payment-links" element={<PaymentLinksPage />} />
+          <Route path="/fraud" element={<FraudPage />} />
+          <Route path="/media" element={<MediaPage />} />
           <Route path="/marketing" element={<MarketingPage />} />
           <Route path="/copilot" element={<CopilotPage />} />
           <Route path="/transfers" element={<TransfersPage />} />

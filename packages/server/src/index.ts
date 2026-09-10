@@ -35,6 +35,14 @@ import catalogRoutes from './routes/catalog.js';
 import syncRoutes from './routes/sync.js';
 import notificationRoutes from './routes/notifications.js';
 import complianceRoutes from './routes/compliance.js';
+import fraudRoutes from './routes/fraud.js';
+import paymentLinkRoutes from './routes/paymentLinks.js';
+import restaurantExtRoutes from './routes/restaurantExt.js';
+import publicOrderingRoutes from './routes/publicOrdering.js';
+import realtimeRoutes from './routes/realtime.js';
+import pushRoutes from './routes/push.js';
+import aiAnalyticsRoutes from './routes/aiAnalytics.js';
+import mediaRoutes from './routes/media.js';
 import { requestLogger, errorLogger } from './middleware/logger.js';
 import { apiRateLimiter, authRateLimiter, paymentRateLimiter } from './middleware/rateLimiter.js';
 import { idempotencyMiddleware } from './middleware/idempotency.js';
@@ -45,6 +53,8 @@ import cookieParser from 'cookie-parser';
 import { csrfProtection } from './middleware/csrf.js';
 import { stripeWebhookHandler } from './routes/paymentWebhooks.js';
 import { initObservability, metricsMiddleware, renderMetrics, metricsAuthorized, captureException } from './services/observability.js';
+import { startScheduler, stopScheduler } from './services/scheduler.js';
+import { registerAllJobs } from './services/scheduledJobs.js';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -124,41 +134,58 @@ app.use(apiRateLimiter); // Global rate limiting (§37)
 app.use(idempotencyMiddleware()); // Idempotency for POST/PUT/PATCH (§36)
 app.use(csrfProtection); // Double-submit-cookie CSRF guard for cookie-authenticated writes (§37)
 
-// Routes
-app.use('/api/auth', authRateLimiter, authRoutes); // Stricter limit on auth to blunt brute-force (§37)
-app.use('/api/inventory', inventoryRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/reports', reportRoutes);
-app.use('/api/settings', settingsRoutes);
-app.use('/api/locations', locationRoutes);
-app.use('/api/registers', registerRoutes);
-app.use('/api/customers', customerRoutes);
-app.use('/api/audit', auditRoutes);
-app.use('/api/receipts', receiptRoutes);
-app.use('/api/webhooks', webhookRoutes);
-app.use('/api/loyalty', loyaltyRoutes);
-app.use('/api/restaurant', restaurantRoutes);
-app.use('/api/accounting', accountingRoutes);
-app.use('/api/employees', employeeRoutes);
-app.use('/api/suppliers', supplierRoutes);
-app.use('/api/purchasing', purchasingRoutes);
-app.use('/api/ai', aiRoutes);
-app.use('/api/developer', developerRoutes);
-app.use('/api/system', systemRoutes);
-app.use('/api/payments', paymentRateLimiter, paymentRoutes); // Stricter limit on payment endpoints (§37)
-app.use('/api/inventory-ops', inventoryOpsRoutes);
-app.use('/api/marketing', marketingRoutes);
-app.use('/api/copilot', copilotRoutes);
-app.use('/api/enterprise', enterpriseRoutes);
-app.use('/api/retail', retailRoutes);
-app.use('/api/permissions', permissionsRoutes);
-app.use('/api/devices', devicesRoutes);
-app.use('/api/commerce', commerceRoutes);
-app.use('/api/catalog', catalogRoutes);
-app.use('/api/sync', syncRoutes);
-app.use('/api/notifications', notificationRoutes); // §5 Notification domain
-app.use('/api/compliance', complianceRoutes); // Privacy / GDPR / CCPA / PCI-DSS compliance center
+// Routes — every router is mounted at BOTH /api/* and the §28 versioned alias
+// /api/v1/* (non-breaking: existing /api/* clients keep working unchanged, while
+// integrators can pin to /api/v1). Per-route security middleware (auth brute-force
+// + payment abuse limiters) is mirrored on both prefixes.
+const routeTable: { path: string; stack: any[] }[] = [
+  { path: '/auth', stack: [authRateLimiter, authRoutes] }, // stricter limit to blunt brute-force (§37)
+  { path: '/inventory', stack: [inventoryRoutes] },
+  { path: '/products', stack: [productRoutes] },
+  { path: '/orders', stack: [orderRoutes] },
+  { path: '/reports', stack: [reportRoutes] },
+  { path: '/settings', stack: [settingsRoutes] },
+  { path: '/locations', stack: [locationRoutes] },
+  { path: '/registers', stack: [registerRoutes] },
+  { path: '/customers', stack: [customerRoutes] },
+  { path: '/audit', stack: [auditRoutes] },
+  { path: '/receipts', stack: [receiptRoutes] },
+  { path: '/webhooks', stack: [webhookRoutes] },
+  { path: '/loyalty', stack: [loyaltyRoutes] },
+  { path: '/restaurant', stack: [restaurantRoutes] },
+  { path: '/restaurant', stack: [restaurantExtRoutes] }, // §17 QR tokens / catering / food-cost (fall-through)
+  { path: '/accounting', stack: [accountingRoutes] },
+  { path: '/employees', stack: [employeeRoutes] },
+  { path: '/suppliers', stack: [supplierRoutes] },
+  { path: '/purchasing', stack: [purchasingRoutes] },
+  { path: '/ai', stack: [aiRoutes] },
+  { path: '/ai', stack: [aiAnalyticsRoutes] }, // §AI depth: forecast / anomalies / RFM segments (fall-through)
+  { path: '/developer', stack: [developerRoutes] },
+  { path: '/system', stack: [systemRoutes] },
+  { path: '/payments', stack: [paymentRateLimiter, paymentRoutes] }, // stricter limit on payment endpoints (§37)
+  { path: '/inventory-ops', stack: [inventoryOpsRoutes] },
+  { path: '/marketing', stack: [marketingRoutes] },
+  { path: '/copilot', stack: [copilotRoutes] },
+  { path: '/enterprise', stack: [enterpriseRoutes] },
+  { path: '/retail', stack: [retailRoutes] },
+  { path: '/permissions', stack: [permissionsRoutes] },
+  { path: '/devices', stack: [devicesRoutes] },
+  { path: '/commerce', stack: [commerceRoutes] },
+  { path: '/catalog', stack: [catalogRoutes] },
+  { path: '/sync', stack: [syncRoutes] },
+  { path: '/notifications', stack: [notificationRoutes] }, // §5 Notification domain
+  { path: '/compliance', stack: [complianceRoutes] }, // Privacy / GDPR / CCPA / PCI-DSS compliance center
+  { path: '/fraud', stack: [fraudRoutes] }, // §37 fraud alert queue
+  { path: '/payment-links', stack: [paymentLinkRoutes] }, // §9 payment links (+ public checkout)
+  { path: '/public', stack: [publicOrderingRoutes] }, // §17 public guest QR ordering (no auth)
+  { path: '/realtime', stack: [realtimeRoutes] }, // Real-time SSE stream (eventBus bridge)
+  { path: '/push', stack: [pushRoutes] }, // Web Push (VAPID) subscriptions
+  { path: '/media', stack: [mediaRoutes] }, // Media asset library (S3/DB adapter)
+];
+for (const r of routeTable) {
+  app.use(`/api${r.path}`, ...r.stack);
+  app.use(`/api/v1${r.path}`, ...r.stack); // §28 versioned public API alias
+}
 
 // Liveness probe — process is up.
 app.get('/api/health', (_req, res) => {
@@ -213,11 +240,16 @@ app.use((err: Error & { status?: number }, req: express.Request, res: express.Re
 
 const server = app.listen(PORT, () => {
   console.log(`POS Server listening on port ${PORT} (NODE_ENV=${process.env.NODE_ENV || 'development'})`);
+  // Start background jobs (§19 campaigns, §10 payouts, §29 webhook retry, §37
+  // retention purge, expiry + reconciliation) once HTTP is accepting traffic.
+  registerAllJobs();
+  startScheduler();
 });
 
 // Graceful shutdown — stop accepting connections, drain, then close the DB pool.
 function shutdown(signal: string) {
   console.log(`\n${signal} received — shutting down gracefully...`);
+  stopScheduler(); // stop background jobs before draining connections
   server.close(async () => {
     try {
       await prisma.$disconnect();

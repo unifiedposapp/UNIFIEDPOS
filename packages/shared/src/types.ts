@@ -111,6 +111,11 @@ export interface Customer {
 
 // ─── Product Catalog ──────────────────────────────────────────
 
+// Classification of a product. PHYSICAL goods are stock-tracked; SERVICE,
+// DIGITAL, GIFT_CARD and NON_INVENTORY items are sold but not counted in stock.
+// Mirrors PRODUCT_TYPES in constants.ts and the `Product.type` column.
+export type ProductType = 'PHYSICAL' | 'SERVICE' | 'DIGITAL' | 'GIFT_CARD' | 'NON_INVENTORY';
+
 export interface Category {
   id: string;
   organizationId: string;
@@ -136,6 +141,7 @@ export interface Product {
   sku: string;
   barcode?: string;
   description?: string;
+  type?: ProductType;
   price: number;
   costPrice: number;
   categoryId?: string;

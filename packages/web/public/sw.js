@@ -170,3 +170,43 @@ async function flushOfflineQueue() {
     if (op.id != null) await removeOp(db, op.id);
   }
 }
+
+// ─── Web Push (VAPID) ────────────────────────────────────────────────────────
+// The server POSTs an RFC 8291-encrypted payload; the browser decrypts it and
+// fires `push`. We show a Notification and focus/open the target URL on click.
+self.addEventListener('push', (event) => {
+  let data = {};
+  if (event.data) {
+    try {
+      data = event.data.json();
+    } catch {
+      data = { title: 'UnifiedPOS', body: event.data.text() };
+    }
+  }
+  const title = data.title || 'UnifiedPOS';
+  const options = {
+    body: data.body || '',
+    icon: '/logo.png',
+    badge: '/icon-maskable.svg',
+    tag: data.tag || 'pos-notification',
+    data: { url: data.url || '/notifications', payload: data.data || null },
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const target = (event.notification.data && event.notification.data.url) || '/notifications';
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      for (const client of list) {
+        if ('focus' in client) {
+          client.navigate(target);
+          return client.focus();
+        }
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(target);
+      return undefined;
+    })
+  );
+});
