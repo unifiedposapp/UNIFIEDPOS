@@ -59,3 +59,10 @@ packages/server/prisma/dev.db*
 spec_extract.txt
 extract_spec.ps1
 IMPLEMENTATION_STATUS.md
+
+# ─── Platform deploy configs (consumed by the host, not the image build) ───
+fly.toml
+render.yaml
+railway.json
+deploy
+DEPLOYMENT.md

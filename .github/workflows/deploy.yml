@@ -1,0 +1,274 @@
+name: Deploy
+
+# Continuous deployment. Runs AFTER the CI workflow succeeds on `main` (or on a
+# manual dispatch). It builds the production image once, pushes it to GHCR, then
+# deploys to the platform selected by the `DEPLOY_TARGET` repository variable and
+# gates promotion on the smoke test.
+#
+# Enable it by setting repository variables/secrets (Settings → Secrets and
+# variables → Actions):
+#   Variable  DEPLOY_TARGET        = "fly" | "ecs" | "none"   (default: none)
+#   Variable  SMOKE_URL            = https://pos.example.com  (deployed base URL)
+#   Variable  AWS_REGION           = eu-central-1             (ecs only)
+#   Variable  AWS_ECS_CLUSTER      = unified-pos              (ecs only)
+#   Variable  AWS_ECS_SERVICE      = unified-pos-web          (ecs only)
+#   Variable  AWS_ECS_SCHED_SERVICE= unified-pos-scheduler    (ecs only)
+#   Variable  AWS_PRIVATE_SUBNET   = subnet-xxxx              (ecs one-off migrate task)
+#   Variable  AWS_APP_SG           = sg-xxxx                  (ecs one-off migrate task)
+#   Variable  AWS_ECR_REPO         = unified-pos              (ecs; default unified-pos)
+#   Secret    FLY_API_TOKEN        = flyctl auth token        (fly only)
+#   Secret    FLY_APP_NAME         = unified-pos              (fly only)
+#   Secret/role AWS — use OIDC (AWS_ROLE_ARN + AWS_OIDC_PROVIDER) or
+#             AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY       (ecs only)
+#
+# With DEPLOY_TARGET unset or "none" this workflow builds + pushes the image only,
+# so committing it is safe before any platform is wired up.
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Deploy target (overrides DEPLOY_TARGET)"
+        required: false
+        default: ""
+        type: choice
+        options: ["", "fly", "ecs", "none"]
+      smoke_url:
+        description: "Base URL to smoke test (overrides SMOKE_URL)"
+        required: false
+        default: ""
+        type: string
+
+# Never run two deploys for the same ref at once; let the newest win.
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write      # push to GHCR
+  id-token: write      # AWS OIDC (ecs)
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # Only proceed if CI passed (skip that gate for a manual dispatch).
+  gate:
+    name: Gate on CI
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    outputs:
+      target: ${{ steps.resolve.outputs.target }}
+      smoke_url: ${{ steps.resolve.outputs.smoke_url }}
+    steps:
+      - name: Resolve target + smoke URL
+        id: resolve
+        run: |
+          TARGET="${{ github.event.inputs.target }}"
+          if [ -z "$TARGET" ]; then TARGET="${{ vars.DEPLOY_TARGET }}"; fi
+          if [ -z "$TARGET" ]; then TARGET="none"; fi
+          SMOKE="${{ github.event.inputs.smoke_url }}"
+          if [ -z "$SMOKE" ]; then SMOKE="${{ vars.SMOKE_URL }}"; fi
+          echo "target=$TARGET" >> "$GITHUB_OUTPUT"
+          echo "smoke_url=$SMOKE" >> "$GITHUB_OUTPUT"
+          echo "Resolved DEPLOY_TARGET=$TARGET"
+
+  build:
+    name: Build & push image
+    runs-on: ubuntu-latest
+    needs: gate
+    # GHCR build/push serves the Fly + "none" paths; the ECS path builds to ECR
+    # in its own job, so skip the redundant GHCR push for ecs.
+    if: needs.gate.outputs.target != 'ecs'
+    outputs:
+      image: ${{ steps.meta.outputs.image }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # workflow_run events need the pushed SHA explicitly.
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      # GHCR requires a lowercase image path; the repository slug may contain
+      # uppercase. Compute the fully-qualified refs once here and reuse them, so
+      # the job output does not depend on the `env` context.
+      - name: Compute image refs
+        id: meta
+        run: |
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "image=ghcr.io/$REPO:${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          echo "image_latest=ghcr.io/$REPO:latest" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.image }}
+            ${{ steps.meta.outputs.image_latest }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-fly:
+    name: Deploy to Fly.io
+    runs-on: ubuntu-latest
+    needs: [gate, build]
+    if: needs.gate.outputs.target == 'fly'
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      # Migrations run via the [release] command in fly.toml (once per deploy).
+      - name: Deploy
+        run: >-
+          flyctl deploy --remote-only
+          --app "${{ secrets.FLY_APP_NAME }}"
+          --image "${{ needs.build.outputs.image }}"
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+  deploy-ecs:
+    name: Deploy to AWS ECS
+    runs-on: ubuntu-latest
+    needs: [gate]
+    if: needs.gate.outputs.target == 'ecs'
+    environment: production
+    env:
+      ECR_REPO: ${{ vars.AWS_ECR_REPO || 'unified-pos' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          # Prefer OIDC: set AWS_ROLE_ARN + AWS_OIDC_PROVIDER repo variables.
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Log in to ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # ECS pulls from ECR (not GHCR), so build + push the image there.
+      - name: Build & push image to ECR
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+        run: |
+          IMG="$REGISTRY/$ECR_REPO"
+          docker build -t "$IMG:${{ github.sha }}" -t "$IMG:latest" .
+          docker push "$IMG:${{ github.sha }}"
+          docker push "$IMG:latest"
+
+      # Substitute the account/region placeholders in the committed task
+      # definitions and register new revisions (services are created once, out of
+      # band — see deploy/aws/README.md).
+      - name: Register task definitions
+        id: reg
+        run: |
+          set -euo pipefail
+          ACCT=$(aws sts get-caller-identity --query Account --output text)
+          REGION="${{ vars.AWS_REGION }}"
+          for f in ecs-task-definition ecs-task-definition-scheduler; do
+            sed -e "s/<AWS_ACCOUNT_ID>/$ACCT/g" -e "s/<AWS_REGION>/$REGION/g" \
+              "deploy/aws/$f.json" > "$f.rendered.json"
+          done
+          WEB_ARN=$(aws ecs register-task-definition --region "$REGION" \
+            --cli-input-json file://ecs-task-definition.rendered.json \
+            --query 'taskDefinition.taskDefinitionArn' --output text)
+          SCHED_ARN=$(aws ecs register-task-definition --region "$REGION" \
+            --cli-input-json file://ecs-task-definition-scheduler.rendered.json \
+            --query 'taskDefinition.taskDefinitionArn' --output text)
+          echo "web_task_def=$WEB_ARN" >> "$GITHUB_OUTPUT"
+          echo "sched_task_def=$SCHED_ARN" >> "$GITHUB_OUTPUT"
+          echo "Registered web=$WEB_ARN scheduler=$SCHED_ARN"
+
+      # Apply committed Prisma migrations from a one-off task BEFORE rolling the
+      # services, so web/scheduler tasks (SKIP_MIGRATIONS=true) never race.
+      - name: Run migrations (one-off task)
+        run: |
+          set -euo pipefail
+          CLUSTER="${{ vars.AWS_ECS_CLUSTER }}"
+          TASK_ARN=$(aws ecs run-task \
+            --cluster "$CLUSTER" \
+            --task-definition "${{ steps.reg.outputs.web_task_def }}" \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[${{ vars.AWS_PRIVATE_SUBNET }}],securityGroups=[${{ vars.AWS_APP_SG }}],assignPublicIp=DISABLED}" \
+            --overrides '{"containerOverrides":[{"name":"unified-pos","command":["node","node_modules/prisma/build/index.js","migrate","deploy","--schema=packages/server/prisma/schema.prisma"],"environment":[{"name":"SCHEDULER_ENABLED","value":"false"}]}]}' \
+            --query 'tasks[0].taskArn' --output text)
+          echo "Migration task: $TASK_ARN"
+          aws ecs wait tasks-stopped --cluster "$CLUSTER" --tasks "$TASK_ARN"
+          CODE=$(aws ecs describe-tasks --cluster "$CLUSTER" --tasks "$TASK_ARN" \
+            --query 'tasks[0].containers[0].exitCode' --output text)
+          echo "Migration exit code: $CODE"
+          [ "$CODE" = "0" ] || { echo "Migrations failed"; exit 1; }
+
+      - name: Roll web service
+        run: >-
+          aws ecs update-service
+          --cluster "${{ vars.AWS_ECS_CLUSTER }}"
+          --service "${{ vars.AWS_ECS_SERVICE }}"
+          --task-definition "${{ steps.reg.outputs.web_task_def }}"
+          --force-new-deployment
+
+      - name: Roll scheduler service
+        run: >-
+          aws ecs update-service
+          --cluster "${{ vars.AWS_ECS_CLUSTER }}"
+          --service "${{ vars.AWS_ECS_SCHED_SERVICE }}"
+          --task-definition "${{ steps.reg.outputs.sched_task_def }}"
+          --force-new-deployment
+
+      - name: Wait for web service stability
+        run: >-
+          aws ecs wait services-stable
+          --cluster "${{ vars.AWS_ECS_CLUSTER }}"
+          --services "${{ vars.AWS_ECS_SERVICE }}"
+
+  smoke:
+    name: Post-deploy smoke test
+    runs-on: ubuntu-latest
+    needs: [gate, build, deploy-fly, deploy-ecs]
+    # Run when a deploy job actually ran and a smoke URL is configured.
+    if: >-
+      always() &&
+      needs.gate.outputs.smoke_url != '' &&
+      (needs.deploy-fly.result == 'success' || needs.deploy-ecs.result == 'success')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Smoke test (/api/health + /api/ready)
+        run: node scripts/smoke-test.mjs
+        env:
+          SMOKE_URL: ${{ needs.gate.outputs.smoke_url }}

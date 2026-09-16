@@ -1,0 +1,58 @@
+{
+  "family": "unified-pos-web",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::<AWS_ACCOUNT_ID>:role/unified-pos-ecs-execution",
+  "taskRoleArn": "arn:aws:iam::<AWS_ACCOUNT_ID>:role/unified-pos-ecs-task",
+  "containerDefinitions": [
+    {
+      "name": "unified-pos",
+      "image": "<AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/unified-pos:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 3001,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "NODE_ENV", "value": "production" },
+        { "name": "PORT", "value": "3001" },
+        { "name": "TRUST_PROXY", "value": "1" },
+        { "name": "WEB_DIST", "value": "/app/packages/web/dist" },
+        { "name": "SKIP_MIGRATIONS", "value": "true" },
+        { "name": "SCHEDULER_ENABLED", "value": "false" },
+        { "name": "STRICT_PROD_CONFIG", "value": "true" }
+      ],
+      "secrets": [
+        { "name": "DATABASE_URL", "valueFrom": "arn:aws:secretsmanager:<AWS_REGION>:<AWS_ACCOUNT_ID>:secret:unified-pos/prod-DatabaseUrl" },
+        { "name": "JWT_SECRET", "valueFrom": "arn:aws:secretsmanager:<AWS_REGION>:<AWS_ACCOUNT_ID>:secret:unified-pos/prod-JwtSecret" },
+        { "name": "ENCRYPTION_KEY", "valueFrom": "arn:aws:secretsmanager:<AWS_REGION>:<AWS_ACCOUNT_ID>:secret:unified-pos/prod-EncryptionKey" },
+        { "name": "CORS_ORIGIN", "valueFrom": "arn:aws:secretsmanager:<AWS_REGION>:<AWS_ACCOUNT_ID>:secret:unified-pos/prod-CorsOrigin" },
+        { "name": "APP_BASE_URL", "valueFrom": "arn:aws:secretsmanager:<AWS_REGION>:<AWS_ACCOUNT_ID>:secret:unified-pos/prod-AppBaseUrl" },
+        { "name": "RESEND_API_KEY", "valueFrom": "arn:aws:secretsmanager:<AWS_REGION>:<AWS_ACCOUNT_ID>:secret:unified-pos/prod-ResendApiKey" },
+        { "name": "METRICS_TOKEN", "valueFrom": "arn:aws:secretsmanager:<AWS_REGION>:<AWS_ACCOUNT_ID>:secret:unified-pos/prod-MetricsToken" },
+        { "name": "STRIPE_SECRET_KEY", "valueFrom": "arn:aws:secretsmanager:<AWS_REGION>:<AWS_ACCOUNT_ID>:secret:unified-pos/prod-StripeSecretKey" },
+        { "name": "STRIPE_WEBHOOK_SECRET", "valueFrom": "arn:aws:secretsmanager:<AWS_REGION>:<AWS_ACCOUNT_ID>:secret:unified-pos/prod-StripeWebhookSecret" }
+      ],
+      "healthCheck": {
+        "command": ["CMD-SHELL", "wget -qO- http://127.0.0.1:3001/api/health >/dev/null 2>&1 || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 25
+      },
+      "stopTimeout": 15,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/unified-pos",
+          "awslogs-region": "<AWS_REGION>",
+          "awslogs-stream-prefix": "web"
+        }
+      }
+    }
+  ]
+}

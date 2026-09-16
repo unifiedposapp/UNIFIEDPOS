@@ -53,6 +53,7 @@ import cookieParser from 'cookie-parser';
 import { csrfProtection } from './middleware/csrf.js';
 import { stripeWebhookHandler } from './routes/paymentWebhooks.js';
 import { initObservability, metricsMiddleware, renderMetrics, metricsAuthorized, captureException } from './services/observability.js';
+import { reviewProductionConfig, formatConfigReview, strictProdConfig } from './services/productionConfig.js';
 import { startScheduler, stopScheduler } from './services/scheduler.js';
 import { registerAllJobs } from './services/scheduledJobs.js';
 import path from 'node:path';
@@ -66,6 +67,26 @@ const PORT = process.env.PORT || 3001;
 
 // Initialise error tracking (Sentry) when SENTRY_DSN is configured. No-op otherwise.
 initObservability().catch(() => { /* non-fatal */ });
+
+// Consolidated production-configuration review (§37 hardening). Logs every gap an
+// operator must close before go-live; under STRICT_PROD_CONFIG=true a production
+// boot with any `error`-severity finding refuses to start rather than silently
+// degrading (e.g. no email provider, a CORS wildcard, a placeholder secret).
+{
+  const review = reviewProductionConfig();
+  const report = formatConfigReview(review);
+  if (review.findings.some((f) => f.severity === 'error')) {
+    console.error(report);
+  } else if (review.findings.length > 0) {
+    console.warn(report);
+  } else {
+    console.log(report);
+  }
+  if (!review.ok && strictProdConfig()) {
+    console.error('[config] STRICT_PROD_CONFIG=true and the production configuration review failed — aborting startup.');
+    process.exit(1);
+  }
+}
 
 // Behind a load balancer / reverse proxy (Docker, Cloud Run, nginx): trust the
 // first proxy hop so req.ip and rate limiting see the real client address.

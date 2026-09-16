@@ -1,0 +1,115 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Render Blueprint — Unified POS
+# Push this repo to Render and "New +" → "Blueprint"; Render reads this file and
+# provisions the web service, the scheduler worker, and a managed PostgreSQL.
+#
+# Set the secret env vars (sync: false) in the Render dashboard after the first
+# deploy: JWT_SECRET, ENCRYPTION_KEY, CORS_ORIGIN, APP_BASE_URL, RESEND_API_KEY,
+# METRICS_TOKEN, STRIPE_* — and the domain. Generate secrets:
+#   node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"   # JWT
+#   node -e "console.log(require('crypto').randomBytes(32).toString('base64'))" # ENC
+#
+# Multi-region: Render is single-region per service. For residency, create one
+# Blueprint instance per region (choose its `region`) with its own database, and
+# route tenants at your DNS layer. See deploy/regions/*.env.example.
+# ─────────────────────────────────────────────────────────────────────────────
+services:
+  # ── API + SPA (single container) ──────────────────────────────────────────
+  - type: web
+    name: unified-pos
+    runtime: docker
+    plan: starter
+    region: oregon                 # frankfurt / singapore for EU / APAC stacks
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    numInstances: 1                # raise for HA; see the migration note below
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3001"
+      - key: TRUST_PROXY
+        value: "1"
+      - key: WEB_DIST
+        value: /app/packages/web/dist
+      - key: STRICT_PROD_CONFIG
+        value: "true"
+      - key: SCHEDULER_ENABLED
+        value: "false"             # jobs run on the worker below, not here
+      - key: SKIP_MIGRATIONS
+        value: "false"             # this service applies migrations on boot
+      - key: DATABASE_URL
+        fromDatabase:
+          name: unified-pos-db
+          property: connectionString
+      # Secrets — set these in the dashboard (never committed):
+      - key: JWT_SECRET
+        sync: false
+      - key: ENCRYPTION_KEY
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: APP_BASE_URL
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: METRICS_TOKEN
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+
+  # ── Background job scheduler (single leader) ──────────────────────────────
+  # Same image, SCHEDULER_ENABLED=true. Keep numInstances at 1 so campaign,
+  # payout, webhook-retry, retention-purge and expiry jobs never double-fire.
+  - type: worker
+    name: unified-pos-scheduler
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    autoDeploy: true
+    numInstances: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3001"
+      - key: WEB_DIST
+        value: /app/packages/web/dist
+      - key: SCHEDULER_ENABLED
+        value: "true"
+      - key: SKIP_MIGRATIONS
+        value: "true"              # web service owns migrations
+      - key: STRICT_PROD_CONFIG
+        value: "true"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: unified-pos-db
+          property: connectionString
+      - key: JWT_SECRET
+        sync: false
+      - key: ENCRYPTION_KEY
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: APP_BASE_URL
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+
+databases:
+  - name: unified-pos-db
+    plan: starter
+    databaseName: unified_pos
+    user: pos
+    postgresMajorVersion: "16"
+
+# NOTE on migrations with numInstances > 1 on the web service: the container
+# entrypoint runs `prisma migrate deploy` on boot (idempotent, but instances can
+# race). For multi-instance web, set SKIP_MIGRATIONS=true on web too and apply
+# migrations from a one-off shell (Render "Shell") or a deploy hook before
+# rolling the instances — mirroring the compose `migrate` profile and the AWS
+# one-off migration task.

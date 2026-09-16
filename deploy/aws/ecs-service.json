@@ -1,0 +1,34 @@
+{
+  "serviceName": "unified-pos-web",
+  "cluster": "unified-pos",
+  "launchType": "FARGATE",
+  "desiredCount": 2,
+  "deploymentConfiguration": {
+    "minimumHealthyPercent": 100,
+    "maximumPercent": 200,
+    "deploymentCircuitBreaker": {
+      "enable": true,
+      "rollback": true
+    }
+  },
+  "networkConfiguration": {
+    "awsvpcConfiguration": {
+      "subnets": ["<PRIVATE_SUBNET_1>", "<PRIVATE_SUBNET_2>"],
+      "securityGroups": ["<APP_SECURITY_GROUP>"],
+      "assignPublicIp": "DISABLED"
+    }
+  },
+  "loadBalancers": [
+    {
+      "targetGroupArn": "arn:aws:elasticloadbalancing:<AWS_REGION>:<AWS_ACCOUNT_ID>:targetgroup/unified-pos-web/<SUFFIX>",
+      "containerName": "unified-pos",
+      "containerPort": 3001
+    }
+  ],
+  "healthCheckGracePeriodSeconds": 30,
+  "enableExecuteCommand": true,
+  "tags": [
+    { "key": "app", "value": "unified-pos" },
+    { "key": "tier", "value": "web" }
+  ]
+}

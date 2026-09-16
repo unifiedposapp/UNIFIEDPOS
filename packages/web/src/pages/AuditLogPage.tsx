@@ -62,7 +62,7 @@ export default function AuditLogPage() {
     return (
       action.toLowerCase().includes(filter.toLowerCase()) ||
       e.resourceType.toLowerCase().includes(filter.toLowerCase()) ||
-      e.actor?.user.name.toLowerCase().includes(filter.toLowerCase())
+      e.actor?.user?.name?.toLowerCase().includes(filter.toLowerCase())
     );
   });
 
@@ -154,7 +154,7 @@ export default function AuditLogPage() {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {event.actor?.user.name || 'System'}
+                    {event.actor?.user?.name || 'System'}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
                     {event.newValue ? JSON.stringify(event.newValue) : '-'}

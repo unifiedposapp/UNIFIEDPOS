@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Production guard: the seed inserts demo data with well-known credentials
-  // (admin@pos.com / admin123, ...). Refuse to run against a production database
+  // (admin@pos.com / Ekwueme_2025, ...). Refuse to run against a production database
   // unless the operator explicitly opts in with ALLOW_PROD_SEED=true.
   if (process.env.NODE_ENV === 'production' && process.env.ALLOW_PROD_SEED !== 'true') {
     console.error(
@@ -92,7 +92,7 @@ async function main() {
   console.log('Created register:', register.name);
 
   // Create admin user (OWNER)
-  const hashedPassword = await bcrypt.hash('admin123', 10);
+  const hashedPassword = await bcrypt.hash('Ekwueme_2025', 10);
   const admin = await prisma.user.create({
     data: {
       email: 'admin@pos.com',

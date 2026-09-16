@@ -15,7 +15,7 @@ router.get('/', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async 
 
     const skip = (Number(page) - 1) * Number(pageSize);
     const [events, total] = await Promise.all([
-      prisma.auditEvent.findMany({ where, include: { actor: { select: { id: true } } }, orderBy: { createdAt: 'desc' }, skip, take: Number(pageSize) }),
+      prisma.auditEvent.findMany({ where, include: { actor: { select: { id: true, user: { select: { name: true, email: true } } } } }, orderBy: { createdAt: 'desc' }, skip, take: Number(pageSize) }),
       prisma.auditEvent.count({ where }),
     ]);
 

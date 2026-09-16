@@ -61,6 +61,7 @@ start (or refuses to sign tokens) when they are missing under `NODE_ENV=producti
 | `TRUST_PROXY` | yes | Proxy hops to trust behind Docker/Cloud Run/nginx (use `1`). |
 | `WEB_DIST` | single-container | Absolute path to the built SPA (`/app/packages/web/dist` in the image). |
 | `SKIP_MIGRATIONS` | no | `true` to run migrations from a one-off job instead of on every boot (recommended for multi-replica). |
+| `STRICT_PROD_CONFIG` | recommended | `true` to **refuse to boot** when the startup production-config review (`packages/server/src/services/productionConfig.ts`) finds any error: missing/placeholder `JWT_SECRET` or `ENCRYPTION_KEY`, no email provider, a CORS wildcard, or no `DATABASE_URL`. Without it the same review only logs, so a mis-deploy is visible in the boot logs either way. |
 | `APP_BASE_URL` | recommended | Public base URL used to build links in emails (falls back to `CORS_ORIGIN`). |
 | `EMAIL_PROVIDER` / `RESEND_API_KEY` / `SENDGRID_API_KEY` / `SMTP_*` | **prod** | Transactional email. See §7. |
 | `EMAIL_FROM` | no | From header (default `Unified POS <no-reply@unifiedpos.local>`). |
@@ -126,6 +127,13 @@ if `schema.prisma` drifts from the committed migrations.
 
 The image is portable — any Docker host works (Render, Railway, Fly.io, a VPS,
 AWS ECS, Google Cloud Run).
+
+> **Ready-made platform configs live in [`deploy/`](deploy/README.md):** `fly.toml`
+> (multi-region, with a dedicated `scheduler` process group), `deploy/aws/` (ECS
+> Fargate web + scheduler task definitions, service, and a setup README),
+> `render.yaml` (web service + scheduler worker + managed Postgres), `railway.json`,
+> and `deploy/regions/*.env.example` (per-region secret templates). Each encodes
+> the same three-role model described in §11.
 
 **Build & run the image:**
 
@@ -248,6 +256,34 @@ Keep `DATABASE_URL` percent-encoded if the password contains `@ : / ?`.
   DPA/DPO, in-country residency, HIPAA BAA) remain **operator responsibilities** and
   are flagged as such in the compliance catalog — they are intentionally not faked.
 
+### 11.1 Three deployment roles (one image)
+
+Every platform config in `deploy/` runs the same image in up to three roles that
+only differ by environment:
+
+| Role | Key env | Replicas | Why |
+|---|---|---|---|
+| **Web/API** | `SCHEDULER_ENABLED=false`, `SKIP_MIGRATIONS=true` | N (autoscale) | Stateless; no sticky sessions needed (JWT/cookies + DB-backed idempotency & rate-limit counters). |
+| **Scheduler** | `SCHEDULER_ENABLED=true`, `SKIP_MIGRATIONS=true` | **exactly 1 per region** | The in-process tick loop drives campaigns, payouts, webhook retry, retention purge, low-stock, stored-value/loyalty expiry, and reconciliation. Jobs are idempotent, but a **single leader** avoids duplicate side effects across replicas. |
+| **Migrator** | one-off `prisma migrate deploy` | 1 per deploy | Decoupled from boot (Fly `[release]`, compose `migrate` profile, ECS `run-task`) so rolling replicas never race. |
+
+With the recommended **one-stack-per-region** model, each region runs its own
+scheduler leader against its own database — there is no cross-region job
+coordination to design. If you run multiple web replicas in a region, do **not**
+enable the scheduler on them; give it the dedicated process/service/worker each
+platform config already defines.
+
+### 11.2 Concrete multi-region rollout
+
+1. Provision managed Postgres 16 (+ pooler) **in each region**; private network.
+2. Create **unique** `JWT_SECRET`/`ENCRYPTION_KEY` per region (never shared); vault
+   the encryption key for DR.
+3. Fill `deploy/regions/<region>.env.example` and load it into the platform secret
+   store; set `STRICT_PROD_CONFIG=true`.
+4. Deploy web (N) + scheduler (1) + run the migrator once per region.
+5. Route tenants to their home region at the DNS/anycast layer (Cloudflare or Route
+   53 latency/geolocation); confirm residency.
+
 ---
 
 ## 12. CI/CD
@@ -261,8 +297,13 @@ Keep `DATABASE_URL` percent-encoded if the password contains `@ : / ?`.
    migration with `prisma migrate deploy`, then asserts **zero schema drift**
    (`prisma migrate diff --exit-code`). A forgotten migration fails the build.
 
-Wire your host to build/push the image on a green `main`, then run the smoke test
-(§13) before switching traffic.
+**Continuous deployment** is provided by `.github/workflows/deploy.yml`: after CI is
+green on `main` it builds the image, pushes to **GHCR**, deploys to the platform
+selected by the `DEPLOY_TARGET` repository variable (`fly` | `ecs` | `none`), and
+runs the smoke test (§13) against `SMOKE_URL`. The ECS path runs migrations from a
+one-off task before rolling the services. With no target set it only builds +
+pushes, so it is safe to enable before a platform is wired. See
+[`deploy/README.md`](deploy/README.md) for the required variables/secrets.
 
 ---
 
@@ -293,6 +334,8 @@ against the migrated schema. Restore the database from backup only as a last res
 - [ ] Database on a private network; least-privilege DB role; pooled connections.
 - [ ] Container runs as non-root (`posapp`); image built with `npm ci`.
 - [ ] Automated backups + a tested restore; secrets stored in a secrets manager.
+- [ ] `STRICT_PROD_CONFIG=true`; the startup `[config]` review logs **no ERROR** findings.
+- [ ] Background scheduler enabled on **exactly one** leader per region (web replicas off).
 - [ ] Rate limiting active: `auth`/`payment` limiters are **DB-backed** (shared
       across replicas); the global `api` limiter is in-memory (per replica).
 - [ ] Stripe webhooks: the raw-body route is mounted before the JSON parser — ensure

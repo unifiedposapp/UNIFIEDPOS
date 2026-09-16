@@ -1,0 +1,110 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Fly.io — multi-region deployment for Unified POS
+#
+# One portable image, two process groups:
+#   • web       — serves /api + the SPA, SCHEDULER_ENABLED=false (any # replicas)
+#   • scheduler — the SAME image but SCHEDULER_ENABLED=true: a single-leader
+#                 background-job runner so campaign/payout/expiry jobs never fire
+#                 twice across web replicas. Keep exactly ONE machine per region.
+#
+# Migrations run ONCE per deploy via [release] (not on every machine boot), so
+# SKIP_MIGRATIONS=true and rolling web replicas never race `migrate deploy`.
+#
+# First deploy:
+#   fly launch --no-deploy --copy-config      # creates the app, keeps this file
+#   fly secrets set JWT_SECRET=... ENCRYPTION_KEY=... DATABASE_URL=... \
+#                   CORS_ORIGIN=https://pos.example.com APP_BASE_URL=https://pos.example.com \
+#                   RESEND_API_KEY=... METRICS_TOKEN=... TRUST_PROXY=1 STRICT_PROD_CONFIG=true
+#   fly postgres create ...                   # or point DATABASE_URL at managed PG
+#   fly deploy
+#
+# Go multi-region (run one stack per region against its own regional database):
+#   fly scale count 2 --region iad            # US-East (primary)
+#   fly scale count 2 --region cdg            # EU (Paris)
+#   fly scale count 1 --region nrt            # APAC (Tokyo)
+#   fly scale count 1 --region iad --process-group scheduler
+#   fly scale count 1 --region cdg --process-group scheduler
+#   fly scale count 1 --region nrt --process-group scheduler
+# Each region needs its own DATABASE_URL/CORS_ORIGIN/APP_BASE_URL secret set
+# (see deploy/regions/*.env.example) — do NOT share one primary across regions.
+# ─────────────────────────────────────────────────────────────────────────────
+
+app = "unified-pos"
+primary_region = "iad"
+kill_signal = "SIGTERM"
+kill_timeout = "15s"   # ≥ the app's 10s graceful-shutdown drain
+
+[build]
+  dockerfile = "Dockerfile"
+
+# Runs once per deploy, before new machines take traffic. Applies committed
+# Prisma migrations idempotently; a failed release blocks the deploy.
+[release]
+  command = "node node_modules/prisma/build/index.js migrate deploy --schema=packages/server/prisma/schema.prisma"
+
+# Shared, non-secret environment. Secrets (JWT_SECRET, ENCRYPTION_KEY,
+# DATABASE_URL, provider keys) are set with `fly secrets set` — never here.
+[env]
+  NODE_ENV = "production"
+  PORT = "3001"
+  TRUST_PROXY = "1"
+  WEB_DIST = "/app/packages/web/dist"
+  SKIP_MIGRATIONS = "true"
+
+# Per-group scheduler leadership: web replicas disable the tick loop, the
+# dedicated scheduler group enables it. Command-level env keeps this in one file.
+[processes]
+  web = "sh -c 'SCHEDULER_ENABLED=false node packages/server/dist/index.js'"
+  scheduler = "sh -c 'SCHEDULER_ENABLED=true node packages/server/dist/index.js'"
+
+[[services]]
+  processes = ["web"]          # only the web group is publicly reachable
+  protocol = "tcp"
+  internal_port = 3001
+  auto_stop_machines = "stop"  # scale-to-zero on idle (set "off" for always-on POS)
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+    [services.ports.tls_options]
+      alpn = ["h2", "http/1.1"]
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    [services.ports.http_options]
+      force_https = true
+
+  # Liveness — process is up.
+  [[services.http_checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "20s"
+    method = "get"
+    path = "/api/health"
+
+  # Readiness — DB reachable before traffic is routed in.
+  [[services.http_checks]]
+    interval = "15s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "get"
+    path = "/api/ready"
+
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 200
+    soft_limit = 160
+
+# Small machines are fine to start; scale up under load.
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
+  processes = ["web"]
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"
+  processes = ["scheduler"]
