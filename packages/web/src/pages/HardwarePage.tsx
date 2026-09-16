@@ -1,12 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Printer, Usb, Barcode, CheckCircle, XCircle, Save, Trash2, Power,
+  Bluetooth, RefreshCw, Search, Cpu,
 } from 'lucide-react';
 import {
   hardware,
   attachBarcodeScanner,
   loadPrinterSettings,
+  systemInfo,
   type PrinterSettings,
+  type DiscoveredDevice,
+  type DeviceKind,
+  type HardwareCapabilities,
+  type SystemInfo,
+  type TransportKind,
 } from '../services/hardware';
 import { CURRENCIES, currencySymbol } from '../data/currencies';
 import type { ReceiptData } from '../services/escpos';
@@ -31,14 +38,42 @@ const SAMPLE_RECEIPT: ReceiptData = {
   footer: 'Test print — hardware is working!',
 };
 
+const KIND_LABELS: Record<DeviceKind, string> = {
+  printer: 'Printer',
+  scanner: 'Scanner',
+  drawer: 'Cash drawer',
+  display: 'Display',
+  scale: 'Scale',
+  unknown: 'Device',
+};
+const KIND_COLORS: Record<DeviceKind, string> = {
+  printer: 'bg-blue-100 text-blue-800',
+  scanner: 'bg-purple-100 text-purple-800',
+  drawer: 'bg-amber-100 text-amber-800',
+  display: 'bg-cyan-100 text-cyan-800',
+  scale: 'bg-pink-100 text-pink-800',
+  unknown: 'bg-gray-100 text-gray-700',
+};
+const TRANSPORT_LABELS: Record<TransportKind, string> = {
+  serial: 'USB / Serial',
+  usb: 'WebUSB',
+  bluetooth: 'Bluetooth',
+  simulator: 'Simulator',
+};
+
 export default function HardwarePage() {
-  const [supported] = useState(() => hardware.isSupported);
+  const [sys, setSys] = useState<SystemInfo | null>(null);
+  const [caps, setCaps] = useState<HardwareCapabilities>({ serial: false, usb: false, bluetooth: false });
+  const [supported, setSupported] = useState(false);
+  const [devices, setDevices] = useState<DiscoveredDevice[]>([]);
+  const [scanning, setScanning] = useState(false);
   const [connected, setConnected] = useState(hardware.isConnected);
+  const [active, setActive] = useState<DiscoveredDevice | null>(hardware.activeDevice);
   const [settings, setSettings] = useState<PrinterSettings>(() => loadPrinterSettings());
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
   const [lastScan, setLastScan] = useState('');
-  const [scanning, setScanning] = useState(false);
+  const [scannerArmed, setScannerArmed] = useState(false);
   const [currFilter, setCurrFilter] = useState('');
   const detachRef = useRef<(() => void) | null>(null);
 
@@ -62,12 +97,80 @@ export default function HardwarePage() {
     window.setTimeout(() => setMsg(''), 4000);
   }
 
-  async function handleConnect() {
+  function syncState() {
+    setConnected(hardware.isConnected);
+    setActive(hardware.activeDevice);
+  }
+
+  /** Re-read the list of already-granted devices across every transport. */
+  async function refresh(silent = false) {
+    setScanning(true);
+    try {
+      const list = await hardware.enumerate();
+      setDevices(list);
+      syncState();
+      if (!silent) flash(`Found ${list.length} paired device${list.length === 1 ? '' : 's'}.`);
+    } finally {
+      setScanning(false);
+    }
+  }
+
+  // On load: detect the system, list granted devices, and silently reconnect to
+  // the last-used (or first recognised printer) device — no gesture required.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const info = systemInfo();
+      if (cancelled) return;
+      setSys(info);
+      setCaps(info.capabilities);
+      setSupported(info.capabilities.serial || info.capabilities.usb || info.capabilities.bluetooth);
+      await refresh(true);
+      if (cancelled) return;
+      const dev = await hardware.autoConnect();
+      if (cancelled) return;
+      syncState();
+      if (dev) flash(`Auto-connected to ${dev.name} (${KIND_LABELS[dev.kind]}).`);
+      else await refresh(true);
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function handleAutoDetect() {
     setBusy(true);
     try {
-      const ok = await hardware.connect(settings.baudRate);
-      setConnected(ok);
-      flash(ok ? 'Printer paired and ready.' : 'Pairing cancelled or unsupported.');
+      const dev = await hardware.autoConnect();
+      syncState();
+      await refresh(true);
+      flash(dev
+        ? `Connected to ${dev.name} (${KIND_LABELS[dev.kind]} · ${TRANSPORT_LABELS[dev.transport]}).`
+        : 'No previously paired device found. Use a Pair button to add one.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handlePair(transport?: TransportKind) {
+    setBusy(true);
+    try {
+      const ok = await hardware.pair(transport, settings.baudRate);
+      syncState();
+      await refresh(true);
+      flash(ok
+        ? `Paired ${hardware.activeDevice?.name ?? 'device'}.`
+        : 'Pairing cancelled, unsupported, or no device selected.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleConnectDevice(device: DiscoveredDevice) {
+    setBusy(true);
+    try {
+      const ok = await hardware.connectToDevice(device, settings.baudRate);
+      syncState();
+      flash(ok ? `Connected to ${device.name}.` : `Could not connect to ${device.name}.`);
     } finally {
       setBusy(false);
     }
@@ -77,8 +180,8 @@ export default function HardwarePage() {
     setBusy(true);
     try {
       await hardware.disconnect();
-      setConnected(false);
-      flash('Printer disconnected.');
+      syncState();
+      flash('Device disconnected.');
     } finally {
       setBusy(false);
     }
@@ -113,10 +216,10 @@ export default function HardwarePage() {
   }
 
   function toggleScanner() {
-    if (scanning) {
+    if (scannerArmed) {
       detachRef.current?.();
       detachRef.current = null;
-      setScanning(false);
+      setScannerArmed(false);
       flash('Scanner listener stopped.');
       return;
     }
@@ -124,11 +227,21 @@ export default function HardwarePage() {
       setLastScan(code);
       flash(`Scanned: ${code}`);
     });
-    setScanning(true);
+    setScannerArmed(true);
     flash('Scanner armed — focus the page and pull the trigger.');
   }
 
   const inputCls = 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500';
+  const pairBtn = 'flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm';
+  const ghostBtn = 'flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 disabled:opacity-50 text-sm';
+
+  function CapChip({ label, on }: { label: string; on: boolean }) {
+    return (
+      <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full border ${on ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-50 border-gray-200 text-gray-400'}`}>
+        {on ? <CheckCircle size={12} /> : <XCircle size={12} />} {label}
+      </span>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6 max-w-4xl">
@@ -137,21 +250,35 @@ export default function HardwarePage() {
           <Usb size={24} /> Register Hardware
         </h1>
         <p className="text-gray-500">
-          Pair thermal receipt printers, cash drawers and barcode scanners. Uses the Web
-          Serial API — Chrome/Edge on desktop. Unsupported browsers fall back to a console
-          simulator so nothing breaks.
+          Automatically detects the system and any paired peripherals over USB/Serial, WebUSB and
+          Bluetooth — printers, cash drawers, barcode scanners and displays. Previously granted
+          devices reconnect on their own; unsupported browsers fall back to a console simulator.
         </p>
       </div>
 
-      {!supported && (
-        <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
-          <XCircle size={18} className="mt-0.5 shrink-0" />
-          <span>
-            Web Serial is not available in this browser. Print/drawer actions are simulated in
-            the console. Use Chrome or Edge on desktop to connect real hardware.
-          </span>
+      {/* System + capability detection */}
+      <section className="bg-white rounded-lg shadow p-5 space-y-3">
+        <h2 className="font-semibold flex items-center gap-2"><Cpu size={18} /> Detected System</h2>
+        <div className="text-sm text-gray-700">
+          {sys
+            ? <span><span className="font-medium">{sys.os}</span> · {sys.browser} · {sys.secureContext ? 'secure context ✓' : 'insecure context (device APIs need HTTPS/localhost)'}</span>
+            : <span className="text-gray-400">Detecting…</span>}
         </div>
-      )}
+        <div className="flex flex-wrap gap-2">
+          <CapChip label="Web Serial (USB/Serial)" on={caps.serial} />
+          <CapChip label="WebUSB" on={caps.usb} />
+          <CapChip label="Web Bluetooth" on={caps.bluetooth} />
+        </div>
+        {!supported && (
+          <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+            <XCircle size={18} className="mt-0.5 shrink-0" />
+            <span>
+              No device transport is available in this browser. Print/drawer actions are simulated
+              in the console. Use Chrome or Edge on desktop (over HTTPS or localhost) to pair real hardware.
+            </span>
+          </div>
+        )}
+      </section>
 
       {msg && (
         <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
@@ -162,32 +289,84 @@ export default function HardwarePage() {
       {/* Connection */}
       <section className="bg-white rounded-lg shadow p-5 space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold flex items-center gap-2"><Printer size={18} /> Receipt Printer</h2>
+          <h2 className="font-semibold flex items-center gap-2"><Printer size={18} /> Active Device</h2>
           <span className={connected ? 'text-green-600 text-sm flex items-center gap-1' : 'text-gray-500 text-sm flex items-center gap-1'}>
             {connected ? <CheckCircle size={16} /> : <XCircle size={16} />}
-            {connected ? 'Connected' : 'Not connected'}
+            {connected ? (active ? `${active.name} · ${KIND_LABELS[active.kind]}` : 'Connected') : 'Not connected'}
           </span>
         </div>
         <div className="flex flex-wrap gap-2">
-          {!connected ? (
-            <button onClick={handleConnect} disabled={busy || !supported}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm">
-              <Power size={16} /> Pair Printer
-            </button>
-          ) : (
-            <button onClick={handleDisconnect} disabled={busy}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 text-sm">
+          <button onClick={handleAutoDetect} disabled={busy || !supported} className={pairBtn}>
+            <Search size={16} /> Auto-detect &amp; Connect
+          </button>
+          <button onClick={() => handlePair('serial')} disabled={busy || !caps.serial} className={ghostBtn}>
+            <Usb size={16} /> Pair USB/Serial
+          </button>
+          <button onClick={() => handlePair('usb')} disabled={busy || !caps.usb} className={ghostBtn}>
+            <Usb size={16} /> Pair WebUSB
+          </button>
+          <button onClick={() => handlePair('bluetooth')} disabled={busy || !caps.bluetooth} className={ghostBtn}>
+            <Bluetooth size={16} /> Pair Bluetooth
+          </button>
+          {connected && (
+            <button onClick={handleDisconnect} disabled={busy} className={ghostBtn}>
               <Power size={16} /> Disconnect
             </button>
           )}
-          <button onClick={handleTestPrint} disabled={busy}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 disabled:opacity-50 text-sm">
+          <button onClick={handleTestPrint} disabled={busy} className={ghostBtn}>
             <Printer size={16} /> Test Print
           </button>
-          <button onClick={handleOpenDrawer} disabled={busy}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 disabled:opacity-50 text-sm">
+          <button onClick={handleOpenDrawer} disabled={busy} className={ghostBtn}>
             <Trash2 size={16} /> Open Cash Drawer
           </button>
+        </div>
+      </section>
+
+      {/* Discovered / already-paired devices */}
+      <section className="bg-white rounded-lg shadow p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold flex items-center gap-2"><Usb size={18} /> Paired Devices ({devices.length})</h2>
+          <button onClick={() => refresh()} disabled={scanning || busy} className={ghostBtn}>
+            <RefreshCw size={16} className={scanning ? 'animate-spin' : ''} /> Refresh
+          </button>
+        </div>
+        <p className="text-sm text-gray-500">
+          Every device this browser has already been granted, across Serial, USB and Bluetooth.
+          Select one to reconnect — no picker needed for devices you have paired before.
+        </p>
+        <div className="border rounded-lg divide-y">
+          {devices.length === 0 ? (
+            <p className="text-sm text-gray-400 px-4 py-6 text-center">
+              No paired devices yet. Use a Pair button above to add one.
+            </p>
+          ) : (
+            devices.map((d) => {
+              const isActive = connected && active?.id === d.id;
+              return (
+                <div key={d.id} className="flex items-center justify-between px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <span className={`text-xs px-2 py-1 rounded ${KIND_COLORS[d.kind]}`}>{KIND_LABELS[d.kind]}</span>
+                    <div>
+                      <div className="text-sm font-medium">{d.name}</div>
+                      <div className="text-xs text-gray-500">
+                        {TRANSPORT_LABELS[d.transport]}
+                        {d.vendorId !== undefined ? ` · ${d.vendorId.toString(16)}:${(d.productId ?? 0).toString(16)}` : ''}
+                        {' · '}{d.connected ? 'reachable' : 'not currently connected'}
+                      </div>
+                    </div>
+                  </div>
+                  {isActive ? (
+                    <span className="text-xs text-green-600 flex items-center gap-1"><CheckCircle size={14} /> In use</span>
+                  ) : (
+                    <button onClick={() => handleConnectDevice(d)} disabled={busy}
+                      className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-xs">
+                      <Power size={14} /> Connect
+                    </button>
+                  )}
+                </div>
+              );
+            })
+          )}
         </div>
       </section>
 
@@ -199,7 +378,7 @@ export default function HardwarePage() {
             <span className="text-sm text-gray-600">Baud rate</span>
             <select className={inputCls} value={settings.baudRate}
               onChange={(e) => setSettings({ ...settings, baudRate: Number(e.target.value) })}>
-            {[4800, 9600, 19200, 38400, 57600, 115200].map((b) => <option key={b} value={b}>{b}</option>)}
+              {[4800, 9600, 19200, 38400, 57600, 115200].map((b) => <option key={b} value={b}>{b}</option>)}
             </select>
           </label>
           <label className="block">
@@ -263,15 +442,15 @@ export default function HardwarePage() {
       <section className="bg-white rounded-lg shadow p-5 space-y-4">
         <h2 className="font-semibold flex items-center gap-2"><Barcode size={18} /> Barcode Scanner</h2>
         <p className="text-sm text-gray-500">
-          USB-HID scanners act as keyboards. Arm the listener, then scan — the fast keystroke
-          burst is detected and separated from normal typing.
+          USB-HID and Bluetooth scanners act as keyboards. Arm the listener, then scan — the fast
+          keystroke burst is detected and separated from normal typing.
         </p>
         <div className="flex items-center gap-3">
           <button onClick={toggleScanner}
-            className={scanning
+            className={scannerArmed
               ? 'flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm'
               : 'flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm'}>
-            <Barcode size={16} /> {scanning ? 'Stop Listening' : 'Arm Scanner'}
+            <Barcode size={16} /> {scannerArmed ? 'Stop Listening' : 'Arm Scanner'}
           </button>
           <span className="text-sm text-gray-600">
             Last scan: <span className="font-mono font-medium">{lastScan || '—'}</span>

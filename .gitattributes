@@ -26,3 +26,4 @@ docker-entrypoint.sh text eol=lf
 *.woff binary
 *.woff2 binary
 *.docx binary
+*.pdf binary

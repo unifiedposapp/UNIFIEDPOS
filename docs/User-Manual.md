@@ -1,0 +1,497 @@
+# Unified POS - Comprehensive Manual of Use
+
+Edition 1.0 - A Division of Glorified Technology Solution (GTS)
+
+> This manual explains every part of Unified POS: signing in, selling at the register, managing products and stock, serving customers, running marketing and commerce, handling money and accounting, staffing, hardware, offline sync, reporting, artificial intelligence, compliance, multi-region enterprise, the developer platform, system health, and settings. Read the section that matches the task in front of you, or work top to bottom for full onboarding.
+
+## 1. Welcome to Unified POS
+
+Unified POS is a complete Business Operating System for retail, restaurant and omnichannel merchants. One workspace brings together the cash register, inventory, purchasing, customers, loyalty, marketing, online commerce, payments, accounting, staffing, hardware, analytics and compliance.
+
+### What you can do
+
+- Sell in person at a fast touch register, take card, cash, gift card and stored-value payments, and print or email receipts.
+- Manage products, variants, bundles and selection options across an unlimited catalog.
+- Track stock across locations, batches, lots, serial numbers and expiry dates, and move inventory between sites.
+- Build a customer 360 view, run loyalty and rewards, and launch targeted marketing campaigns.
+- Take online orders, offer pickup and delivery, and connect sales channels and marketplaces.
+- Reconcile accounting entries, manage employees, roles, permissions, time and labor.
+- Pair printers, scanners, cash drawers and displays over USB, Serial or Bluetooth.
+- Keep selling offline and sync automatically when the connection returns.
+- Read reports, forecasts and AI recommendations, and act on them in one click.
+
+### Who this manual is for
+
+- Owners and administrators who configure the business and control access.
+- Managers who oversee stock, staff, purchasing and reporting.
+- Cashiers and servers who operate the register and fulfill orders.
+
+> Note: Feature visibility depends on your role. If a menu or button described here is not visible to you, your administrator has scoped it to a different role.
+
+## 2. Getting Started
+
+### Signing in
+
+1. Open the app in a modern browser. Chrome or Edge on a desktop is recommended for the full experience, including hardware pairing.
+2. Enter your email and password on the Sign In page and choose Sign In.
+3. If you do not yet have an account, choose Create Account to register a new business. You will provide a business name, industry, currency, your name, email and a password. The first account becomes the Owner.
+4. If you forget your password, choose Forgot Password. A secure reset link is emailed to you. Open the link, set a new password, and you will be returned to Sign In.
+
+> Security: For your protection the password reset link is only ever sent by email. It is never displayed on screen in a production deployment.
+
+### Understanding the layout
+
+- Left navigation sidebar: all modules, grouped by area, with your profile and sign-out at the bottom and the legal and manual links in the footer.
+- Top bar: search, notifications bell with an unread badge, language selector, and quick actions.
+- Main area: the selected module.
+- Footer: Privacy, Terms, Cookies, Accessibility, Refunds and the one-click User Manual download.
+
+### Choosing your language and region
+
+Use the language selector in the top bar to switch the interface language. Set your business country, address, tax rate and currency in Settings. Unified POS supports businesses in every nation and every ISO 4217 currency.
+
+### The demo environment
+
+A fresh installation seeds a demo business with sample products, an owner, a manager and a cashier so you can explore safely. Replace or remove demo data before going live, and change the seeded passwords immediately.
+
+## 3. Dashboard and Overview
+
+The Overview page is your command center. It shows today's sales, order count, average order value, top products, recent activity and health indicators.
+
+- Use the date range control to compare periods.
+- Cards link through to the relevant module for deeper analysis.
+- Alerts surface low stock, pending purchasing, staffing gaps and system notices.
+
+## 4. Selling at the Register (POS)
+
+The Register is the heart of the system, built for speed and accuracy.
+
+### Starting a sale
+
+1. Open the POS page and select the active register and location if prompted.
+2. Tap or search products to add them to the cart. Use the category grid, the search box, or a barcode scanner.
+3. Adjust quantities, add notes or modifiers, and apply line discounts where allowed.
+4. Review the running subtotal, discounts, tax and total in the totals panel.
+
+### Product selection types
+
+- Simple products add directly to the cart.
+- Variant products prompt for options such as size or color.
+- Selection or bundle products prompt for included choices, with pricing rules applied automatically.
+- Weighed and open-price items let you enter a quantity or a price at the point of sale.
+
+### Discounts and promotions
+
+- Apply an item-level discount or an order-level discount.
+- Enter a promotion or coupon code to apply automatic rules.
+- Price changes and discounts are recorded in the audit log for accountability.
+
+### Taking payment
+
+1. Choose Take Payment.
+2. Select one or more tender types: Cash, Card, Gift Card, Store Credit, or a connected gateway.
+3. For cash, enter the amount tendered; the change due is calculated for you and can trigger the cash drawer.
+4. For card, follow the connected terminal or gateway prompts, or use the built-in simulator in non-production setups.
+5. Split payments across multiple tenders are supported; the sale completes when the balance reaches zero.
+
+### Receipts
+
+- Print to a paired thermal printer, or use Register Printer on the receipt screen.
+- Email or send the receipt by SMS where configured.
+- Reprint any receipt later from the Orders module.
+- Customize the receipt footer message, logo and currency in Settings.
+
+### Holding, parking and recalling orders
+
+- Hold a sale to serve another customer, then recall it later.
+- Held orders are listed and can be resumed or discarded.
+
+### Cash drawer and shifts
+
+- Open a register session at the start of a shift with a starting float.
+- The drawer kicks automatically on cash sales when auto-open is enabled.
+- Close the session at the end of the shift to record the expected versus counted cash and the variance.
+
+### Guest orders and quotes
+
+- Create a guest order for walk-in or phone customers without a customer profile.
+- Convert a quote into a sale when the customer confirms.
+
+## 5. Orders and Fulfillment
+
+The Orders module lists every sale and its lifecycle.
+
+- Filter by status, channel, location, register and date.
+- Open an order to see items, payments, discounts, tax, customer and fulfillment.
+- Complete, cancel, void or refund an order.
+- Issue partial or full refunds and returns; refund actions are audited.
+- Handle disputes and chargebacks through the connected payment provider.
+
+### Fulfillment methods
+
+- In-store pickup: mark items ready and record the pickup.
+- Local delivery: assign a courier, track status and capture proof of delivery.
+- Shipping: generate packages and labels through connected providers.
+
+## 6. Products and Catalog
+
+The Catalog is where you author what you sell.
+
+### Creating a product
+
+1. Open Catalog and choose New Product.
+2. Enter a name, description, category and tags.
+3. Set pricing: standard price, cost, compare-at price and tax class.
+4. Choose the product type: Simple, Variant, Selection or Bundle, Weighed, or Open Price.
+5. Add images and media from the Media Library.
+6. Save. The product becomes available to the register immediately.
+
+### Variants and options
+
+- Define option axes such as Size and Color.
+- Generate variant combinations, each with its own SKU, price and stock.
+- The register prompts for options when a variant product is sold.
+
+### Categories and organization
+
+- Group products into categories and subcategories for fast register navigation.
+- Use tags and collections for cross-cutting groupings and promotions.
+
+### Media library
+
+- Upload logos, product photos and brand assets.
+- Assets are reused on receipts, the online store and marketing materials.
+
+## 7. Inventory Management
+
+Inventory keeps stock counts accurate across every location.
+
+### Stock levels
+
+- See on-hand, committed, available and reorder points per product per location.
+- Low-stock alerts highlight items that have reached their reorder point.
+
+### Adjustments
+
+- Record stock adjustments for shrinkage, damage, counts and corrections, each with a reason code.
+- Every adjustment is time-stamped and attributable.
+
+### Batches, lots, serials and expiry
+
+- Track inventory by batch or lot for recall precision.
+- Record serial numbers for high-value or warranty items.
+- Track expiration dates and receive alerts before items expire.
+
+### Transfers
+
+- Move stock between locations with a transfer order.
+- Track the transfer from requested to in-transit to received, adjusting both sites automatically.
+
+### Stock counts
+
+- Run a cycle count or a full physical inventory.
+- Enter counted quantities; the system posts the variance as an adjustment.
+
+## 8. Purchasing and Suppliers
+
+Purchasing replenishes stock efficiently and keeps supplier records complete.
+
+- Maintain suppliers with contact details, terms and lead times.
+- Create purchase orders from low-stock suggestions or manually.
+- Receive purchase orders fully or partially; received quantities update inventory and cost.
+- Track purchase order status from draft to sent to partially received to closed.
+- Record supplier invoices and match them to receipts for accounting.
+
+## 9. Customers
+
+The Customers module builds a 360-degree view of each person or company.
+
+- Add customers with contact details, addresses, tax status and notes.
+- View lifetime spend, visit frequency, average order value and recency.
+- See full purchase history, returns, loyalty balance and stored value.
+- Segment customers by behavior, value and preferences for targeted marketing.
+- Manage consent and communication preferences for privacy compliance.
+
+## 10. Loyalty and Rewards
+
+Loyalty turns first-time buyers into regulars.
+
+- Create loyalty programs with earn and burn rules.
+- Award points on purchases and redeem them at the register.
+- Issue and track rewards, tiers and member benefits.
+- Sell and top up gift cards and stored-value accounts; balances are tracked with a full ledger.
+- View loyalty transactions per customer for transparency.
+
+## 11. Marketing
+
+Marketing helps you reach the right customers with the right offer.
+
+### Campaigns and segments
+
+- Build segments from customer behavior, value and attributes.
+- Create campaigns targeting a segment with a message and an offer.
+- Track delivery, opens, redemptions and revenue attributed to each campaign.
+
+### RFM analysis
+
+- Recency, Frequency and Monetary analysis scores customers automatically.
+- Use RFM segments such as champions, loyal, at-risk and hibernating to tailor outreach.
+
+### Automation
+
+- Trigger messages on events such as birthdays, win-back windows and low engagement.
+- Schedule campaigns and review performance in Reports.
+
+## 12. Commerce Hub
+
+The Commerce Hub unifies online and in-person selling.
+
+- Manage sales channels and connected marketplaces.
+- Accept online orders into the same inventory and fulfillment flows as in-store sales.
+- Offer pickup, delivery and shipping options with live availability.
+- Keep omnichannel inventory in sync so you never oversell.
+- Publish products to connected channels and map categories and pricing.
+
+## 13. Restaurant Operations
+
+For food and beverage venues, Restaurant mode adds floor and kitchen workflows.
+
+- Manage tables, floors and seating, and open tabs per table.
+- Send orders to kitchen display screens or preparation stations.
+- Track course firing, prep status and service timing.
+- Split bills by seat, item or amount, and merge or transfer tabs.
+- Manage menus, modifiers, recipes and ingredient-level stock.
+
+## 14. Payments, Payment Links and Gateways
+
+- Take in-person and online payments through connected gateways.
+- Configure a payment provider and, where available, a card terminal.
+- Create payment links and send them to customers to pay remotely.
+- View settlements and payouts, and reconcile them against your bank.
+- Handle refunds, voids, disputes and chargebacks from the Payments module.
+- In non-production setups a simulator allows full end-to-end testing without live charges.
+
+> Security: Card data is handled by your connected, compliant payment provider. Unified POS does not store full card numbers.
+
+## 15. Accounting
+
+Accounting keeps your books aligned with operations.
+
+- Post sales, refunds, payouts and purchases to accounting entries.
+- Map accounts and tax codes to your chart of accounts.
+- Reconcile entries against statements and resolve discrepancies.
+- Export entries and reports for your accountant or external system.
+- Connect an accounting integration from the Developer Platform for automated sync.
+
+## 16. Employees, Roles and Permissions
+
+Staffing controls who can do what, and tracks time and labor cost.
+
+### Employees
+
+- Add employees with contact details, position, department, pay rates and location assignments.
+- Deactivate employees to end access without deleting history.
+
+### Roles and permissions
+
+- Define roles such as Owner, Admin, Manager and Cashier.
+- Grant or restrict permissions per module and per action.
+- Assign roles to employees; the interface adapts to each person's permissions.
+
+### Time and labor
+
+- Record clock-in and clock-out time entries per employee.
+- Review hours, breaks and labor cost against sales.
+- Use labor optimization recommendations from the AI module for scheduling.
+
+## 17. Registers and Devices
+
+### Registers
+
+- Create registers for each physical or virtual point of sale.
+- Assign registers to locations and open or close sessions.
+- Monitor register status and activity.
+
+### Device registry
+
+- Register POS terminals, mobile devices, kiosks, kitchen displays and printers.
+- Track each device's status, location, last heartbeat and configuration version.
+- Retire devices to revoke their credentials.
+
+### Pairing hardware (printers, scanners, drawers, displays)
+
+Open Register Hardware. The page automatically detects your system and lists the transports your browser supports: Web Serial for USB and serial, WebUSB, and Web Bluetooth.
+
+- Auto-detect and connect: reconnects to previously paired devices with no prompts.
+- Pair USB or Serial, Pair WebUSB, or Pair Bluetooth: first-time pairing uses the browser's device chooser once; after that the device is remembered and reconnects automatically.
+- Every already-granted device appears in the Paired Devices list and is classified as a printer, scanner, cash drawer, display or scale, so nothing goes missing.
+- Test Print sends a sample receipt; Open Cash Drawer sends a drawer kick.
+- Arm Scanner enables keyboard-wedge barcode scanning, which works with both USB-HID and Bluetooth scanners.
+
+> Requirements: Real device pairing needs Chrome or Edge on a desktop over HTTPS or localhost. Firefox and Safari do not implement these device APIs, so the app falls back to a console simulator and nothing breaks.
+
+### Receipt printer settings
+
+- Set the baud rate, paper width (58mm or 80mm), receipt currency and symbol.
+- Choose the cash drawer pin and whether to auto-open on cash sales and auto-print after checkout.
+
+## 18. Offline Mode and Sync
+
+Unified POS keeps selling when the network drops.
+
+- Transactions are queued securely on the device while offline.
+- When connectivity returns, the queue flushes automatically in the background, even if the tab was closed.
+- Sync is idempotent: each transaction is de-duplicated so nothing is double-counted.
+- The Sync page shows the queue, per-device status and a full sync history with sequence numbers and outcomes.
+
+## 19. Reports and Analytics
+
+Reports turn activity into decisions.
+
+- Sales reports by period, product, category, location, register and employee.
+- Inventory reports for stock valuation, movement, shrinkage and aging.
+- Customer and loyalty reports for retention and lifetime value.
+- Marketing campaign performance and attribution.
+- Accounting summaries and tax reports.
+- Export reports for offline analysis or sharing.
+
+## 20. AI Insights, Forecasting and Copilot
+
+Artificial intelligence is built in to help you act, not just observe.
+
+- AI Insights surfaces anomalies, trends and opportunities in plain language.
+- Forecasting projects demand and sales so you can stock and staff appropriately.
+- Reorder recommendations suggest what to purchase and when.
+- Labor optimization recommends schedules aligned to predicted demand.
+- The Copilot answers natural-language questions about your business and proposes next steps, with a concise summary of what changed and what to do.
+
+## 21. Notifications
+
+- The bell in the top bar shows unread notifications with a badge.
+- Receive alerts for low stock, system events, marketing triggers and order activity.
+- Manage notification preferences per channel and per event type.
+- Where enabled, push notifications reach supported browsers and devices.
+
+## 22. Compliance Center
+
+The Compliance Center helps you meet legal and privacy obligations.
+
+- Record and manage customer consent for cookies and communications.
+- Honor data-subject requests: export personal data and submit deletion requests.
+- Maintain compliance records and evidence for audits.
+- Review privacy policies, terms, cookie policy, accessibility statement, refund policy and the data processing agreement.
+
+## 23. Enterprise and Multi-Region
+
+For organizations operating across sites and countries.
+
+- Manage multiple locations and warehouses under one organization.
+- Provision and monitor global regions for data residency and performance.
+- Assign locations to regions and track coverage.
+- Apply consistent policies while allowing local tax, currency and language settings.
+
+## 24. Developer Platform
+
+Extend and integrate Unified POS.
+
+- Generate API keys (public and secret) to call the platform programmatically.
+- Register OAuth applications for secure third-party access.
+- Configure webhooks to receive real-time events, with signature verification.
+- Explore a catalog of integrations across payments, accounting, commerce, delivery and marketing, and connect the ones you need.
+- Use the sandbox and API documentation to build and test safely.
+
+## 25. System and Observability
+
+Keep the platform healthy and observable.
+
+- View health, readiness and runtime metrics.
+- Monitor non-functional requirements such as latency and error rates.
+- Manage backups and disaster-recovery posture.
+- Review the audit log of sensitive actions for security and accountability.
+
+## 26. Settings
+
+Settings configure how the system looks and behaves for your business.
+
+- Business profile: name, industry, address, phone, email and website.
+- Branding: logo, favicon, cover graphics, brand colors and tagline, uploaded as media.
+- Localization: country, language, time zone, currency and tax rate.
+- Receipts: footer message, paper width and printer behavior.
+- Alerts: low-stock thresholds and notification preferences.
+- Security: change passwords and review active sessions.
+
+> Tip: Branding and receipt changes take effect immediately across the register, receipts and the online store.
+
+## 27. Security and Privacy
+
+- Multi-tenant isolation ensures your data is separated from every other business.
+- Passwords are hashed; sensitive credentials at rest are encrypted.
+- Role-based access control and rate limiting protect against abuse.
+- Sessions use secure cookies; audit logging records sensitive actions.
+- You own your data. Export or request deletion at any time from the Compliance Center.
+
+## 28. Troubleshooting and FAQ
+
+### The register will not connect to my printer
+
+- Confirm you are using Chrome or Edge on a desktop, over HTTPS or localhost.
+- On Register Hardware, check that the transport chip for your connection type is available.
+- Choose the correct Pair button, select the printer in the browser chooser, and confirm the baud rate and paper width.
+- Use Test Print to verify. If nothing prints, check the printer's power, cable and paper.
+
+### A page appears blank
+
+- Refresh the browser. If it persists, sign out and back in.
+- Confirm your session has not expired and that your role grants access to that module.
+
+### Payments fail
+
+- Verify the payment provider is configured and reachable.
+- In non-production setups, confirm whether the simulator is active.
+- Check the Payments module and audit log for the specific error.
+
+### Data is not syncing
+
+- Open the Sync page to see the queue and last outcome per device.
+- Confirm connectivity; the queue flushes automatically when you are back online.
+
+### I forgot my password
+
+- Use Forgot Password on the Sign In page. The reset link is sent to your email.
+
+## 29. Keyboard and Speed Tips
+
+- Use the search box to jump to any product fast; barcode scanners type into it automatically.
+- Arm the scanner on the Hardware page for continuous scanning during a shift.
+- Learn the common register actions: add item, discount, hold, recall, take payment and print.
+- Keep the register session open for the whole shift to maintain accurate cash tracking.
+
+## 30. Roles at a Glance
+
+- Owner: full access, including billing, enterprise, developer platform and destructive actions.
+- Admin: broad operational access across modules, staff and settings.
+- Manager: day-to-day operations, purchasing, inventory, reporting and staff scheduling.
+- Cashier: register operations, order taking and basic customer lookup.
+
+> Access is fully configurable. Your organization can tailor each role's permissions per module and action.
+
+## 31. Glossary
+
+- Register: a point of sale, physical or virtual, where sales are rung up.
+- Session or Shift: an opened-to-closed period on a register with a cash float and variance.
+- Tender: a payment method applied to a sale.
+- Stored Value: gift cards and store credit balances tracked with a ledger.
+- SKU: a unique identifier for a sellable item or variant.
+- Batch or Lot: a group of stock tracked together for recalls and expiry.
+- RFM: Recency, Frequency, Monetary - a customer value scoring model.
+- Omnichannel: unified selling across in-person, online and marketplace channels.
+- Idempotent Sync: de-duplicated offline sync so transactions are never double-counted.
+- Web Serial, WebUSB, Web Bluetooth: browser APIs for connecting physical devices.
+
+## 32. Getting Help
+
+- Use this manual at any time from the footer link: User Manual (PDF).
+- Review the legal and policy documents from the footer and the Compliance Center.
+- Contact support for assistance with your account, integrations or hardware.
+
+> Thank you for choosing Unified POS. We are proud to power your business, everywhere in the world.
