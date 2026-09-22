@@ -980,6 +980,7 @@ model RestaurantTable {
   name            String?
   capacity        Int      @default(4)
   status          String   @default("AVAILABLE") // AVAILABLE, OCCUPIED, RESERVED, DIRTY
+  color           String? // §17 per-table identity color from the shared palette (null = auto-assigned by number)
   section         String?
   notes           String?
   qrToken         String?  @unique // §17 QR ordering — scan-to-order token for this table

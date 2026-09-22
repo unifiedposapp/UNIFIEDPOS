@@ -2,11 +2,34 @@ import { useEffect, useState } from 'react';
 import { api } from '../api/client';
 import { Armchair, Plus, X, Calendar, Clock, Users } from 'lucide-react';
 
-const STATUS_COLORS: Record<string, string> = {
-  AVAILABLE: 'bg-green-100 text-green-800 border-green-300',
-  OCCUPIED: 'bg-red-100 text-red-800 border-red-300',
-  RESERVED: 'bg-blue-100 text-blue-800 border-blue-300',
-  DIRTY: 'bg-yellow-100 text-yellow-800 border-yellow-300',
+// Every table gets its own identity colour on the floor plan: an explicit pick
+// when the venue has one, otherwise a deterministic palette slot derived from
+// the table number (7 and 12 are coprime, so consecutive tables never clash).
+// Class strings are written out in full so Tailwind's scanner keeps them.
+const TABLE_PALETTE = [
+  { name: 'Rose', face: 'bg-rose-50 border-rose-300', deep: 'bg-rose-100', dot: 'bg-rose-500', text: 'text-rose-900' },
+  { name: 'Amber', face: 'bg-amber-50 border-amber-300', deep: 'bg-amber-100', dot: 'bg-amber-500', text: 'text-amber-900' },
+  { name: 'Emerald', face: 'bg-emerald-50 border-emerald-300', deep: 'bg-emerald-100', dot: 'bg-emerald-500', text: 'text-emerald-900' },
+  { name: 'Sky', face: 'bg-sky-50 border-sky-300', deep: 'bg-sky-100', dot: 'bg-sky-500', text: 'text-sky-900' },
+  { name: 'Violet', face: 'bg-violet-50 border-violet-300', deep: 'bg-violet-100', dot: 'bg-violet-500', text: 'text-violet-900' },
+  { name: 'Fuchsia', face: 'bg-fuchsia-50 border-fuchsia-300', deep: 'bg-fuchsia-100', dot: 'bg-fuchsia-500', text: 'text-fuchsia-900' },
+  { name: 'Lime', face: 'bg-lime-50 border-lime-300', deep: 'bg-lime-100', dot: 'bg-lime-600', text: 'text-lime-900' },
+  { name: 'Cyan', face: 'bg-cyan-50 border-cyan-300', deep: 'bg-cyan-100', dot: 'bg-cyan-500', text: 'text-cyan-900' },
+  { name: 'Teal', face: 'bg-teal-50 border-teal-300', deep: 'bg-teal-100', dot: 'bg-teal-500', text: 'text-teal-900' },
+  { name: 'Indigo', face: 'bg-indigo-50 border-indigo-300', deep: 'bg-indigo-100', dot: 'bg-indigo-500', text: 'text-indigo-900' },
+  { name: 'Orange', face: 'bg-orange-50 border-orange-300', deep: 'bg-orange-100', dot: 'bg-orange-500', text: 'text-orange-900' },
+  { name: 'Pink', face: 'bg-pink-50 border-pink-300', deep: 'bg-pink-100', dot: 'bg-pink-500', text: 'text-pink-900' },
+];
+
+const autoPaletteFor = (number: number) => TABLE_PALETTE[(Number(number) * 7 + 3) % TABLE_PALETTE.length];
+const paletteFor = (table: any) => TABLE_PALETTE.find(p => p.name === table.color) || autoPaletteFor(table.number);
+
+// Live status rides on a badge chip so the card colour stays pure table identity.
+const STATUS_CHIP: Record<string, string> = {
+  AVAILABLE: 'bg-green-600 text-white ring-1 ring-green-700/40',
+  OCCUPIED: 'bg-red-600 text-white ring-1 ring-red-700/40',
+  RESERVED: 'bg-blue-600 text-white ring-1 ring-blue-700/40',
+  DIRTY: 'bg-yellow-500 text-yellow-950 ring-1 ring-yellow-600/40',
 };
 
 const RES_STATUS_COLORS: Record<string, string> = {
@@ -32,7 +55,7 @@ export default function RestaurantPage() {
   const [reservations, setReservations] = useState<any[]>([]);
   const [waitlist, setWaitlist] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ number: '', name: '', capacity: '4', section: '', notes: '' });
+  const [form, setForm] = useState({ number: '', name: '', capacity: '4', section: '', notes: '', color: '' });
   const [resForm, setResForm] = useState({ customerName: '', partySize: '2', date: '', time: '', notes: '' });
   const [waitForm, setWaitForm] = useState({ name: '', partySize: '2', phone: '', notes: '' });
 
@@ -65,9 +88,15 @@ export default function RestaurantPage() {
       capacity: Number(form.capacity),
       section: form.section || undefined,
       notes: form.notes || undefined,
+      color: form.color || undefined,
     });
     setShowForm(false);
-    setForm({ number: '', name: '', capacity: '4', section: '', notes: '' });
+    setForm({ number: '', name: '', capacity: '4', section: '', notes: '', color: '' });
+    load();
+  };
+
+  const setColor = async (id: string, color: string) => {
+    await api.updateRestaurantTable(id, { color: color || null });
     load();
   };
 
@@ -169,6 +198,8 @@ export default function RestaurantPage() {
             </button>
           </div>
 
+          <p className="text-xs text-gray-500">Each table keeps its own colour as identity; the badge shows its live status. Leave a table on Auto or pick a colour.</p>
+
           {showForm && (
             <div className="bg-white rounded-lg border p-4 space-y-3">
               <h3 className="font-semibold">New Table</h3>
@@ -177,6 +208,12 @@ export default function RestaurantPage() {
                 <input placeholder="Name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="border rounded px-3 py-2" />
                 <input placeholder="Capacity" type="number" value={form.capacity} onChange={e => setForm({ ...form, capacity: e.target.value })} className="border rounded px-3 py-2" />
                 <input placeholder="Section" value={form.section} onChange={e => setForm({ ...form, section: e.target.value })} className="border rounded px-3 py-2" />
+                <label className="flex items-center gap-2 text-sm text-gray-600">Colour
+                  <select value={form.color} onChange={e => setForm({ ...form, color: e.target.value })} className="border rounded px-2 py-2 bg-white">
+                    <option value="">Auto</option>
+                    {TABLE_PALETTE.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                  </select>
+                </label>
                 <button onClick={createTable} className="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700">Create</button>
               </div>
             </div>
@@ -186,27 +223,43 @@ export default function RestaurantPage() {
             <div key={group.section}>
               <h2 className="text-lg font-semibold mb-3">{group.section}</h2>
               <div className="grid grid-cols-4 gap-4">
-                {group.tables.map((table: any) => (
-                  <div key={table.id} className={`border rounded-lg p-4 ${STATUS_COLORS[table.status] || 'bg-gray-50'}`}>
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <Armchair size={20} />
-                        <span className="font-bold text-lg">Table {table.number}</span>
+                {group.tables.map((table: any) => {
+                  const p = paletteFor(table);
+                  const busy = table.status === 'OCCUPIED' || table.status === 'RESERVED';
+                  return (
+                    <div key={table.id} className={`rounded-xl border-2 p-4 shadow-sm transition-colors ${p.face} ${busy ? p.deep : ''}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className={`h-3.5 w-3.5 shrink-0 rounded-full ring-2 ring-white ${p.dot}`} />
+                          <span className={`font-bold text-lg ${p.text}`}>Table {table.number}</span>
+                        </div>
+                        <button onClick={() => deleteTable(table.id)} aria-label={`Delete table ${table.number}`} className="text-gray-400 hover:text-red-500"><X size={16} /></button>
                       </div>
-                      <button onClick={() => deleteTable(table.id)} className="text-gray-400 hover:text-red-500"><X size={16} /></button>
+                      <div className="mb-1 flex items-center gap-2">
+                        <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${STATUS_CHIP[table.status] || 'bg-gray-600 text-white'}`}>{table.status}</span>
+                        <span className="text-xs font-medium text-gray-600">{p.name}</span>
+                      </div>
+                      {table.name && <div className="text-sm mb-1">{table.name}</div>}
+                      <div className="text-sm">Capacity: {table.capacity}</div>
+                      <div className="flex gap-1 mt-3">
+                        {['AVAILABLE', 'OCCUPIED', 'RESERVED', 'DIRTY'].map(s => (
+                          <button key={s} onClick={() => changeStatus(table.id, s)}
+                            className={`text-xs px-2 py-1 rounded border ${table.status === s ? 'bg-white font-bold' : 'bg-transparent opacity-60 hover:opacity-100'}`}>
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                      <label className="mt-3 flex items-center gap-2 text-xs text-gray-600">
+                        Colour
+                        <select value={table.color || ''} onChange={e => setColor(table.id, e.target.value)}
+                          className="rounded border border-gray-300 bg-white/80 px-1.5 py-0.5 text-xs">
+                          <option value="">Auto ({autoPaletteFor(table.number).name})</option>
+                          {TABLE_PALETTE.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                        </select>
+                      </label>
                     </div>
-                    {table.name && <div className="text-sm mb-1">{table.name}</div>}
-                    <div className="text-sm">Capacity: {table.capacity} | Status: {table.status}</div>
-                    <div className="flex gap-1 mt-3">
-                      {['AVAILABLE', 'OCCUPIED', 'RESERVED', 'DIRTY'].map(s => (
-                        <button key={s} onClick={() => changeStatus(table.id, s)}
-                          className={`text-xs px-2 py-1 rounded border ${table.status === s ? 'bg-white font-bold' : 'bg-transparent opacity-60 hover:opacity-100'}`}>
-                          {s}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ))}

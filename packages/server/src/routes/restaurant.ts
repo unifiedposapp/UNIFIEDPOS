@@ -12,6 +12,8 @@ const tableSchema = z.object({
   capacity: z.number().int().positive().default(4),
   section: z.string().optional(),
   notes: z.string().optional(),
+  // Identity color; the palette itself lives on the client, so we only guard length.
+  color: z.string().max(24).optional().nullable(),
 });
 
 // GET /api/restaurant/tables
@@ -44,10 +46,15 @@ router.post('/tables', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'),
 router.put('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const data = tableSchema.partial().parse(req.body);
-    const table = await prisma.restaurantTable.update({
-      where: { id: String(req.params.id) },
+    const id = String(req.params.id);
+    // Scope the write to the caller's organization so table ids from other
+    // tenants simply 404 instead of being mutated.
+    const updated = await prisma.restaurantTable.updateMany({
+      where: { id, organizationId: req.user!.organizationId! },
       data,
     });
+    if (!updated.count) return res.status(404).json({ success: false, message: 'Table not found' });
+    const table = await prisma.restaurantTable.findUnique({ where: { id } });
     res.json({ success: true, data: table });
   } catch (error) {
     handleError(error, res);
@@ -58,10 +65,13 @@ router.put('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
 router.put('/:id/status', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { status } = z.object({ status: z.enum(['AVAILABLE', 'OCCUPIED', 'RESERVED', 'DIRTY']) }).parse(req.body);
-    const table = await prisma.restaurantTable.update({
-      where: { id: String(req.params.id) },
+    const id = String(req.params.id);
+    const updated = await prisma.restaurantTable.updateMany({
+      where: { id, organizationId: req.user!.organizationId! },
       data: { status },
     });
+    if (!updated.count) return res.status(404).json({ success: false, message: 'Table not found' });
+    const table = await prisma.restaurantTable.findUnique({ where: { id } });
     res.json({ success: true, data: table });
   } catch (error) {
     handleError(error, res);
@@ -71,7 +81,10 @@ router.put('/:id/status', authMiddleware, async (req: AuthRequest, res: Response
 // DELETE /api/restaurant/tables/:id
 router.delete('/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.restaurantTable.delete({ where: { id: String(req.params.id) } });
+    const deleted = await prisma.restaurantTable.deleteMany({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+    });
+    if (!deleted.count) return res.status(404).json({ success: false, message: 'Table not found' });
     res.json({ success: true, message: 'Table deleted' });
   } catch (error) {
     handleError(error, res);

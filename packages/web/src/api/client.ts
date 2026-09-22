@@ -306,9 +306,11 @@ export const api = {
   createRestaurantTable: (data: any) =>
     request<any>('/restaurant/tables', { method: 'POST', body: JSON.stringify(data) }),
   updateTableStatus: (id: string, status: string) =>
-    request<any>(`/restaurant/tables/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+    request<any>(`/restaurant/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+  updateRestaurantTable: (id: string, data: Record<string, unknown>) =>
+    request<any>(`/restaurant/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteRestaurantTable: (id: string) =>
-    request<any>(`/restaurant/tables/${id}`, { method: 'DELETE' }),
+    request<any>(`/restaurant/${id}`, { method: 'DELETE' }),
   getRestaurantOverview: () => request<any>('/restaurant/overview'),
   getReservations: (params?: Record<string, string>) => {
     const query = params ? '?' + new URLSearchParams(params).toString() : '';
