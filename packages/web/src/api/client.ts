@@ -1202,4 +1202,6 @@ export const api = {
   deleteSsoConnection: (id: string) =>
     request<any>(`/sso/connections/${id}`, { method: 'DELETE' }),
   discoverSso: (email: string) => request<any>(`/sso/discover?email=${encodeURIComponent(email)}`),
+  /** Full browser-navigation URL that starts an SSO login for a connection. */
+  ssoAuthorizeUrl: (connectionId: string) => `${API_BASE}/sso/authorize?connectionId=${encodeURIComponent(connectionId)}`,
 };

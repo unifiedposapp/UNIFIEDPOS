@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { api } from '../api/client';
@@ -12,8 +12,41 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [mfaToken, setMfaToken] = useState('');
   const [mfaCode, setMfaCode] = useState('');
+  const [ssoConn, setSsoConn] = useState<{ id: string; label: string; providerType: string } | null>(null);
+  const [ssoNotice, setSsoNotice] = useState('');
   const { login } = useAuthStore();
   const { t } = useI18n();
+
+  // The SSO callback lands back here as /login?sso=error after a failed federation.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('sso') === 'error') {
+      setSsoNotice(t('login.ssoFailed'));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Debounced domain discovery: if the owner wired this email domain to an
+  // identity provider, offer the one-click "Continue with …" shortcut.
+  useEffect(() => {
+    const trimmed = email.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmed)) {
+      setSsoConn(null);
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        const r = await api.discoverSso(trimmed);
+        if (!cancelled) setSsoConn(r.data || null);
+      } catch {
+        if (!cancelled) setSsoConn(null);
+      }
+    }, 400);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [email]);
 
   // Persist the token BEFORE fetching /me, otherwise getMe() is sent
   // unauthenticated and returns 401, which previously broke sign-in.
@@ -84,6 +117,25 @@ export default function LoginPage() {
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
               {error}
+            </div>
+          )}
+
+          {ssoNotice && (
+            <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700">
+              {ssoNotice}
+            </div>
+          )}
+
+          {ssoConn && !mfaToken && (
+            <div className="mb-2">
+              <button
+                type="button"
+                onClick={() => window.location.assign(api.ssoAuthorizeUrl(ssoConn.id))}
+                className="w-full rounded-lg bg-ink-900 py-2.5 font-semibold text-white transition hover:bg-ink-800"
+              >
+                {t('login.ssoContinue', { provider: ssoConn.label || (ssoConn.providerType === 'SAML' ? 'SAML' : 'SSO') })}
+              </button>
+              <div className="gold-rule my-4" />
             </div>
           )}
 

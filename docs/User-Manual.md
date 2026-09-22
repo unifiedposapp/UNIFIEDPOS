@@ -35,7 +35,8 @@ Unified POS is a complete Business Operating System for retail, restaurant and o
 1. Open the app in a modern browser. Chrome or Edge on a desktop is recommended for the full experience, including hardware pairing.
 2. Enter your email and password on the Sign In page and choose Sign In.
 3. If you do not yet have an account, choose Create Account to register a new business. You will provide a business name, industry, currency, your name, email and a password. The first account becomes the Owner.
-4. If you forget your password, choose Forgot Password. A secure reset link is emailed to you. Open the link, set a new password, and you will be returned to Sign In.
+4. If your company uses single sign-on (Okta, Microsoft Entra ID, Google Workspace and any other OIDC or SAML provider), Unified POS recognises your email domain on the Sign In page and routes you to your own identity provider. Your company password never passes through us, and your account is created automatically on first login inside your organization.
+5. If you forget your password, choose Forgot Password. A secure reset link is emailed to you. Open the link, set a new password, and you will be returned to Sign In.
 
 > Security: For your protection the password reset link is only ever sent by email. It is never displayed on screen in a production deployment.
 
@@ -48,7 +49,7 @@ Unified POS is a complete Business Operating System for retail, restaurant and o
 
 ### Choosing your language and region
 
-Use the language selector in the top bar to switch the interface language. Set your business country, address, tax rate and currency in Settings. Unified POS supports businesses in every nation and every ISO 4217 currency.
+Use the language selector in the top bar to switch the interface language. Eight languages ship today: English, Spanish, French, German, Portuguese, Arabic, Simplified Chinese and Hindi. Arabic flips the entire shell to right-to-left reading - sidebar, tables, forms and navigation all mirror automatically - and dates and numbers are formatted for each language's own conventions. Set your business country, address, tax rate and currency in Settings. Unified POS supports businesses in every nation and every ISO 4217 currency.
 
 ### The demo environment
 
@@ -432,6 +433,7 @@ For organizations operating across sites and countries.
 - Provision and monitor global regions for data residency and performance.
 - Assign locations to regions and track coverage.
 - Apply consistent policies while allowing local tax, currency and language settings.
+- Live updates (orders, stock, notifications) follow you across every app replica: events fan out through the database, so a multi-region, multi-instance deployment behaves like one screen.
 
 ## 24. Developer Platform
 
@@ -462,6 +464,7 @@ Settings configure how the system looks and behaves for your business.
 - Receipts: footer message, paper width and printer behavior.
 - Alerts: low-stock thresholds and notification preferences.
 - Security: change passwords and review active sessions.
+- Single Sign-On: connect your company directory (OIDC or SAML 2.0), decide which email domains sign in through it, and let staff accounts provision themselves on first login. Secrets are stored write-only and encrypted. See section 32.13.
 
 > Tip: Branding and receipt changes take effect immediately across the register, receipts and the online store.
 
@@ -542,10 +545,16 @@ Settings configure how the system looks and behaves for your business.
 - Royalty base: agreed revenue after exclusions, which is what a franchise royalty is actually charged on.
 - Elimination: removing intercompany sales when consolidating a franchise network, because the network did not sell to itself.
 - k-anonymity: a privacy rule that hides any statistic drawn from fewer than k comparable stores.
+- Dunning ladder: the scheduled retry sequence (1, 3, 7, 14, 21 days) applied when a subscription payment fails.
+- MRR: Monthly Recurring Revenue - subscription income normalised to a monthly figure.
+- Proration: a partial-period charge or credit when a subscription changes mid-cycle.
+- OIDC / SAML: the two federation protocols an enterprise identity provider speaks; Unified POS supports both.
+- SCIM: the protocol a directory uses to create, update and deactivate user accounts automatically.
+- Just-in-time provisioning: a staff account created inside your organization the moment the identity provider vouches for them at first login.
 
 ## 32. Global Expansion Modules
 
-Ten modules exist for one reason: a business that crosses a border - a second country, a second store, a franchisee, a buying agent, a partner app - normally needs a second system. Here it needs a second tick box. Each one is described below with where to find it in the navigation.
+Thirteen modules exist for one reason: a business that crosses a border - a second country, a second store, a franchisee, a buying agent, a partner app - normally needs a second system. Here it needs a second tick box. Each one is described below with where to find it in the navigation.
 
 ### 32.1 Fiscalisation and e-invoicing
 
@@ -618,7 +627,7 @@ A store is a terminal, a tablet, a kitchen display and a kiosk writing to the sa
 
 - Royalty agreements support flat percentage, banded, per-unit and fixed models, agreed exclusions (VAT, tips, gift-card redemption) and a monthly minimum. Each calculation is printed as the steps that produced it, so a franchisee can audit a statement without asking you for a spreadsheet.
 - Stock moved between entities is priced cost-plus-markup with freight, so the sending entity recognises its margin and the receiving one carries a real cost.
-- The consolidated P&L sums the entities and then eliminates intercompany sales and their matching cost, showing the unrealised profit still sitting in a franchisee's stock. Unpaid royalties are aged.
+- The consolidated P&L converts every entity's results into the consolidation currency using your stored exchange rates before summing (see 32.11), then eliminates intercompany sales and their matching cost, showing the unrealised profit still sitting in a franchisee's stock. An entity whose rate is missing or stale is flagged rather than silently mis-summed. Unpaid royalties are aged.
 
 ### 32.9 Ecosystem: apps and custom fields
 
@@ -637,6 +646,38 @@ Ten metrics - average basket, gross margin, labour cost, shrink, discounting, at
 - A cohort smaller than the k threshold never publishes, not even a median. Outliers are clipped into the 5th-95th percentile range and a calibrated noise figure is added to what is shown.
 - The page publishes the privacy ledger with every figure: cohort size, k, noise applied, participation rate. A suppressed cell is the model working, not a missing feature.
 - Contributing your own numbers is what makes the comparison exist at all; the participation rate is shown alongside every metric.
+
+### 32.11 Exchange rates and multi-currency consolidation
+
+**Where: Exchange Rates.**
+
+A group that trades in more than one currency needs one honest number at the end of the month.
+
+- Store rates per pair and effective date - imported in bulk, or fetched from a configured provider - each tagged with its source and timestamp.
+- The built-in converter answers any pair directly, by inverse, or by triangulating through a common base, and it always shows which method and which stored rate it used, with a staleness warning when the rate is older than your tolerance.
+- Franchise consolidation (32.8), subscription revenue and any cross-currency report draw on this single rate table, so the same rate is never quietly different in two places.
+
+### 32.12 Subscriptions and recurring billing
+
+**Where: Subscriptions.**
+
+Recurring revenue runs through exactly the same money path as a one-off sale.
+
+- Plans cover daily, weekly, monthly, quarterly and yearly intervals, optional trial days, and feature lists; prices are kept in the plan's own currency.
+- Each billing cycle runs automatically: invoices open, payment is attempted through your configured provider, and failures walk a dunning ladder (retry at 1, 3, 7, 14 and 21 days) before the subscription expires - no silent churn.
+- Cancel immediately or at period end, reinstate later, and prorate when a customer changes plan mid-cycle.
+- The dashboard shows live MRR, status mix, open invoices and twelve months of collected revenue; every invoice keeps its attempt history for audit.
+- A webhook endpoint lets a payment provider push success or failure straight back, so status updates are instant rather than waiting for the next cycle tick.
+
+### 32.13 Enterprise single sign-on and directory sync
+
+**Where: Settings, Single Sign-On panel.**
+
+- Two federation protocols: OIDC (authorization-code, with provider discovery and signature-verified ID tokens) and SAML 2.0. Add as many connections as you have directories, each with its own label.
+- Staff simply type their work email: the domain whitelist decides whether they sign in with a password or are redirected to your identity provider, and their account - with a staff role - is provisioned automatically inside your organization on first login. Automatic provisioning can never claim or merge an existing owner account.
+- Client secrets are write-only: stored encrypted, never returned to the browser afterwards.
+- Directory sync (SCIM 2.0) lets your identity provider create, update and deactivate staff accounts as roles change, always scoped to your organization. Deactivating is never destructive, and the last active owner of an organization cannot be removed by directory sync.
+- Trust is fail-closed: unsigned SAML assertions, mismatched issuers, wrong audience, expired tokens and replayed nonces are all refused.
 
 ## 33. Getting Help
 
