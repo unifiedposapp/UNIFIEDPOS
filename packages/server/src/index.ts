@@ -60,7 +60,7 @@ import subscriptionRoutes from './routes/subscriptions.js';
 import ssoRoutes from './routes/sso.js';
 import wellKnownRoutes from './routes/wellKnown.js';
 import { requestLogger, errorLogger } from './middleware/logger.js';
-import { apiRateLimiter, authRateLimiter, paymentRateLimiter } from './middleware/rateLimiter.js';
+import { apiRateLimiter, paymentRateLimiter } from './middleware/rateLimiter.js';
 import { idempotencyMiddleware } from './middleware/idempotency.js';
 import { prisma } from './db/client.js';
 import helmet from 'helmet';
@@ -179,7 +179,7 @@ app.use(csrfProtection); // Double-submit-cookie CSRF guard for cookie-authentic
 // integrators can pin to /api/v1). Per-route security middleware (auth brute-force
 // + payment abuse limiters) is mirrored on both prefixes.
 const routeTable: { path: string; stack: any[] }[] = [
-  { path: '/auth', stack: [authRateLimiter, authRoutes] }, // stricter limit to blunt brute-force (§37)
+  { path: '/auth', stack: [authRoutes] }, // brute-force limiting is applied per credential route inside authRoutes (§37) - not on /me and friends, which every app load calls
   { path: '/inventory', stack: [inventoryRoutes] },
   { path: '/products', stack: [productRoutes] },
   { path: '/orders', stack: [orderRoutes] },

@@ -11,6 +11,7 @@ import { getJwtSecret, generateBase32Secret, verifyTotp, otpauthUrl } from '../s
 import { isValidCurrency, normalizeCurrency } from '../data/currencies.js';
 import { setSessionCookies, clearSessionCookies, issueCsrfToken } from '../services/session.js';
 import { sendPasswordResetEmail, canExposeResetToken } from '../services/email.js';
+import { authRateLimiter, loginRateLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 
@@ -73,7 +74,7 @@ function respondWithSession(
 }
 
 // POST /api/auth/register — public self-service account creation (any country)
-router.post('/register', validateRequest(registerSchema), async (req: AuthRequest, res: Response) => {
+router.post('/register', loginRateLimiter, validateRequest(registerSchema), async (req: AuthRequest, res: Response) => {
   try {
     const { name, email, password, organizationName, country, countryCode, currency, industry, phone } = req.body;
 
@@ -147,7 +148,7 @@ router.post('/register', validateRequest(registerSchema), async (req: AuthReques
 // account exists. SECURITY: in production the raw token is NEVER returned to the
 // caller — it is only ever emailed. In local dev with no mail provider the token
 // is surfaced inline so the flow is testable, gated by canExposeResetToken().
-router.post('/forgot-password', validateRequest(forgotPasswordSchema), async (req: AuthRequest, res: Response) => {
+router.post('/forgot-password', authRateLimiter, validateRequest(forgotPasswordSchema), async (req: AuthRequest, res: Response) => {
   try {
     const { email } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
@@ -194,7 +195,7 @@ router.post('/forgot-password', validateRequest(forgotPasswordSchema), async (re
 });
 
 // POST /api/auth/reset-password — consume a valid reset token and set a new password
-router.post('/reset-password', validateRequest(resetPasswordSchema), async (req: AuthRequest, res: Response) => {
+router.post('/reset-password', authRateLimiter, validateRequest(resetPasswordSchema), async (req: AuthRequest, res: Response) => {
   try {
     const { token, password } = req.body;
     const user = await prisma.user.findFirst({ where: { resetToken: hashToken(token) } });
@@ -217,7 +218,7 @@ router.post('/reset-password', validateRequest(resetPasswordSchema), async (req:
 });
 
 // POST /api/auth/login
-router.post('/login', validateRequest(loginSchema), async (req: AuthRequest, res: Response) => {
+router.post('/login', loginRateLimiter, validateRequest(loginSchema), async (req: AuthRequest, res: Response) => {
   try {
     const { email, password } = req.body;
 
@@ -385,7 +386,7 @@ router.post('/mfa/setup', authMiddleware, async (req: AuthRequest, res: Response
 });
 
 // POST /api/auth/mfa/enable — confirm a code to activate MFA.
-router.post('/mfa/enable', authMiddleware, validateRequest(mfaCodeSchema), async (req: AuthRequest, res: Response) => {
+router.post('/mfa/enable', loginRateLimiter, authMiddleware, validateRequest(mfaCodeSchema), async (req: AuthRequest, res: Response) => {
   try {
     const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
     if (!user?.mfaSecret) {
@@ -404,7 +405,7 @@ router.post('/mfa/enable', authMiddleware, validateRequest(mfaCodeSchema), async
 });
 
 // POST /api/auth/mfa/disable — turn MFA off (requires a valid code).
-router.post('/mfa/disable', authMiddleware, validateRequest(mfaCodeSchema), async (req: AuthRequest, res: Response) => {
+router.post('/mfa/disable', loginRateLimiter, authMiddleware, validateRequest(mfaCodeSchema), async (req: AuthRequest, res: Response) => {
   try {
     const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
     if (!user?.mfaEnabled || !user.mfaSecret) {
@@ -423,7 +424,7 @@ router.post('/mfa/disable', authMiddleware, validateRequest(mfaCodeSchema), asyn
 });
 
 // POST /api/auth/mfa/verify — exchange an MFA challenge token for a session.
-router.post('/mfa/verify', validateRequest(mfaVerifySchema), async (req: AuthRequest, res: Response) => {
+router.post('/mfa/verify', loginRateLimiter, validateRequest(mfaVerifySchema), async (req: AuthRequest, res: Response) => {
   try {
     let payload: any;
     try {

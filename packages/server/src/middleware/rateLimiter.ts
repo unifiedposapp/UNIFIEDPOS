@@ -83,14 +83,17 @@ export interface RateLimitOptions {
   name?: string;
   /** Use the shared DB backend (cross-instance) instead of per-instance memory. */
   shared?: boolean;
+  /** Requests this returns true for bypass the counter entirely. */
+  skip?: (req: Request) => boolean;
 }
 
 export function rateLimiter(
   options: RateLimitOptions,
 ): (req: Request, res: Response, next: NextFunction) => void {
-  const { maxRequests, windowSeconds, keyFn } = options;
+  const { maxRequests, windowSeconds, keyFn, skip } = options;
   const bucket = options.name || 'default';
   const windowMs = windowSeconds * 1000;
+  const skipped = (req: Request): boolean => (skip ? skip(req) : false);
 
   const clientKey = (req: Request): string =>
     keyFn ? keyFn(req) : req.ip || req.socket.remoteAddress || 'unknown';
@@ -98,6 +101,7 @@ export function rateLimiter(
   if (!options.shared) {
     // Fast per-instance path (no I/O).
     return (req: Request, res: Response, next: NextFunction) => {
+      if (skipped(req)) return next();
       const { count, resetAt } = memoryHit(`${bucket}:${clientKey(req)}`, windowMs);
       sendRateLimitResponse(res, next, count, maxRequests, resetAt);
     };
@@ -105,6 +109,7 @@ export function rateLimiter(
 
   // Shared, cross-instance path backed by PostgreSQL.
   return async (req: Request, res: Response, next: NextFunction) => {
+    if (skipped(req)) return next();
     const key = clientKey(req);
     const now = Date.now();
     const windowStartMs = Math.floor(now / windowMs) * windowMs;
@@ -134,16 +139,33 @@ export function rateLimiter(
  */
 // Global API limiter: high volume → per-instance memory (avoids a DB write on
 // every request); per-instance limiting is the norm for a coarse abuse guard.
+// Health/readiness are exempt: orchestrator probes run every few seconds per
+// node and must never consume (or be denied by) the abuse budget.
+// The ceiling is deployment-tunable via RATE_LIMIT_MAX_PER_MIN (e.g. load tests).
 export const apiRateLimiter = rateLimiter({
   name: 'api',
-  maxRequests: 100,
+  maxRequests: Number(process.env.RATE_LIMIT_MAX_PER_MIN || 100),
   windowSeconds: 60,
+  skip: (req) => req.path === '/api/health' || req.path === '/api/ready',
 });
 
 // Auth limiter: brute-force protection must be shared across instances → DB.
+// Applied ONLY to emailed-token endpoints (forgot/reset): unlimited attempts
+// there burn email reputation and enable token spraying.
 export const authRateLimiter = rateLimiter({
   name: 'auth',
   maxRequests: 10,
+  windowSeconds: 60,
+  shared: true,
+});
+
+// Login-tier limiter: password guessing must be capped, but an entire shop
+// floor shares one NAT IP and a morning shift change can mean 20+ legitimate
+// logins in a minute. 30/min/IP blunts distributed guessing without locking
+// out a real store; per-account lockout is handled by the fraud engine.
+export const loginRateLimiter = rateLimiter({
+  name: 'login',
+  maxRequests: 30,
   windowSeconds: 60,
   shared: true,
 });
