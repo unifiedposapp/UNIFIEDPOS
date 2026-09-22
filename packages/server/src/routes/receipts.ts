@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { prisma } from '../db/client.js';
 import { AuthRequest, authMiddleware } from '../middleware/auth.js';
 import { handleError } from '../middleware/error.js';
+import { complianceFor, receiptFooterFor } from '../data/complianceProfiles.js';
 
 const router = Router();
 
@@ -99,6 +100,21 @@ router.get('/:orderId', authMiddleware, async (req: AuthRequest, res: Response) 
       
       // Footer
       receiptFooter: settings?.receiptFooter || 'Thank you for your business!',
+
+      // Regional compliance guidance (§ country compliance profiles): the
+      // market's privacy law, tax-ID label and default legal receipt lines.
+      compliance: (() => {
+        const cc = settings?.countryCode;
+        const prof = complianceFor(cc);
+        return {
+          countryCode: cc || null,
+          privacyLaw: prof.privacyLaw,
+          dataResidency: prof.dataResidency,
+          taxIdLabel: prof.taxIdLabel,
+          eInvoiceFormat: prof.eInvoiceFormat || null,
+          legalFooter: receiptFooterFor(cc, { taxId: settings?.taxId || prof.taxIdLabel, receiptNumber: order.orderNumber }),
+        };
+      })(),
       
       // Currency
       currency: order.currency,

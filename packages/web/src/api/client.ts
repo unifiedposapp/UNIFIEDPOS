@@ -970,6 +970,18 @@ export const api = {
   transmitFiscalDocuments: (data?: { limit?: number }) =>
     request<any>('/fiscal/transmit', { method: 'POST', body: JSON.stringify(data || {}) }),
   getFiscalRetention: () => request<any>('/fiscal/retention'),
+  
+    // ── Country compliance / data-protection profiles ──
+    getComplianceProfiles: () => request<any>('/fiscal/compliance'),
+  
+    // ── Regional payment gateways (Paystack / Flutterwave / M-Pesa) ──
+    getRegionalGateways: () => request<any>('/regional/gateways'),
+    connectRegionalGateway: (data: any) => request<any>('/regional/connect', { method: 'PUT', body: JSON.stringify(data) }),
+    disconnectRegionalGateway: (id: string) => request<any>(`/regional/connect/${id}`, { method: 'DELETE' }),
+    regionalCharge: (data: { provider: string; orderId?: string; amount?: number; currency?: string; email?: string; phoneNumber?: string; reference?: string; description?: string }) =>
+      request<any>('/regional/charge', { method: 'POST', body: JSON.stringify(data) }),
+    verifyRegionalTransaction: (provider: string, reference: string) =>
+      request<any>(`/regional/verify/${encodeURIComponent(provider)}/${encodeURIComponent(reference)}`),
 
   // ── Local payment rails + settlement reconciliation ──
   getRailCatalog: (params?: Record<string, string>) => {

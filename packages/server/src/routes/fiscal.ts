@@ -21,6 +21,7 @@ import {
   isKnownFiscalCountry,
 } from '../data/fiscalProfiles.js';
 import { TAX_PROFILES, taxProfileFor, taxProfilesByRegion, taxCoverage, suggestedTaxRateFor } from '../data/taxProfiles.js';
+import { COMPLIANCE_PROFILES, complianceFor, complianceProfilesByRegion, complianceCoverage, isKnownComplianceCountry } from '../data/complianceProfiles.js';
 import {
   SEAL_ALGORITHM,
   MAX_TRANSMIT_ATTEMPTS,
@@ -77,6 +78,25 @@ router.get('/tax-profiles', authMiddleware, async (req: AuthRequest, res: Respon
         coverage: taxCoverage(),
         byRegion: taxProfilesByRegion(),
         profiles: TAX_PROFILES,
+      },
+    });
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
+// GET /api/fiscal/compliance - country privacy / data-residency / e-invoice guidance
+router.get('/compliance', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const { countryCode } = await orgContext(req.user!.organizationId!);
+    res.json({
+      success: true,
+      data: {
+        active: { countryCode, profile: complianceFor(countryCode) },
+        knownCountry: isKnownComplianceCountry(countryCode),
+        coverage: complianceCoverage(),
+        byRegion: complianceProfilesByRegion(),
+        profiles: COMPLIANCE_PROFILES,
       },
     });
   } catch (error) {

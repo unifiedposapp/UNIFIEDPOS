@@ -41,6 +41,8 @@ export default defineConfig({
         'packages/server/src/services/tradingPatterns.ts',
         'packages/server/src/services/deliveryChannels.ts',
         'packages/server/src/data/taxProfiles.ts',
+        'packages/server/src/data/complianceProfiles.ts',
+        'packages/server/src/services/regionalGateways.ts',
       ],
       thresholds: {
         statements: 70,

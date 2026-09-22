@@ -455,7 +455,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 18 0 R >>
 endobj
 18 0 obj
-<< /Length 2626 >>
+<< /Length 2948 >>
 stream
 0.70 0.53 0.14 rg
 BT /F1 11 Tf 1 0 0 1 68.00 692.00 Tm (•) Tj ET
@@ -476,25 +476,29 @@ BT /F2 13 Tf 1 0 0 1 64.00 620.00 Tm (Choosing your language and region) Tj ET
 0.08 0.08 0.09 rg
 BT /F1 11 Tf 1 0 0 1 64.00 602.00 Tm (Use the language selector in the top bar to switch the interface language. Seventeen languages) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 587.00 Tm (ship today: English, Spanish, French, German, Portuguese, Arabic, Simplified Chinese, Hindi,) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 587.00 Tm (ship today, each fully translated across the whole interface \(not just the sidebar\): English, Spanish,) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 572.00 Tm (Turkish, Japanese, Korean, Vietnamese, Indonesian, Thai, Swahili, Hebrew and Persian. Arabic,) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 572.00 Tm (French, German, Portuguese, Arabic, Simplified Chinese, Hindi, Turkish, Japanese, Korean,) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 557.00 Tm (Hebrew and Persian flip the entire shell to right-to-left reading - sidebar, tables, forms and) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 557.00 Tm (Vietnamese, Indonesian, Thai, Swahili, Hebrew and Persian. Arabic, Hebrew and Persian flip the) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 542.00 Tm (navigation all mirror automatically - and dates and numbers are formatted for each language's own) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 542.00 Tm (entire shell to right-to-left reading - sidebar, tables, forms and navigation all mirror automatically -) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 527.00 Tm (conventions. Set your business country, address, tax rate and currency in Settings. Unified POS) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 527.00 Tm (and dates and numbers are formatted for each language's own conventions. A) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 512.00 Tm (supports businesses in every nation and every ISO 4217 currency.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 512.00 Tm (continuous-integration check enforces that no language silently drops back to English, so every) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 497.00 Tm (locale stays complete. Set your business country, address, tax rate and currency in Settings.) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 482.00 Tm (Unified POS supports businesses in every nation and every ISO 4217 currency.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 486.00 Tm (The demo environment) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 456.00 Tm (The demo environment) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 468.00 Tm (A fresh installation seeds a demo business with sample products, an owner, a manager and a) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 438.00 Tm (A fresh installation seeds a demo business with sample products, an owner, a manager and a) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 453.00 Tm (cashier so you can explore safely. Replace or remove demo data before going live, and change the) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 423.00 Tm (cashier so you can explore safely. Replace or remove demo data before going live, and change the) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 438.00 Tm (seeded passwords immediately.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 408.00 Tm (seeded passwords immediately.) Tj ET
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
 BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
@@ -6020,7 +6024,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 96 0 R >>
 endobj
 96 0 obj
-<< /Length 6042 >>
+<< /Length 6058 >>
 stream
 0.11 0.19 0.44 rg
 BT /F2 13 Tf 1 0 0 1 64.00 686.00 Tm (32.13 Enterprise single sign-on and directory sync) Tj ET
@@ -6111,7 +6115,7 @@ BT /F1 11 Tf 1 0 0 1 84.00 122.00 Tm (encrypted and never fabricates a partner e
 0.70 0.53 0.14 rg
 BT /F1 11 Tf 1 0 0 1 68.00 105.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 105.00 Tm (Language breadth. The interface now ships in seventeen languages \( Choosing your) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 105.00 Tm (Suggested rate, applied automatically. When a new business is created, its tax rate is pre-filled) Tj ET
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
 BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
@@ -6125,12 +6129,76 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 98 0 R >>
 endobj
 98 0 obj
-<< /Length 564 >>
+<< /Length 4817 >>
 stream
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 692.00 Tm (language and region\), including three right-to-left scripts, so the register speaks the customer's) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 692.00 Tm (from this table using the sign-up country, so the very first receipt is already taxed correctly;) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 677.00 Tm (language in most of the world's major markets.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 677.00 Tm (tax-free and unknown markets seed 0 rather than a wrong non-zero guess. You can always) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 662.00 Tm (override it in Settings.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 645.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 645.00 Tm (Country compliance profiles. The Fiscal page also carries a per-country compliance card: the) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 630.00 Tm (privacy/data-protection law that governs customer data \(GDPR, NDPA, LGPD, PIPL, DPDP) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 615.00 Tm (and so on\), whether records must stay inside the border \(data residency\), the local name for) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 600.00 Tm (your tax identifier, the mandated e-invoice message standard, and the default legal lines a) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 585.00 Tm (receipt is expected to print. These lines seed your receipt footer automatically \(Settings can still) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 570.00 Tm (override it\). This is routing and guidance to configure a market correctly, not legal advice -) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 555.00 Tm (nothing here auto-submits to a regulator.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 538.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 538.00 Tm (Language breadth. The interface ships in seventeen languages \( Choosing your language) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 523.00 Tm (and region\), all fully translated and including three right-to-left scripts, so the register speaks) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 508.00 Tm (the customer's language in most of the world's major markets. A continuous-integration check) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 493.00 Tm (enforces that no locale silently drops back to English.) Tj ET
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 470.00 Tm (32.15 Regional payment gateways) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 452.00 Tm (Where: Fiscal \(Regional payment gateways card\), Integrations.) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 432.00 Tm (Most of the world does not pay by card. Alongside the card PSP layer \(Stripe and an offline) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 417.00 Tm (simulator\), the platform ships first-class charge adapters for the three gateways that dominate their) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 402.00 Tm (regions, each driven by its own documented public REST API and the merchant's own credentials:) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 382.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 382.00 Tm (Paystack \(Nigeria, Ghana, South Africa, Kenya, Egypt\) - hosted checkout returning an) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 367.00 Tm (authorization URL; webhooks authenticated by an HMAC-SHA512 x-paystack-signature.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 350.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 350.00 Tm (Flutterwave \(across Africa\) - hosted checkout; webhooks authenticated by a shared verif-hash.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 333.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 333.00 Tm (M-Pesa via the Safaricom Daraja API \(Kenya, Tanzania\) - an STK-Push PIN prompt to the) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 318.00 Tm (customer's handset; callbacks are unsigned, so settlement is confirmed by a status query) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 303.00 Tm (before it is trusted.) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 286.00 Tm (A connection stores its keys encrypted at rest \(never returned to the browser\). With no credentials) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 271.00 Tm (configured, every charge runs in a clearly-labelled simulation so the full flow - initiate, redirect or) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 256.00 Tm (PIN prompt, webhook, reconcile - can be rehearsed offline before a live account exists. Nothing) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 241.00 Tm (here invents a partner's endpoint or pretends a demo is real money.) Tj ET
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
 BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
@@ -6389,94 +6457,94 @@ xref
 0000015719 00000 n
 0000021010 00000 n
 0000021158 00000 n
-0000023837 00000 n
-0000023985 00000 n
-0000032098 00000 n
-0000032246 00000 n
-0000045745 00000 n
-0000045893 00000 n
-0000051289 00000 n
-0000051437 00000 n
-0000054994 00000 n
-0000055142 00000 n
-0000063484 00000 n
-0000063632 00000 n
-0000073850 00000 n
-0000073998 00000 n
-0000074794 00000 n
-0000074942 00000 n
-0000083806 00000 n
-0000083954 00000 n
-0000084751 00000 n
-0000084899 00000 n
-0000092651 00000 n
-0000092799 00000 n
-0000100512 00000 n
-0000100660 00000 n
-0000108787 00000 n
-0000108935 00000 n
-0000117951 00000 n
-0000118099 00000 n
-0000126716 00000 n
-0000126864 00000 n
-0000128458 00000 n
-0000128606 00000 n
-0000136795 00000 n
-0000136943 00000 n
-0000144420 00000 n
-0000144568 00000 n
-0000153122 00000 n
-0000153270 00000 n
-0000163231 00000 n
-0000163379 00000 n
-0000166861 00000 n
-0000167009 00000 n
-0000174638 00000 n
-0000174786 00000 n
-0000183196 00000 n
-0000183344 00000 n
-0000191304 00000 n
-0000191452 00000 n
-0000192749 00000 n
-0000192897 00000 n
-0000200250 00000 n
-0000200398 00000 n
-0000208899 00000 n
-0000209047 00000 n
-0000216685 00000 n
-0000216833 00000 n
-0000224897 00000 n
-0000225045 00000 n
-0000233981 00000 n
-0000234129 00000 n
-0000236116 00000 n
-0000236264 00000 n
-0000239739 00000 n
-0000239887 00000 n
-0000241259 00000 n
-0000241407 00000 n
-0000243105 00000 n
-0000243253 00000 n
-0000249806 00000 n
-0000249954 00000 n
-0000255260 00000 n
-0000255408 00000 n
-0000260843 00000 n
-0000260991 00000 n
-0000266610 00000 n
-0000266758 00000 n
-0000272440 00000 n
-0000272588 00000 n
-0000278683 00000 n
-0000278831 00000 n
-0000279447 00000 n
-0000279596 00000 n
-0000285521 00000 n
-0000285671 00000 n
-0000290089 00000 n
-0000290239 00000 n
+0000024159 00000 n
+0000024307 00000 n
+0000032420 00000 n
+0000032568 00000 n
+0000046067 00000 n
+0000046215 00000 n
+0000051611 00000 n
+0000051759 00000 n
+0000055316 00000 n
+0000055464 00000 n
+0000063806 00000 n
+0000063954 00000 n
+0000074172 00000 n
+0000074320 00000 n
+0000075116 00000 n
+0000075264 00000 n
+0000084128 00000 n
+0000084276 00000 n
+0000085073 00000 n
+0000085221 00000 n
+0000092973 00000 n
+0000093121 00000 n
+0000100834 00000 n
+0000100982 00000 n
+0000109109 00000 n
+0000109257 00000 n
+0000118273 00000 n
+0000118421 00000 n
+0000127038 00000 n
+0000127186 00000 n
+0000128780 00000 n
+0000128928 00000 n
+0000137117 00000 n
+0000137265 00000 n
+0000144742 00000 n
+0000144890 00000 n
+0000153444 00000 n
+0000153592 00000 n
+0000163553 00000 n
+0000163701 00000 n
+0000167183 00000 n
+0000167331 00000 n
+0000174960 00000 n
+0000175108 00000 n
+0000183518 00000 n
+0000183666 00000 n
+0000191626 00000 n
+0000191774 00000 n
+0000193071 00000 n
+0000193219 00000 n
+0000200572 00000 n
+0000200720 00000 n
+0000209221 00000 n
+0000209369 00000 n
+0000217007 00000 n
+0000217155 00000 n
+0000225219 00000 n
+0000225367 00000 n
+0000234303 00000 n
+0000234451 00000 n
+0000236438 00000 n
+0000236586 00000 n
+0000240061 00000 n
+0000240209 00000 n
+0000241581 00000 n
+0000241729 00000 n
+0000243427 00000 n
+0000243575 00000 n
+0000250128 00000 n
+0000250276 00000 n
+0000255582 00000 n
+0000255730 00000 n
+0000261165 00000 n
+0000261313 00000 n
+0000266932 00000 n
+0000267080 00000 n
+0000272762 00000 n
+0000272910 00000 n
+0000279021 00000 n
+0000279169 00000 n
+0000284039 00000 n
+0000284188 00000 n
+0000290113 00000 n
+0000290263 00000 n
+0000294681 00000 n
+0000294831 00000 n
 trailer
 << /Size 105 /Root 1 0 R /Info 6 0 R >>
 startxref
-291705
+296297
 %%EOF

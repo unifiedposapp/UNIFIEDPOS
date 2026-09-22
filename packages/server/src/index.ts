@@ -41,6 +41,7 @@ import restaurantExtRoutes from './routes/restaurantExt.js';
 import publicOrderingRoutes from './routes/publicOrdering.js';
 import storefrontRoutes from './routes/storefront.js';
 import deliveryRoutes, { deliveryWebhookHandler } from './routes/delivery.js';
+import regionalRoutes, { regionalWebhookHandler } from './routes/regionalPayments.js';
 import realtimeRoutes from './routes/realtime.js';
 import pushRoutes from './routes/push.js';
 import aiAnalyticsRoutes from './routes/aiAnalytics.js';
@@ -172,6 +173,10 @@ app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), stri
 app.post('/api/delivery/webhooks/:provider', express.raw({ type: () => true }), deliveryWebhookHandler);
 app.post('/api/v1/delivery/webhooks/:provider', express.raw({ type: () => true }), deliveryWebhookHandler);
 
+// Regional payment-gateway callbacks (Paystack / Flutterwave / M-Pesa) must see the
+// exact bytes to verify their signature, so mount them raw before the JSON parser.
+app.post('/api/regional/webhooks/:provider', express.raw({ type: () => true }), regionalWebhookHandler);
+
 app.use(express.json({ limit: '12mb' })); // Raised limit: Settings branding stores base64 logo/media uploads
 app.use(express.urlencoded({ extended: false, limit: '2mb' })); // SAML POST-binding ACS sends form-encoded SAMLResponse (§sso)
 app.use(cookieParser()); // Parse cookies so the httpOnly session + CSRF cookies are readable (§37)
@@ -231,6 +236,7 @@ const routeTable: { path: string; stack: any[] }[] = [
   { path: '/push', stack: [pushRoutes] }, // Web Push (VAPID) subscriptions
   { path: '/media', stack: [mediaRoutes] }, // Media asset library (S3/DB adapter)
   { path: '/fiscal', stack: [fiscalRoutes] }, // Fiscalisation: devices, hash-chain seals, verification
+  { path: '/regional', stack: [paymentRateLimiter, regionalRoutes] }, // Regional gateways: Paystack / Flutterwave / M-Pesa charges
   { path: '/rails', stack: [paymentRateLimiter, railsRoutes] }, // Local payment rails + settlement reconciliation
   { path: '/agent', stack: [agentOpsRoutes] }, // Agentic back-office: replenishment plans awaiting approval
   { path: '/verticals', stack: [verticalsRoutes] }, // Vertical solution manifests + install/retire

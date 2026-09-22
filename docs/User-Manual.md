@@ -49,7 +49,7 @@ Unified POS is a complete Business Operating System for retail, restaurant and o
 
 ### Choosing your language and region
 
-Use the language selector in the top bar to switch the interface language. Seventeen languages ship today: English, Spanish, French, German, Portuguese, Arabic, Simplified Chinese, Hindi, Turkish, Japanese, Korean, Vietnamese, Indonesian, Thai, Swahili, Hebrew and Persian. Arabic, Hebrew and Persian flip the entire shell to right-to-left reading - sidebar, tables, forms and navigation all mirror automatically - and dates and numbers are formatted for each language's own conventions. Set your business country, address, tax rate and currency in Settings. Unified POS supports businesses in every nation and every ISO 4217 currency.
+Use the language selector in the top bar to switch the interface language. Seventeen languages ship today, **each fully translated across the whole interface** (not just the sidebar): English, Spanish, French, German, Portuguese, Arabic, Simplified Chinese, Hindi, Turkish, Japanese, Korean, Vietnamese, Indonesian, Thai, Swahili, Hebrew and Persian. Arabic, Hebrew and Persian flip the entire shell to right-to-left reading - sidebar, tables, forms and navigation all mirror automatically - and dates and numbers are formatted for each language's own conventions. A continuous-integration check enforces that no language silently drops back to English, so every locale stays complete. Set your business country, address, tax rate and currency in Settings. Unified POS supports businesses in every nation and every ISO 4217 currency.
 
 ### The demo environment
 
@@ -687,7 +687,21 @@ So that opening a store in a new country is a selection rather than a research p
 
 - **Country tax profiles.** Beyond *how* a receipt is sealed (§32.1), the Fiscal page answers *what the default rate is*. It carries the standard VAT/GST/sales-tax rate and the common reduced slabs for 100+ markets - Nigeria 7.5%, Kenya 16%, South Africa 15%, Germany 19%, Saudi Arabia 15%, the UAE 5%, India's 5/12/18/28% GST slabs, Japan's 10% with an 8% reduced food rate, and so on (rates reflect the mid-2026 global survey and are sensible defaults, not legal advice). Your selected country is highlighted with a **suggested rate** you can use to pre-fill the organisation tax rate; tax-free and unknown markets return 0 rather than a wrong non-zero guess. Actual return filing is delegated to a TAX_COMPLIANCE integration (Avalara, TaxJar, Stripe Tax, Sovos).
 - **Payment-gateway breadth.** The Integrations catalog now lists the major regional processors on every continent alongside the global names: Interswitch, Yoco, PayFast, DPO and PesaPal (Africa); Cashfree, Paytm, PhonePe, SafePay and SSLCommerz (South Asia); Xendit, 2C2P, iPay88 and VNPay (Southeast Asia); Telr, PayTabs, Moyasar, HyperPay, Amazon Payment Services, Tap and iyzico (MENA and Türkiye); Toss Payments, KG Inicis, Multi Payment, UnionPay (East Asia); Mollie, Worldline, Nuvei, SumUp, Adyen, and more. Each is a bring-your-own-credentials connection - the platform stores the API keys and webhook secrets encrypted and never fabricates a partner endpoint.
-- **Language breadth.** The interface now ships in seventeen languages (§ Choosing your language and region), including three right-to-left scripts, so the register speaks the customer's language in most of the world's major markets.
+- **Suggested rate, applied automatically.** When a new business is created, its tax rate is pre-filled from this table using the sign-up country, so the very first receipt is already taxed correctly; tax-free and unknown markets seed 0 rather than a wrong non-zero guess. You can always override it in Settings.
+- **Country compliance profiles.** The Fiscal page also carries a per-country compliance card: the privacy/data-protection law that governs customer data (GDPR, NDPA, LGPD, PIPL, DPDP and so on), whether records must stay inside the border (data residency), the local name for your tax identifier, the mandated e-invoice message standard, and the default legal lines a receipt is expected to print. These lines seed your receipt footer automatically (Settings can still override it). This is routing and guidance to configure a market correctly, **not legal advice** - nothing here auto-submits to a regulator.
+- **Language breadth.** The interface ships in seventeen languages (§ Choosing your language and region), **all fully translated** and including three right-to-left scripts, so the register speaks the customer's language in most of the world's major markets. A continuous-integration check enforces that no locale silently drops back to English.
+
+### 32.15 Regional payment gateways
+
+**Where: Fiscal (Regional payment gateways card), Integrations.**
+
+Most of the world does not pay by card. Alongside the card PSP layer (Stripe and an offline simulator), the platform ships first-class charge adapters for the three gateways that dominate their regions, each driven by its own **documented public REST API** and the merchant's own credentials:
+
+- **Paystack** (Nigeria, Ghana, South Africa, Kenya, Egypt) - hosted checkout returning an authorization URL; webhooks authenticated by an HMAC-SHA512 `x-paystack-signature`.
+- **Flutterwave** (across Africa) - hosted checkout; webhooks authenticated by a shared `verif-hash`.
+- **M-Pesa via the Safaricom Daraja API** (Kenya, Tanzania) - an STK-Push PIN prompt to the customer's handset; callbacks are unsigned, so settlement is confirmed by a status query before it is trusted.
+
+A connection stores its keys encrypted at rest (never returned to the browser). **With no credentials configured, every charge runs in a clearly-labelled simulation** so the full flow - initiate, redirect or PIN prompt, webhook, reconcile - can be rehearsed offline before a live account exists. Nothing here invents a partner's endpoint or pretends a demo is real money.
 
 ## 33. Storefront, Delivery, Labels and Trading Insights
 

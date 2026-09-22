@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../api/client';
-import { Receipt, Link2, Send, ShieldCheck, Usb, Trash2, Percent, Globe2 } from 'lucide-react';
+import { Receipt, Link2, Send, ShieldCheck, Usb, Trash2, Percent, Globe2, Scale, CreditCard } from 'lucide-react';
 import {
   Badge,
   Card,
@@ -29,6 +29,9 @@ export default function FiscalizationPage() {
   const [profiles, setProfiles] = useState<any>(null);
   const [tax, setTax] = useState<any>(null);
   const [taxQuery, setTaxQuery] = useState('');
+  const [compliance, setCompliance] = useState<any>(null);
+  const [compQuery, setCompQuery] = useState('');
+  const [gateways, setGateways] = useState<any>(null);
   const [status, setStatus] = useState<any>(null);
   const [documents, setDocuments] = useState<any[]>([]);
   const [chain, setChain] = useState<any>(null);
@@ -38,16 +41,20 @@ export default function FiscalizationPage() {
   const [form, setForm] = useState({ serialNumber: '', profileCode: '', activationCode: '', locationId: '' });
 
   const load = useCallback(async () => {
-    const [p, s, d, tx] = await Promise.all([
+    const [p, s, d, tx, cp, gw] = await Promise.all([
       call(() => api.getFiscalProfiles(), setError),
       call(() => api.getFiscalStatus(), setError),
       call(() => api.getFiscalDocuments({ limit: '25' }), setError),
       call(() => api.getTaxProfiles(), setError),
+      call(() => api.getComplianceProfiles(), setError),
+      call(() => api.getRegionalGateways(), setError),
     ]);
     setProfiles(p);
     setStatus(s);
     setDocuments(d?.documents || []);
     setTax(tx);
+    setCompliance(cp);
+    setGateways(gw);
   }, []);
 
   useEffect(() => {
@@ -245,6 +252,71 @@ export default function FiscalizationPage() {
               </Table>
             </div>
           </>
+        )}
+      </Card>
+
+      <Card
+        title="Country compliance & data residency"
+        icon={<Scale size={18} />}
+        actions={
+          <input
+            className={inputClass + ' max-w-xs'}
+            placeholder="Search country…"
+            value={compQuery}
+            onChange={(e) => setCompQuery(e.target.value)}
+          />
+        }
+      >
+        {compliance && (
+          <>
+            <div className="flex items-center gap-2 flex-wrap mb-3 text-sm">
+              <Badge tone="good">
+                {compliance.active?.profile?.country || compliance.active?.countryCode || 'No market set'} · {compliance.active?.profile?.privacyLaw || 'local law'}
+              </Badge>
+              <span className="text-gray-500">
+                <Globe2 size={13} className="inline -mt-0.5" /> {compliance.coverage?.markets ?? 0} markets · {compliance.coverage?.mandatoryResidency ?? 0} mandatory in-country · {compliance.coverage?.eInvoiceMandated ?? 0} e-invoice regimes
+              </span>
+            </div>
+            <div className="max-h-80 overflow-y-auto -mx-4">
+              <Table head={<tr><Th>Country</Th><Th>Privacy law</Th><Th>Residency</Th><Th>Tax-ID label</Th><Th>e-Invoice</Th></tr>}>
+                {(compliance.profiles || [])
+                  .filter((p: any) => !compQuery || `${p.country} ${p.privacyLaw} ${p.countryCode}`.toLowerCase().includes(compQuery.toLowerCase()))
+                  .map((p: any) => (
+                    <tr key={p.countryCode} className={p.countryCode === compliance.active?.countryCode ? 'bg-blue-50' : undefined}>
+                      <Td className="font-medium whitespace-nowrap">{p.country}</Td>
+                      <Td className="text-gray-600">{p.privacyLaw}</Td>
+                      <Td><Badge tone={p.dataResidency === 'MANDATORY_IN_COUNTRY' ? 'bad' : p.dataResidency === 'NONE' ? 'neutral' : 'warn'}>{p.dataResidency}</Badge></Td>
+                      <Td className="text-gray-500">{p.taxIdLabel}</Td>
+                      <Td className="text-gray-500">{p.eInvoiceFormat || '—'}</Td>
+                    </tr>
+                  ))}
+              </Table>
+            </div>
+          </>
+        )}
+      </Card>
+
+      <Card title="Regional payment gateways" icon={<CreditCard size={18} />}>
+        <p className="text-sm text-gray-500 mb-3">
+          Card-free rails for the markets that run on them. Connect your own credentials and live charges route through the provider’s documented API; until then every call runs in a clearly-labelled simulation.
+        </p>
+        {(gateways?.gateways || []).length === 0 ? (
+          <Empty>No regional gateways available.</Empty>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {(gateways.gateways || []).map((g: any) => (
+              <div key={g.id} className="border rounded-lg p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium">{g.name}</span>
+                  <Badge tone={g.connected && g.connection?.configured ? 'good' : g.connected ? 'warn' : 'neutral'}>
+                    {g.connected && g.connection?.configured ? 'CONNECTED' : g.connected ? 'PARTIAL' : 'NOT SET UP'}
+                  </Badge>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">{g.region} · {g.flow === 'redirect' ? 'hosted checkout' : 'handset PIN prompt'}</p>
+                <p className="text-xs text-gray-400 mt-1">{g.countries.join(', ')} · {g.currencies.join(', ')}</p>
+              </div>
+            ))}
+          </div>
         )}
       </Card>
 

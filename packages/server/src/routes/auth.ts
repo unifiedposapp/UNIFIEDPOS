@@ -9,6 +9,7 @@ import { validateRequest, handleError } from '../middleware/error.js';
 import { createAuditEvent } from '../services/audit.js';
 import { getJwtSecret, generateBase32Secret, verifyTotp, otpauthUrl } from '../services/crypto.js';
 import { isValidCurrency, normalizeCurrency } from '../data/currencies.js';
+import { suggestedTaxRateFor } from '../data/taxProfiles.js';
 import { setSessionCookies, clearSessionCookies, issueCsrfToken } from '../services/session.js';
 import { sendPasswordResetEmail, canExposeResetToken } from '../services/email.js';
 import { authRateLimiter, loginRateLimiter } from '../middleware/rateLimiter.js';
@@ -94,6 +95,10 @@ router.post('/register', loginRateLimiter, validateRequest(registerSchema), asyn
           currency: normalizeCurrency(currency) || 'USD',
           country,
           countryCode: countryCode.toUpperCase(),
+          // Pre-fill the local standard consumption-tax rate so a brand-new
+          // tenant's first receipt is taxed sensibly out of the box. Unknown or
+          // tax-free markets yield 0 (never a wrong non-zero guess).
+          taxRate: suggestedTaxRateFor(countryCode),
           phone,
           email,
         },
