@@ -43,6 +43,19 @@ import realtimeRoutes from './routes/realtime.js';
 import pushRoutes from './routes/push.js';
 import aiAnalyticsRoutes from './routes/aiAnalytics.js';
 import mediaRoutes from './routes/media.js';
+// ─── Global-expansion subsystems (fiscal, rails, agent ops, verticals, finance,
+// agentic commerce, mesh, franchise, ecosystem, benchmarking) ───
+import fiscalRoutes from './routes/fiscal.js';
+import railsRoutes from './routes/rails.js';
+import agentOpsRoutes from './routes/agentOps.js';
+import verticalsRoutes from './routes/verticals.js';
+import financeRoutes from './routes/finance.js';
+import agentsRoutes from './routes/agents.js';
+import meshRoutes from './routes/mesh.js';
+import franchiseRoutes from './routes/franchise.js';
+import appsRoutes from './routes/apps.js';
+import benchmarkRoutes from './routes/benchmark.js';
+import wellKnownRoutes from './routes/wellKnown.js';
 import { requestLogger, errorLogger } from './middleware/logger.js';
 import { apiRateLimiter, authRateLimiter, paymentRateLimiter } from './middleware/rateLimiter.js';
 import { idempotencyMiddleware } from './middleware/idempotency.js';
@@ -202,11 +215,24 @@ const routeTable: { path: string; stack: any[] }[] = [
   { path: '/realtime', stack: [realtimeRoutes] }, // Real-time SSE stream (eventBus bridge)
   { path: '/push', stack: [pushRoutes] }, // Web Push (VAPID) subscriptions
   { path: '/media', stack: [mediaRoutes] }, // Media asset library (S3/DB adapter)
+  { path: '/fiscal', stack: [fiscalRoutes] }, // Fiscalisation: devices, hash-chain seals, verification
+  { path: '/rails', stack: [paymentRateLimiter, railsRoutes] }, // Local payment rails + settlement reconciliation
+  { path: '/agent', stack: [agentOpsRoutes] }, // Agentic back-office: replenishment plans awaiting approval
+  { path: '/verticals', stack: [verticalsRoutes] }, // Vertical solution manifests + install/retire
+  { path: '/finance', stack: [financeRoutes] }, // Embedded finance: underwriting, facilities, sweeps
+  { path: '/agents', stack: [paymentRateLimiter, agentsRoutes] }, // Agentic commerce: mandates + public machine surface
+  { path: '/mesh', stack: [meshRoutes] }, // Store mesh: leader election + fencing tokens
+  { path: '/franchise', stack: [franchiseRoutes] }, // Royalties, transfer pricing, consolidated P&L
+  { path: '/apps', stack: [appsRoutes] }, // Ecosystem: partner apps, scopes, custom fields
+  { path: '/benchmark', stack: [benchmarkRoutes] }, // Peer benchmarking (k-anonymous, noised)
 ];
 for (const r of routeTable) {
   app.use(`/api${r.path}`, ...r.stack);
   app.use(`/api/v1${r.path}`, ...r.stack); // §28 versioned public API alias
 }
+
+// Machine-facing discovery documents for buying agents (RFC 8615).
+app.use('/.well-known', wellKnownRoutes);
 
 // Liveness probe — process is up.
 app.get('/api/health', (_req, res) => {

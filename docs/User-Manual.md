@@ -533,8 +533,112 @@ Settings configure how the system looks and behaves for your business.
 - Omnichannel: unified selling across in-person, online and marketplace channels.
 - Idempotent Sync: de-duplicated offline sync so transactions are never double-counted.
 - Web Serial, WebUSB, Web Bluetooth: browser APIs for connecting physical devices.
+- Fiscalisation: a government requirement that every receipt be signed, numbered and (in most regimes) reported.
+- Seal: the cryptographic signature and chain link that makes a fiscal document tamper-evident.
+- Settlement rail: the local clearing network a payment travels (SEPA Instant, PIX, ACH, UPI, M-Pesa and so on).
+- Reconciliation: matching what the acquirer paid out against what the register recorded.
+- Mandate: a signed, time-limited, ceiling-capped authorisation a shopping agent presents at checkout.
+- Fencing token: the (epoch, sequence) pair that lets a store reject writes from a deposed leader.
+- Royalty base: agreed revenue after exclusions, which is what a franchise royalty is actually charged on.
+- Elimination: removing intercompany sales when consolidating a franchise network, because the network did not sell to itself.
+- k-anonymity: a privacy rule that hides any statistic drawn from fewer than k comparable stores.
 
-## 32. Getting Help
+## 32. Global Expansion Modules
+
+Ten modules exist for one reason: a business that crosses a border - a second country, a second store, a franchisee, a buying agent, a partner app - normally needs a second system. Here it needs a second tick box. Each one is described below with where to find it in the navigation.
+
+### 32.1 Fiscalisation and e-invoicing
+
+**Where: Fiscal.**
+
+Unified POS ships 26 country regimes - TSE in Germany, SdI in Italy, ZATCA Phase 2 in Saudi Arabia, eTIMS in Kenya, NFC-e in Brazil, CFDI in Mexico, GST e-invoicing in India, KSeF in Poland and more - plus a no-fiscalisation profile for markets such as the US and UK.
+
+- Every sealed document carries a sequence number, a digest of its content and a link to the previous document, so editing an old receipt breaks the chain and says so.
+- **Verify chain** re-walks the documents and reports the first break, which is what an auditor asks for.
+- Missing receipt numbers are listed rather than silently accepted; each regime keeps its own document numbering prefix and retention period.
+- Where the regime requires a QR or TLV block (ZATCA, eTIMS, SAT, FATOORA), it is generated on the receipt.
+- Reporting is queued, retried with back-off and shown with its last outcome. When a country needs a hardware or partner bridge, the Fiscal page tells you which single setting is missing instead of failing at the register.
+
+### 32.2 Local payment rails and settlement
+
+**Where: Rails.**
+
+- Validates the identifier the local rail actually demands: IBAN check digits, US routing numbers, UK sort codes, Mexican CLABE, Brazilian CPF/CNPJ, Indian IFSC and UPI addresses, Nigerian NUBAN, Australian BSB, South African till numbers and international MSISDNs. A mistyped digit is caught before money moves, with the reason.
+- Chooses the cheapest workable rail for a payout (instant, standard or wire) using each network's ceiling and fee, and shows what the choice costs.
+- **Settlement reconciliation** compares the acquirer's statement against your own captured sales line by line, classifying every difference as amount, fee, timing or unmatched, and publishes a batch health score so a slow day is visible immediately.
+
+### 32.3 Agentic back-office
+
+**Where: Agent Ops.**
+
+The planner forecasts demand per item, then works out the reorder point from lead time, review period and a chosen service level, with safety stock, pack sizes and supplier minimums respected.
+
+- Guardrails are yours: a maximum spend, a maximum number of lines, and suppliers you have blocked. The plan trims the least urgent lines to fit and tells you what was deferred.
+- Urgency is scored, so the line that runs dry first is at the top of the list.
+- Approved lines become draft purchase orders. **Nothing is sent to a supplier until a human approves it** - the agent drafts, you decide.
+
+### 32.4 Vertical solutions
+
+**Where: Verticals.**
+
+Fourteen trade packs - grocery, pharmacy, fashion, hardware, auto repair, salon, quick service, liquor, electronics, bakery, wholesale, rental, pet care and clinic - each add the fields, menu entries and register behaviour that trade needs. Enabling a pack applies it to your location; disabling it removes what it added without touching your sales history.
+
+### 32.5 Embedded finance
+
+**Where: Finance.**
+
+- Underwriting reads only your own trading history - months trading, sales stability, refund and chargeback rates, dormant days and settlement freshness - and returns a score, a risk band, a suggested limit, the reasons for any decline and a term sheet per available duration.
+- Each facility has a real amortisation schedule and a daily sweep that takes a fixed percentage of net sales, capped, oldest instalment first. Any leftover is reported rather than applied twice.
+- This is a ledger of a credit facility with its repayment maths; funds move only through the payment rails you have already configured.
+
+### 32.6 Agentic commerce
+
+**Where: Agent Storefront.**
+
+Buying agents can already read your shop; now they can pay for it safely.
+
+- The catalogue is published as JSON-LD (schema.org Product and Offer) so an agent can price and stock-check without scraping.
+- `/.well-known/unifiedpos` and `/.well-known/unifiedpos/{merchantId}` declare your endpoints, mandate rules and accepted payment methods before an agent authenticates.
+- A **mandate** is a signed authorisation with a ceiling amount, a lifetime, per-line price guards and a nonce. Checkout verifies the signature, the window, the currency, stock, the agent-sellable flag and the ceiling, and refuses with a specific code so the agent can correct one line instead of losing the sale.
+
+### 32.7 Store mesh
+
+**Where: Mesh.**
+
+A store is a terminal, a tablet, a kitchen display and a kiosk writing to the same stock count.
+
+- The leader is elected deterministically from live devices (role, then operator priority, then most recent heartbeat, then id), so every device reaches the same answer.
+- The leader holds a lease. Every write carries its epoch and sequence, which is what fences off the classic failure: a partitioned ex-leader coming back and overwriting committed state. A write claiming an epoch the store never granted is refused for the same reason.
+- Concurrent stock edits are merged as deltas rather than overwriting each other; absolute values fall back to last-writer-wins with a deterministic tie-break.
+- The page shows health as healthy, degraded or isolated, with the lease countdown and which devices are unreachable.
+
+### 32.8 Franchise and multi-entity
+
+**Where: Franchise.**
+
+- Royalty agreements support flat percentage, banded, per-unit and fixed models, agreed exclusions (VAT, tips, gift-card redemption) and a monthly minimum. Each calculation is printed as the steps that produced it, so a franchisee can audit a statement without asking you for a spreadsheet.
+- Stock moved between entities is priced cost-plus-markup with freight, so the sending entity recognises its margin and the receiving one carries a real cost.
+- The consolidated P&L sums the entities and then eliminates intercompany sales and their matching cost, showing the unrealised profit still sitting in a franchisee's stock. Unpaid royalties are aged.
+
+### 32.9 Ecosystem: apps and custom fields
+
+**Where: Apps.**
+
+- Eleven partner and first-party apps are listed with exactly the scopes they need. Installing shows the riskiest thing the grant can do; a high-risk grant needs an explicit acknowledgement before it is issued.
+- The API token is shown once. It can be rotated or revoked per installation, verified, and its scopes narrowed later without reinstalling.
+- Custom fields add the columns your trade needs - cut length, batch number, stylist note - to orders, customers or products. Values are typed and validated at the edge, so a number field never quietly accepts "yes".
+
+### 32.10 Peer benchmarking
+
+**Where: Benchmark.**
+
+Ten metrics - average basket, gross margin, labour cost, shrink, discounting, attachment rate, repeat customers, digital share, inventory turns and daily sales - compared against stores in your country, trade and size band.
+
+- A cohort smaller than the k threshold never publishes, not even a median. Outliers are clipped into the 5th-95th percentile range and a calibrated noise figure is added to what is shown.
+- The page publishes the privacy ledger with every figure: cohort size, k, noise applied, participation rate. A suppressed cell is the model working, not a missing feature.
+- Contributing your own numbers is what makes the comparison exist at all; the participation rate is shown alongside every metric.
+
+## 33. Getting Help
 
 - Use this manual at any time from the footer link: User Manual (PDF).
 - Review the legal and policy documents from the footer and the Compliance Center.

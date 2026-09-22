@@ -2085,3 +2085,422 @@ model MediaAsset {
   @@index([organizationId, folder])
   @@map("media_assets")
 }
+
+// ═══ FISCALIZATION (per-country signed receipts / e-invoicing) ═══
+// A fiscal profile is a country's legal cash-register regime (Germany TSE,
+// Italy SDI, Saudi ZATCA phase-2, Nigeria e-invoice …). The device row is the
+// tenant's registration with that regime; documents form a hash chain so a
+// deleted or edited receipt breaks verification.
+model FiscalDevice {
+  id             String    @id @default(uuid())
+  organizationId String
+  locationId     String?
+  profileCode    String   // DE_TSE, FR_TSE, IT_SDI, SA_ZATCA, NG_EINV, KE_ETIMS, SIMPLE
+  serialNumber   String
+  activationCode String?  // stored encrypted via services/crypto
+  publicKeyRef   String?
+  lastSequence   Int       @default(0)
+  lastSignedAt   DateTime?
+  status         String    @default("ACTIVE") // ACTIVE, SUSPENDED, RETIRED
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([organizationId, serialNumber])
+  @@index([organizationId, status])
+  @@map("fiscal_devices")
+}
+
+model FiscalDocument {
+  id             String    @id @default(uuid())
+  organizationId String
+  orderId        String?
+  deviceId       String?
+  profileCode    String
+  documentType   String    @default("RECEIPT") // RECEIPT, INVOICE, CREDIT_NOTE
+  receiptNumber  String
+  sequenceNumber Int       @default(1)
+  total          Decimal   @db.Decimal(12, 2)
+  vatTotal       Decimal   @default(0) @db.Decimal(12, 2)
+  currency       String    @default("USD")
+  payloadHash    String   // sha256 over the canonical fiscal payload
+  previousHash   String?  // hash-chain link to the document before it
+  signedHash     String?  // seal = hash(previousHash + payloadHash + salt)
+  qrPayload      String?
+  status         String    @default("SEALED") // SEALED, PENDING, TRANSMITTED, REJECTED, FAILED
+  attempts       Int       @default(0)
+  nextRetryAt    DateTime?
+  externalRef    String?
+  errorMessage   String?
+  sealedAt       DateTime  @default(now())
+  transmittedAt  DateTime?
+
+  @@unique([organizationId, profileCode, receiptNumber])
+  @@index([organizationId, status, nextRetryAt])
+  @@index([organizationId, orderId])
+  @@map("fiscal_documents")
+}
+
+// ═══ LOCAL PAYMENT RAILS + SETTLEMENT ═══
+// Rail accounts are the tenant's real-world receiving instruments per country
+// (IBAN, UPI address, PIX key, CVM/Mobile-money till, ACH …). Settlement
+// batches are the money statements the acquirer sends back; reconciling them
+// against internal Payment rows is what turns "we took money" into "the bank
+// agrees we took this much, minus these fees".
+model RailAccount {
+  id             String   @id @default(uuid())
+  organizationId String
+  locationId     String?
+  countryCode    String   @default("US")
+  railCode       String   // SEPA, FPS, PIX, UPI, ACH, SWIFT, CVM, MOMO, BVN, ...
+  label          String
+  identifier     String   // IBAN / virtual account / till number / VPA
+  holderName     String?
+  verification   String   @default("UNVERIFIED") // UNVERIFIED, VERIFIED, FAILED
+  isValid        Boolean  @default(true)
+  validationNote String?
+  isPrimary      Boolean  @default(false)
+  metadata       Json?
+  status         String   @default("ACTIVE") // ACTIVE, INACTIVE
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([organizationId, railCode, identifier])
+  @@index([organizationId, countryCode])
+  @@map("rail_accounts")
+}
+
+model SettlementBatch {
+  id                String    @id @default(uuid())
+  organizationId    String
+  countryCode       String    @default("US")
+  railCode          String
+  provider          String    @default("INTERNAL")
+  batchDate         DateTime
+  currency          String    @default("USD")
+  grossAmount       Decimal   @default(0) @db.Decimal(14, 2)
+  feeAmount         Decimal   @default(0) @db.Decimal(14, 2)
+  expectedNet       Decimal   @default(0) @db.Decimal(14, 2)
+  matchedNet        Decimal   @default(0) @db.Decimal(14, 2)
+  variance          Decimal   @default(0) @db.Decimal(14, 2)
+  lineCount         Int       @default(0)
+  matchedCount      Int       @default(0)
+  status            String    @default("OPEN") // OPEN, RECONCILED, DISCREPANCY, SIGNED_OFF
+  discrepancyDetail Json?
+  signedOffBy       String?
+  signedOffAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([organizationId, status])
+  @@index([organizationId, batchDate])
+  @@map("settlement_batches")
+}
+
+model SettlementLine {
+  id                String   @id @default(uuid())
+  batchId           String
+  organizationId    String
+  externalReference String?
+  paymentId         String?
+  orderId           String?
+  amount            Decimal  @default(0) @db.Decimal(14, 2)
+  fee               Decimal  @default(0) @db.Decimal(14, 2)
+  valueDate         DateTime?
+  status            String   @default("UNMATCHED_PROVIDER") // MATCHED, UNMATCHED_PROVIDER, UNMATCHED_INTERNAL, FEE_MISMATCH
+  note              String?
+  createdAt         DateTime @default(now())
+
+  @@index([batchId, status])
+  @@index([organizationId, externalReference])
+  @@map("settlement_lines")
+}
+
+// ═══ AGENTIC BACK-OFFICE ═══
+// A replenishment run is the plan the buying agent drafts from the demand
+// forecast; it stays a DRAFT until a human approves it into purchase orders.
+model ReplenishmentRun {
+  id              String    @id @default(uuid())
+  organizationId  String
+  trigger         String    @default("MANUAL") // MANUAL, AUTO
+  horizonDays     Int       @default(14)
+  itemCount       Int       @default(0)
+  supplierCount   Int       @default(0)
+  estimatedCost   Decimal   @default(0) @db.Decimal(14, 2)
+  status          String    @default("DRAFT") // DRAFT, APPROVED, ORDERED, DISCARDED
+  plan            Json?    // [{supplierId, productId, onHand, projected, quantity, unitCost, cost}]
+  guardrails      Json?    // {maxSpend, excludedSuppliers, minQuantity}
+  approvedBy      String?
+  approvedAt      DateTime?
+  purchaseOrderIds Json?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([organizationId, status])
+  @@map("replenishment_runs")
+}
+
+// ═══ VERTICAL SOLUTIONS ═══
+model VerticalInstallation {
+  id             String   @id @default(uuid())
+  organizationId String
+  solutionCode   String
+  version        String   @default("1.0.0")
+  status         String   @default("INSTALLED") // INSTALLED, RETIRED
+  features       Json?    // capability flags the solution switched on
+  config         Json?    // per-solution overrides
+  posHints       Json?    // what the POS screen should surface for this vertical
+  appliedDelta   Json?    // settings changes made at install time (for rollback)
+  enabledBy      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([organizationId, solutionCode])
+  @@index([organizationId, status])
+  @@map("vertical_installations")
+}
+
+// ═══ EMBEDDED FINANCE ═══
+// Working-capital lending underwritten from the tenant's own settlement
+// history, repaid by a daily sweep of card sales.
+model CreditFacility {
+  id               String    @id @default(uuid())
+  organizationId   String
+  status           String    @default("PENDING") // PENDING, APPROVED, DECLINED, ACTIVE, CLOSED, DEFAULTED
+  requestedAmount  Decimal   @default(0) @db.Decimal(14, 2)
+  approvedLimit    Decimal   @default(0) @db.Decimal(14, 2)
+  drawnAmount      Decimal   @default(0) @db.Decimal(14, 2)
+  outstanding      Decimal   @default(0) @db.Decimal(14, 2)
+  rate             Decimal   @default(0) @db.Decimal(6, 3) // annual percentage
+  termMonths       Int       @default(6)
+  installmentAmount Decimal  @default(0) @db.Decimal(14, 2)
+  sweepPercent     Decimal   @default(0) @db.Decimal(5, 2) // share of daily net sales swept
+  score            Int       @default(0)
+  scoreBand        String?
+  underwriting     Json?     // factor-by-factor breakdown of the decision
+  eligibility      Json?
+  nextDueDate      DateTime?
+  lastSweepAt      DateTime?
+  openedAt         DateTime?
+  closedAt         DateTime?
+  decidedBy        String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([organizationId, status])
+  @@map("credit_facilities")
+}
+
+model LoanRepayment {
+  id           String    @id @default(uuid())
+  facilityId   String
+  organizationId String
+  period       Int
+  dueDate      DateTime
+  principal    Decimal   @default(0) @db.Decimal(14, 2)
+  interest     Decimal   @default(0) @db.Decimal(14, 2)
+  total        Decimal   @default(0) @db.Decimal(14, 2)
+  paidAmount   Decimal   @default(0) @db.Decimal(14, 2)
+  status       String    @default("DUE") // DUE, PARTIAL, PAID, OVERDUE
+  paidAt       DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([facilityId, period])
+  @@index([organizationId, status, dueDate])
+  @@map("loan_repayments")
+}
+
+// ═══ AGENTIC COMMERCE ═══
+// A mandate is a cryptographically signed purchase authorisation issued by (or
+// on behalf of) a human, which an AI agent can present to check out unattended.
+model AgentMandate {
+  id             String    @id @default(uuid())
+  organizationId String
+  locationId     String?
+  agentId        String
+  agentName      String?
+  principalEmail String?
+  mandateType    String    @default("PURCHASE") // PURCHASE, GIFT, REPLENISH
+  items          Json     // [{productId | sku, quantity, maxUnitPrice}]
+  ceilingAmount  Decimal   @default(0) @db.Decimal(14, 2)
+  amount         Decimal   @default(0) @db.Decimal(14, 2)
+  currency       String    @default("USD")
+  nonce          String    @unique
+  issuedAt       DateTime
+  expiresAt      DateTime
+  signature      String
+  signatureAlg   String    @default("HMAC-SHA256")
+  status         String    @default("ACTIVE") // ACTIVE, FULFILLED, REJECTED, EXPIRED, REVOKED
+  rejectReason   String?
+  orderId        String?
+  fulfilledAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([organizationId, status])
+  @@index([organizationId, agentId])
+  @@map("agent_mandates")
+}
+
+// ═══ STORE MESH (multi-device reconciliation) ═══
+// One device per location is elected leader; every write carries the epoch it
+// was issued under so a partitioned ex-leader can never overwrite committed
+// state with a stale write (classic fencing token).
+model MeshFence {
+  id              String    @id @default(uuid())
+  organizationId  String
+  locationId      String
+  epoch           Int       @default(1)
+  leaderDeviceId  String?
+  previousLeaderId String?
+  committedSequence Int     @default(0)
+  leaseSeconds    Int       @default(30)
+  lastCommitAt    DateTime?
+  reason          String?  // BOOTSTRAP, HEARTBEAT_TIMEOUT, MANUAL_FAILOVER, RENEWED
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([organizationId, locationId])
+  @@map("mesh_fences")
+}
+
+// ═══ FRANCHISE / MULTI-ENTITY ═══
+model FranchiseAgreement {
+  id                   String    @id @default(uuid())
+  organizationId       String
+  entityCode           String
+  franchiseeName       String
+  locationId           String?
+  royaltyModel         String    @default("PERCENT") // PERCENT, TIERED, PER_ITEM, FIXED
+  royaltyPercent       Decimal   @default(0) @db.Decimal(5, 2)
+  tiers                Json?    // [{upTo, percent}] ascending
+  perItemFee           Decimal   @default(0) @db.Decimal(12, 2)
+  fixedMonthly         Decimal   @default(0) @db.Decimal(14, 2)
+  minimumMonthly       Decimal   @default(0) @db.Decimal(14, 2)
+  marketingFundPercent Decimal   @default(0) @db.Decimal(5, 2)
+  transferMarkupPercent Decimal  @default(0) @db.Decimal(5, 2) // cost-plus for inter-entity stock
+  exclusions           Json?    // non-refundable taxes, vouchers, tips …
+  currency             String    @default("USD")
+  status               String    @default("ACTIVE") // DRAFT, ACTIVE, SUSPENDED, TERMINATED
+  startDate            DateTime
+  endDate              DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@unique([organizationId, entityCode])
+  @@index([organizationId, status])
+  @@map("franchise_agreements")
+}
+
+model RoyaltyAccrual {
+  id                  String   @id @default(uuid())
+  organizationId      String
+  agreementId         String
+  locationId          String?
+  periodStart         DateTime
+  periodEnd           DateTime
+  grossSales          Decimal  @default(0) @db.Decimal(14, 2)
+  taxableBase         Decimal  @default(0) @db.Decimal(14, 2)
+  unitsSold           Int      @default(0)
+  royaltyAmount       Decimal  @default(0) @db.Decimal(14, 2)
+  marketingFundAmount Decimal  @default(0) @db.Decimal(14, 2)
+  minimumApplied      Boolean  @default(false)
+  calculation         Json?   // step-by-step audit of how the number was derived
+  status              String   @default("CALCULATED") // CALCULATED, INVOICED, PAID, DISPUTED
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@unique([agreementId, periodStart])
+  @@index([organizationId, status])
+  @@map("royalty_accruals")
+}
+
+// ═══ ECOSYSTEM (third-party apps + custom fields) ═══
+model AppInstallation {
+  id             String   @id @default(uuid())
+  organizationId String
+  appCode        String
+  appName        String
+  publisher      String?
+  categories     Json?
+  scopes         Json    // grant list, validated against the app manifest
+  config         Json?
+  tokenHash      String? // sha256 of the issued API token (never the token)
+  status         String   @default("INSTALLED") // INSTALLED, DISABLED, UNINSTALLED
+  installedBy    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([organizationId, appCode])
+  @@index([organizationId, status])
+  @@map("app_installations")
+}
+
+model CustomFieldDefinition {
+  id             String   @id @default(uuid())
+  organizationId String
+  entity         String   @default("ORDER") // ORDER, CUSTOMER, PRODUCT
+  fieldKey       String
+  label          String
+  dataType       String   @default("TEXT") // TEXT, NUMBER, MONEY, PERCENT, DATE, BOOLEAN, SELECT
+  required       Boolean  @default(false)
+  defaultValue   String?
+  options        Json?   // SELECT choices
+  validation     Json?   // {min, max, pattern, maxLength}
+  active         Boolean  @default(true)
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([organizationId, entity, fieldKey])
+  @@index([organizationId, entity, active])
+  @@map("custom_field_definitions")
+}
+
+model CustomFieldValue {
+  id           String    @id @default(uuid())
+  organizationId String
+  fieldId      String
+  entityUuid   String
+  textValue    String?
+  numberValue  Decimal?  @db.Decimal(14, 4)
+  boolValue    Boolean?
+  dateValue    DateTime?
+  updatedBy    String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([fieldId, entityUuid])
+  @@index([organizationId, entityUuid])
+  @@map("custom_field_values")
+}
+
+// ═══ PEER BENCHMARKING (k-anonymous, noised) ═══
+// A snapshot is one cohort-metric cell (country + industry + metric + period).
+// Individual submissions are normalised into buckets and differentially noised
+// before publication, and a cohort smaller than k is never published at all.
+model BenchmarkSnapshot {
+  id             String   @id @default(uuid())
+  organizationId String?
+  countryCode    String   @default("US")
+  industry       String   @default("RETAIL")
+  metricKey      String
+  periodStart    DateTime
+  periodEnd      DateTime
+  cohortSize     Int      @default(0)
+  kValue         Int      @default(5)
+  publishable    Boolean  @default(false)
+  median         Decimal? @db.Decimal(14, 4)
+  p10            Decimal? @db.Decimal(14, 4)
+  p25            Decimal? @db.Decimal(14, 4)
+  p75            Decimal? @db.Decimal(14, 4)
+  p90            Decimal? @db.Decimal(14, 4)
+  noiseApplied   Decimal  @default(0) @db.Decimal(14, 4)
+  distribution   Json?   // {members: [...], min, max} without re-identifying detail
+  generatedAt    DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  @@index([countryCode, industry, metricKey])
+  @@index([organizationId, metricKey])
+  @@map("benchmark_snapshots")
+}

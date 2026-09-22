@@ -28,7 +28,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "smoke": "node scripts/smoke-test.mjs"
+    "smoke": "node scripts/smoke-test.mjs",
+    "smoke:global": "node scripts/smoke-global.mjs"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^5.0.0",

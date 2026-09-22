@@ -936,4 +936,224 @@ export const api = {
     request<any>('/media', { method: 'POST', body: JSON.stringify(data) }),
   getMediaAsset: (id: string) => request<any>(`/media/${id}`),
   deleteMediaAsset: (id: string) => request<any>(`/media/${id}`, { method: 'DELETE' }),
+
+  // ── Fiscalization: country regimes, hash-chain seals, verification ──
+  getFiscalProfiles: () => request<any>('/fiscal/profiles'),
+  getFiscalStatus: () => request<any>('/fiscal/status'),
+  getFiscalDevices: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/fiscal/devices${query}`);
+  },
+  createFiscalDevice: (data: any) => request<any>('/fiscal/devices', { method: 'POST', body: JSON.stringify(data) }),
+  updateFiscalDeviceStatus: (id: string, status: string) =>
+    request<any>(`/fiscal/devices/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+  retireFiscalDevice: (id: string) => request<any>(`/fiscal/devices/${id}`, { method: 'DELETE' }),
+  sealFiscalDocument: (data: { orderId: string; receiptNumber?: string; locationId?: string }) =>
+    request<any>('/fiscal/seal', { method: 'POST', body: JSON.stringify(data) }),
+  getFiscalDocuments: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/fiscal/documents${query}`);
+  },
+  getFiscalDocument: (id: string) => request<any>(`/fiscal/documents/${id}`),
+  verifyFiscalChain: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/fiscal/chain/verify${query}`);
+  },
+  transmitFiscalDocuments: (data?: { limit?: number }) =>
+    request<any>('/fiscal/transmit', { method: 'POST', body: JSON.stringify(data || {}) }),
+  getFiscalRetention: () => request<any>('/fiscal/retention'),
+
+  // ── Local payment rails + settlement reconciliation ──
+  getRailCatalog: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/rails/catalog${query}`);
+  },
+  getRailsForMarket: (countryCode: string) => request<any>(`/rails/market/${countryCode}`),
+  validateRailIdentifier: (data: { kind: string; identifier: string; keyType?: string | null }) =>
+    request<any>('/rails/validate', { method: 'POST', body: JSON.stringify(data) }),
+  quoteRail: (data: { amount: number; countryCode?: string; currency?: string; feePercent?: number; feeFixed?: number }) =>
+    request<any>('/rails/quote', { method: 'POST', body: JSON.stringify(data) }),
+  getRailAccounts: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/rails/accounts${query}`);
+  },
+  createRailAccount: (data: any) => request<any>('/rails/accounts', { method: 'POST', body: JSON.stringify(data) }),
+  setPrimaryRailAccount: (id: string) => request<any>(`/rails/accounts/${id}/primary`, { method: 'PUT' }),
+  removeRailAccount: (id: string) => request<any>(`/rails/accounts/${id}`, { method: 'DELETE' }),
+  createSettlementBatch: (data: {
+    railCode: string;
+    lines: { reference?: string | null; externalReference?: string | null; providerRef?: string | null; amount: number; fee?: number; valueDate?: string | null }[];
+    provider?: string;
+    batchDate?: string;
+    currency?: string;
+    tolerance?: number;
+    feeTolerance?: number;
+    autoMatchFrom?: string;
+    autoMatchTo?: string;
+  }) => request<any>('/rails/settlements', { method: 'POST', body: JSON.stringify(data) }),
+  getSettlementBatches: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/rails/settlements${query}`);
+  },
+  getSettlementBatch: (id: string) => request<any>(`/rails/settlements/${id}`),
+  signOffSettlement: (id: string, data?: { note?: string }) =>
+    request<any>(`/rails/settlements/${id}/sign-off`, { method: 'POST', body: JSON.stringify(data || {}) }),
+
+  // ── Agentic back-office: replenishment drafts awaiting a human approval ──
+  runReplenishment: (data?: any) => request<any>('/agent/replenish', { method: 'POST', body: JSON.stringify(data || {}) }),
+  getReplenishmentRuns: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/agent/runs${query}`);
+  },
+  getReplenishmentRun: (id: string) => request<any>(`/agent/runs/${id}`),
+  approveReplenishmentRun: (id: string) => request<any>(`/agent/runs/${id}/approve`, { method: 'POST' }),
+  discardReplenishmentRun: (id: string, reason?: string) =>
+    request<any>(`/agent/runs/${id}/discard`, { method: 'POST', body: JSON.stringify({ reason }) }),
+  getAgentLowStock: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/agent/low-stock${query}`);
+  },
+  getAgentForecast: (productId: string, params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/agent/forecast/${productId}${query}`);
+  },
+  getAgentOverview: () => request<any>('/agent/overview'),
+
+  // ── Vertical solutions marketplace ──
+  getVerticals: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/verticals${query}`);
+  },
+  getVerticalCapabilities: () => request<any>('/verticals/capabilities'),
+  getPosHints: () => request<any>('/verticals/pos/hints'),
+  getVerticalMarketFit: () => request<any>('/verticals/market/fit'),
+  getVertical: (code: string) => request<any>(`/verticals/${code}`),
+  installVertical: (code: string, data?: { confirmations?: string[]; config?: Record<string, unknown> }) =>
+    request<any>(`/verticals/${code}/install`, { method: 'POST', body: JSON.stringify(data || {}) }),
+  retireVertical: (code: string) => request<any>(`/verticals/${code}/retire`, { method: 'POST', body: JSON.stringify({}) }),
+  configureVertical: (code: string, config: Record<string, unknown>) =>
+    request<any>(`/verticals/${code}/config`, { method: 'PUT', body: JSON.stringify(config) }),
+
+  // ── Embedded finance: underwriting, facilities, daily sweeps ──
+  getFinanceEligibility: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/finance/eligibility${query}`);
+  },
+  applyForFacility: (data: { requestedAmount: number; termMonths?: number; acknowledgeTerms?: boolean }) =>
+    request<any>('/finance/apply', { method: 'POST', body: JSON.stringify(data) }),
+  getCreditFacilities: () => request<any>('/finance/facilities'),
+  getCreditFacility: (id: string) => request<any>(`/finance/facilities/${id}`),
+  approveCreditFacility: (id: string, data?: any) =>
+    request<any>(`/finance/facilities/${id}/approve`, { method: 'POST', body: JSON.stringify(data || {}) }),
+  declineCreditFacility: (id: string, reason?: string) =>
+    request<any>(`/finance/facilities/${id}/decline`, { method: 'POST', body: JSON.stringify({ reason }) }),
+  sweepCreditFacility: (id: string) => request<any>(`/finance/facilities/${id}/sweep`, { method: 'POST' }),
+  getFinancePosition: () => request<any>('/finance/position'),
+  quoteFacility: (data: { principal: number; annualRatePercent?: number; months?: number }) =>
+    request<any>('/finance/quote', { method: 'POST', body: JSON.stringify(data) }),
+
+  // ── Agentic commerce: signed mandates + the public machine surface ──
+  createAgentMandate: (data: any) => request<any>('/agents/mandates', { method: 'POST', body: JSON.stringify(data) }),
+  getAgentMandates: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/agents/mandates${query}`);
+  },
+  revokeAgentMandate: (id: string, reason?: string) =>
+    request<any>(`/agents/mandates/${id}/revoke`, { method: 'POST', body: JSON.stringify({ reason }) }),
+  getAgentStorefrontOverview: () => request<any>('/agents/overview'),
+  // Public, unauthenticated: the /agents page previews what an agent sees.
+  getPublicAgentDescriptor: (merchant: string) => request<any>(`/agents/public/descriptor?merchant=${encodeURIComponent(merchant)}`),
+  getPublicAgentCatalog: (merchant: string, params?: Record<string, string>) => {
+    const query = new URLSearchParams({ merchant, ...(params || {}) }).toString();
+    return request<any>(`/agents/public/catalog.jsonld?${query}`);
+  },
+  verifyAgentMandate: (data: { merchantId: string; mandate: any }) =>
+    request<any>('/agents/public/mandate/verify', { method: 'POST', body: JSON.stringify(data) }),
+  checkoutAgentMandate: (data: { merchantId: string; mandate: any; signature: string }) =>
+    request<any>('/agents/public/mandate/checkout', { method: 'POST', body: JSON.stringify(data) }),
+
+  // ── Store mesh: leader election, fencing tokens, conflict merge ──
+  getMeshStatus: () => request<any>('/mesh/status'),
+  getMeshLocation: (locationId: string) => request<any>(`/mesh/locations/${locationId}`),
+  claimMeshLeadership: (locationId: string, data: { deviceId: string; epoch?: number | null; leaseSeconds?: number; reason?: string }) =>
+    request<any>(`/mesh/locations/${locationId}/claim`, { method: 'POST', body: JSON.stringify(data) }),
+  sendMeshHeartbeat: (locationId: string, deviceId: string) =>
+    request<any>(`/mesh/locations/${locationId}/heartbeat`, { method: 'POST', body: JSON.stringify({ deviceId }) }),
+  commitMeshWrite: (locationId: string, data: { deviceId: string; epoch: number; sequence: number }) =>
+    request<any>(`/mesh/locations/${locationId}/commit`, { method: 'POST', body: JSON.stringify(data) }),
+  resolveMeshConflict: (data: { base: number; writes: { deviceId: string; deviceTimestamp: string; delta?: number | null; value?: number | null; epoch?: number | null }[] }) =>
+    request<any>('/mesh/conflicts/resolve', { method: 'POST', body: JSON.stringify(data) }),
+  getMeshReconciliation: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/mesh/reconcile${query}`);
+  },
+
+  // ── Franchise: agreements, royalties, transfer pricing, consolidation ──
+  getFranchiseAgreements: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/franchise/agreements${query}`);
+  },
+  saveFranchiseAgreement: (data: any) => request<any>('/franchise/agreements', { method: 'POST', body: JSON.stringify(data) }),
+  setFranchiseAgreementStatus: (id: string, status: string, reason?: string) =>
+    request<any>(`/franchise/agreements/${id}/status`, { method: 'POST', body: JSON.stringify({ status, reason }) }),
+  previewRoyalty: (data: { agreement: any; period: any }) =>
+    request<any>('/franchise/royalties/preview', { method: 'POST', body: JSON.stringify(data) }),
+  accrueRoyalties: (data?: { periodStart?: string; periodEnd?: string }) =>
+    request<any>('/franchise/royalties/accrue', { method: 'POST', body: JSON.stringify(data || {}) }),
+  getRoyaltyAccruals: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/franchise/royalties${query}`);
+  },
+  setRoyaltyAccrualStatus: (id: string, status: string, note?: string) =>
+    request<any>(`/franchise/royalties/${id}/status`, { method: 'POST', body: JSON.stringify({ status, note }) }),
+  quoteTransferPrice: (data: { cost: number; markupPercent?: number; freight?: number; quantity?: number; fromAgreement?: string }) =>
+    request<any>('/franchise/transfer-price', { method: 'POST', body: JSON.stringify(data) }),
+  getConsolidatedPnl: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/franchise/consolidated${query}`);
+  },
+
+  // ── Ecosystem: partner apps, scopes, custom fields ──
+  getAppCatalog: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/apps/catalog${query}`);
+  },
+  getAppManifest: (code: string) => request<any>(`/apps/catalog/${code}`),
+  installApp: (data: { appCode: string; scopes?: string[]; config?: any; acknowledgeScopes?: boolean }) =>
+    request<any>('/apps/install', { method: 'POST', body: JSON.stringify(data) }),
+  uninstallApp: (code: string) => request<any>(`/apps/${code}/uninstall`, { method: 'POST', body: JSON.stringify({}) }),
+  rotateAppToken: (code: string) => request<any>(`/apps/${code}/token`, { method: 'POST' }),
+  updateAppScopes: (code: string, scopes: string[]) =>
+    request<any>(`/apps/${code}/scopes`, { method: 'PUT', body: JSON.stringify({ scopes }) }),
+  getAppInstallations: () => request<any>('/apps/installs'),
+  verifyAppToken: (data: { token: string; appCode?: string; requiredScopes?: string[] }) =>
+    request<any>('/apps/verify-token', { method: 'POST', body: JSON.stringify(data) }),
+  getCustomFields: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/apps/fields${query}`);
+  },
+  saveCustomField: (data: any) => request<any>('/apps/fields', { method: 'POST', body: JSON.stringify(data) }),
+  deactivateCustomField: (id: string) => request<any>(`/apps/fields/${id}`, { method: 'DELETE' }),
+  getCustomFieldValues: (entityUuid: string, entity?: string) =>
+    request<any>(`/apps/fields/values/${entityUuid}${entity ? `?entity=${entity}` : ''}`),
+  saveCustomFieldValues: (data: { entityUuid: string; entity?: string; values: Record<string, unknown>; partial?: boolean }) =>
+    request<any>('/apps/fields/values', { method: 'POST', body: JSON.stringify(data) }),
+  getEcosystemOverview: () => request<any>('/apps/overview'),
+
+  // ── Peer benchmarking (k-anonymous, noised) ──
+  getBenchmarkMetrics: () => request<any>('/benchmark/metrics'),
+  getBenchmark: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/benchmark${query}`);
+  },
+  getAllBenchmarks: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/benchmark/all${query}`);
+  },
+  getBenchmarkProfile: () => request<any>('/benchmark/profile'),
+  getBenchmarkSnapshots: () => request<any>('/benchmark/snapshots'),
+  getBenchmarkCohort: (metric: string, params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/benchmark/cohort/${metric}${query}`);
+  },
 };

@@ -71,6 +71,19 @@ export const en = {
   'nav.media': 'Media',
   'nav.fraud': 'Fraud',
 
+  // Global-expansion subsystems
+  'nav.group.global': 'Global',
+  'nav.fiscalization': 'Fiscalization',
+  'nav.rails': 'Payment Rails',
+  'nav.agentOps': 'Buying Agent',
+  'nav.verticals': 'Verticals',
+  'nav.finance': 'Embedded Finance',
+  'nav.agents': 'Agent Storefront',
+  'nav.mesh': 'Store Mesh',
+  'nav.franchise': 'Franchise',
+  'nav.apps': 'App Ecosystem',
+  'nav.benchmark': 'Peer Benchmark',
+
   // Login page
   'login.brandName': 'Unified POS',
   'login.subtitle': 'Sign in to your account',
@@ -97,6 +110,17 @@ export type TranslationKey = keyof typeof en;
 export type Dictionary = Partial<Record<TranslationKey, string>>;
 
 export const es: Dictionary = {
+  'nav.group.global': 'Global',
+  'nav.fiscalization': 'Fiscalización',
+  'nav.rails': 'Canales de pago',
+  'nav.agentOps': 'Agente de compras',
+  'nav.verticals': 'Verticales',
+  'nav.finance': 'Finanzas integradas',
+  'nav.agents': 'Escaparate para agentes',
+  'nav.mesh': 'Malla de tiendas',
+  'nav.franchise': 'Franquicia',
+  'nav.apps': 'Ecosistema de apps',
+  'nav.benchmark': 'Comparativa entre pares',
   'common.loading': 'Cargando…',
   'app.tagline': 'Comercio de lujo',
   'app.status.operational': 'Todos los sistemas operativos',
@@ -168,6 +192,17 @@ export const es: Dictionary = {
 };
 
 export const fr: Dictionary = {
+  'nav.group.global': 'Global',
+  'nav.fiscalization': 'Fiscalisation',
+  'nav.rails': 'Canaux de paiement',
+  'nav.agentOps': "Agent d'achats",
+  'nav.verticals': 'Verticales',
+  'nav.finance': 'Finance intégrée',
+  'nav.agents': 'Vitrine agents',
+  'nav.mesh': 'Maillage des magasins',
+  'nav.franchise': 'Franchise',
+  'nav.apps': "Écosystème d'apps",
+  'nav.benchmark': 'Comparatif entre pairs',
   'common.loading': 'Chargement…',
   'app.tagline': 'Commerce de luxe',
   'app.status.operational': 'Tous les systèmes sont opérationnels',
@@ -239,6 +274,17 @@ export const fr: Dictionary = {
 };
 
 export const de: Dictionary = {
+  'nav.group.global': 'Global',
+  'nav.fiscalization': 'Fiskalisierung',
+  'nav.rails': 'Zahlungsverkehre',
+  'nav.agentOps': 'Einkaufsagent',
+  'nav.verticals': 'Branchenlösungen',
+  'nav.finance': 'Eingebettete Finanzen',
+  'nav.agents': 'Agenten-Shop',
+  'nav.mesh': 'Filialnetz',
+  'nav.franchise': 'Franchise',
+  'nav.apps': 'App-Ökosystem',
+  'nav.benchmark': 'Vergleich mit Branchen',
   'common.loading': 'Wird geladen …',
   'app.tagline': 'Luxus-Handel',
   'app.status.operational': 'Alle Systeme betriebsbereit',
@@ -310,6 +356,17 @@ export const de: Dictionary = {
 };
 
 export const pt: Dictionary = {
+  'nav.group.global': 'Global',
+  'nav.fiscalization': 'Fiscalização',
+  'nav.rails': 'Canais de pagamento',
+  'nav.agentOps': 'Agente de compras',
+  'nav.verticals': 'Verticais',
+  'nav.finance': 'Finanças embutidas',
+  'nav.agents': 'Vitrine para agentes',
+  'nav.mesh': 'Malha de lojas',
+  'nav.franchise': 'Franquia',
+  'nav.apps': 'Ecossistema de apps',
+  'nav.benchmark': 'Comparação entre pares',
   'common.loading': 'Carregando…',
   'app.tagline': 'Comércio de luxo',
   'app.status.operational': 'Todos os sistemas operacionais',

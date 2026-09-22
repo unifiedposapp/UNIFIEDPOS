@@ -42,6 +42,17 @@ import {
   Images,
   LineChart,
   ShieldAlert,
+  // Global-expansion subsystems
+  Receipt,
+  Landmark,
+  Bot,
+  Layers,
+  PiggyBank,
+  Store,
+  Network,
+  Building,
+  Puzzle,
+  Scale,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
@@ -115,6 +126,21 @@ const navGroups: { labelKey: TranslationKey; items: { to: string; labelKey: Tran
       { to: '/enterprise', labelKey: 'nav.enterprise', icon: Building2 },
       { to: '/system', labelKey: 'nav.system', icon: Activity },
       { to: '/sync', labelKey: 'nav.sync', icon: RefreshCw },
+    ],
+  },
+  {
+    labelKey: 'nav.group.global',
+    items: [
+      { to: '/fiscalization', labelKey: 'nav.fiscalization', icon: Receipt },
+      { to: '/rails', labelKey: 'nav.rails', icon: Landmark },
+      { to: '/agent-ops', labelKey: 'nav.agentOps', icon: Bot },
+      { to: '/verticals', labelKey: 'nav.verticals', icon: Layers },
+      { to: '/finance', labelKey: 'nav.finance', icon: PiggyBank },
+      { to: '/agents', labelKey: 'nav.agents', icon: Store },
+      { to: '/mesh', labelKey: 'nav.mesh', icon: Network },
+      { to: '/franchise', labelKey: 'nav.franchise', icon: Building },
+      { to: '/apps', labelKey: 'nav.apps', icon: Puzzle },
+      { to: '/benchmark', labelKey: 'nav.benchmark', icon: Scale },
     ],
   },
   {

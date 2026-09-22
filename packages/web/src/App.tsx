@@ -60,6 +60,18 @@ const MediaPage = lazy(() => import('./pages/MediaPage'));
 // Public, unauthenticated guest pages (payment checkout + scan-to-order)
 const PayLinkPage = lazy(() => import('./pages/PayLinkPage'));
 const GuestOrderPage = lazy(() => import('./pages/GuestOrderPage'));
+// Global-expansion surfaces: fiscal, rails, agentic ops, verticals, finance,
+// agent commerce, mesh, franchise, ecosystem, benchmarking
+const FiscalizationPage = lazy(() => import('./pages/FiscalizationPage'));
+const RailsPage = lazy(() => import('./pages/RailsPage'));
+const AgentOpsPage = lazy(() => import('./pages/AgentOpsPage'));
+const VerticalsPage = lazy(() => import('./pages/VerticalsPage'));
+const FinancePage = lazy(() => import('./pages/FinancePage'));
+const AgentStorefrontPage = lazy(() => import('./pages/AgentStorefrontPage'));
+const MeshPage = lazy(() => import('./pages/MeshPage'));
+const FranchisePage = lazy(() => import('./pages/FranchisePage'));
+const AppsPage = lazy(() => import('./pages/AppsPage'));
+const BenchmarkPage = lazy(() => import('./pages/BenchmarkPage'));
 
 /** Centered spinner shown while a lazy route chunk is being fetched. */
 function RouteFallback() {
@@ -149,6 +161,16 @@ function App() {
           <Route path="/receipt/:orderId" element={<ReceiptPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/compliance" element={<CompliancePage />} />
+          <Route path="/fiscalization" element={<FiscalizationPage />} />
+          <Route path="/rails" element={<RailsPage />} />
+          <Route path="/agent-ops" element={<AgentOpsPage />} />
+          <Route path="/verticals" element={<VerticalsPage />} />
+          <Route path="/finance" element={<FinancePage />} />
+          <Route path="/agents" element={<AgentStorefrontPage />} />
+          <Route path="/mesh" element={<MeshPage />} />
+          <Route path="/franchise" element={<FranchisePage />} />
+          <Route path="/apps" element={<AppsPage />} />
+          <Route path="/benchmark" element={<BenchmarkPage />} />
           <Route path="/legal/:doc" element={<LegalPage />} />
           <Route path="*" element={<Navigate to="/pos" replace />} />
         </Routes>

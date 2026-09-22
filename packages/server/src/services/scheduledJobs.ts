@@ -11,6 +11,7 @@ import { registerJob, type JobResult } from './scheduler.js';
 import { emitEvent } from './eventBus.js';
 import { sendEmail, isEmailConfigured } from './email.js';
 import { round2 } from './moneyMath.js';
+import { registerGlobalJobs } from './globalJobs.js';
 
 const SEC = 1000;
 const MIN = 60 * SEC;
@@ -383,4 +384,7 @@ export function registerAllJobs(): void {
   registerJob({ name: 'retail.expire-stored-value', intervalMs: HOUR, handler: expireStoredValue });
   registerJob({ name: 'loyalty.expire-points', intervalMs: 6 * HOUR, handler: expireLoyaltyPoints });
   registerJob({ name: 'compliance.retention-purge', intervalMs: DAY, handler: retentionPurge });
+  // Global-expansion jobs (fiscal chain, sweeps, replenishment drafts, royalty
+  // close, benchmark cells, mesh leases) live in their own registry module.
+  registerGlobalJobs();
 }
