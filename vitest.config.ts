@@ -37,6 +37,9 @@ export default defineConfig({
         'packages/server/src/services/moneyMath.ts',
         'packages/server/src/services/email.ts',
         'packages/server/src/services/aiEngine.ts',
+        'packages/server/src/services/barcodes.ts',
+        'packages/server/src/services/tradingPatterns.ts',
+        'packages/server/src/services/deliveryChannels.ts',
       ],
       thresholds: {
         statements: 70,

@@ -11,7 +11,10 @@ import {
   padRight,
   CMD,
   ESC,
+  buildLabel,
+  buildLabelBatch,
   type ReceiptData,
+  type LabelData,
 } from '../src/services/escpos';
 
 /** Decode ASCII bytes back to a string for readable assertions. */
@@ -138,5 +141,86 @@ describe('buildReceipt', () => {
   it('prints a discount line only when a discount exists', () => {
     expect(ascii(buildReceipt(SAMPLE))).not.toContain('Discount');
     expect(ascii(buildReceipt({ ...SAMPLE, discount: 1.5 }))).toContain('Discount');
+  });
+});
+
+const LABEL: LabelData = {
+  name: 'Coffee Beans',
+  price: 4.99,
+  sku: 'CB-1',
+  barcode: '1234567890123',
+  storeName: 'Demo',
+};
+
+describe('buildLabel', () => {
+  it('renders the store, name, price, sku line and barcode value', () => {
+    const text = ascii(buildLabel(LABEL));
+    expect(text).toContain('DEMO'); // store name is upper-cased
+    expect(text).toContain('Coffee Beans');
+    expect(text).toContain('$4.99');
+    expect(text).toContain('SKU CB-1');
+    expect(text).toContain('1234567890123');
+  });
+
+  it('begins with a centre-alignment command (not a reset — the batch owns that)', () => {
+    const bytes = buildLabel(LABEL);
+    expect(bytes[0]).toBe(ESC);
+    expect(bytes[1]).toBe(0x61); // ESC a n
+    expect(bytes[2]).toBe(1); // centered
+  });
+
+  it('omits the amount entirely for an info-only label', () => {
+    expect(ascii(buildLabel({ name: 'Shelf info' }))).not.toContain('$');
+  });
+
+  it('falls back to the SKU as the scannable code when no barcode is given', () => {
+    const text = ascii(buildLabel({ name: 'Thing', sku: 'SKU-9' }));
+    expect(text).toContain('SKU SKU-9');
+    expect(text).toContain('SKU-9'); // printed under the bar too
+  });
+
+  it('feeds a size-specific gap after each label so a batch tears cleanly', () => {
+    const tail = (size: 'SMALL' | 'MEDIUM' | 'LARGE') => {
+      const bytes = buildLabel({ name: 'x' }, { size });
+      return Array.from(bytes.slice(bytes.length - 3));
+    };
+    expect(tail('SMALL')).toEqual([ESC, 0x64, 2]);
+    expect(tail('MEDIUM')).toEqual([ESC, 0x64, 3]);
+    expect(tail('LARGE')).toEqual([ESC, 0x64, 4]);
+  });
+
+  it('wraps an over-long name across two rows and drops the overflow', () => {
+    const long = `${'A'.repeat(20)} ${'B'.repeat(20)} ${'C'.repeat(20)}`;
+    const text = ascii(buildLabel({ name: long }));
+    expect(text).toContain('A'.repeat(20));
+    expect(text).toContain('B'.repeat(20));
+    expect(text).not.toContain('C'.repeat(20));
+  });
+});
+
+describe('buildLabelBatch', () => {
+  it('initialises once at the head and cuts once at the tail', () => {
+    const bytes = buildLabelBatch([LABEL, { name: 'Tea', price: 2.5 }]);
+    expect(Array.from(bytes.slice(0, CMD.INIT.length))).toEqual(Array.from(CMD.INIT));
+    expect(Array.from(bytes.slice(bytes.length - CMD.CUT.length))).toEqual(Array.from(CMD.CUT));
+  });
+
+  it('concatenates every label in the run', () => {
+    const text = ascii(buildLabelBatch([{ name: 'Alpha', price: 1.5 }, { name: 'Beta', price: 2.5 }]));
+    expect(text).toContain('Alpha');
+    expect(text).toContain('$1.50');
+    expect(text).toContain('Beta');
+    expect(text).toContain('$2.50');
+  });
+
+  it('omits the trailing cut when cut:false', () => {
+    const bytes = buildLabelBatch([{ name: 'A' }], { cut: false });
+    expect(Array.from(bytes.slice(bytes.length - CMD.CUT.length))).not.toEqual(Array.from(CMD.CUT));
+  });
+
+  it('is deterministic — identical input yields identical bytes', () => {
+    const a = buildLabelBatch([LABEL]);
+    const b = buildLabelBatch([LABEL]);
+    expect(Array.from(a)).toEqual(Array.from(b));
   });
 });

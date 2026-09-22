@@ -58,6 +58,7 @@ model Organization {
   tips            Tip[]
   commissions     Commission[]
   purchaseOrders  PurchaseOrder[]
+  storefronts     Storefront[]
   giftCards       GiftCard[]
   storeCredits    StoreCredit[]
   layaways        Layaway[]
@@ -102,6 +103,8 @@ model Location {
   orders       Order[]
   deliveryZones DeliveryZone[]
   batches       InventoryBatch[]
+  storefronts   Storefront[]
+  purchaseOrders PurchaseOrder[]
 
   @@map("locations")
 }
@@ -565,6 +568,7 @@ model Order {
   employeeId      String?
   customerId      String?
   channel         String   @default("IN_STORE") // IN_STORE, WEBSITE, MOBILE_APP, PHONE, SOCIAL, MARKETPLACE, POP_UP
+  storefrontToken String?  @unique // set when the order was placed through a public online storefront (§Epos-Now multi-channel)
   status          String   @default("DRAFT")    // DRAFT, HELD, CONFIRMED, PAID, PROCESSING, FULFILLED, COMPLETED, CANCELLED, REFUNDED, PARTIALLY_REFUNDED
   currency        String   @default("USD")
   subtotal        Decimal  @default(0) @db.Decimal(10, 2)
@@ -1533,6 +1537,8 @@ model PurchaseOrder {
   id              String   @id @default(uuid())
   organizationId  String
   supplierId      String
+  locationId      String? // where the delivery lands; defaults to the org's main location
+  replenishmentRunId String? // set when the buying agent's approved draft created this PO
   status          String   @default("DRAFT") // DRAFT, SENT, PARTIAL, RECEIVED, CANCELLED
   orderDate       DateTime @default(now())
   expectedDate    DateTime?
@@ -1542,7 +1548,8 @@ model PurchaseOrder {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  organization Organization         @relation(fields: [organizationId], references: [id])
+  organization Organization  @relation(fields: [organizationId], references: [id])
+  location     Location?     @relation(fields: [locationId], references: [id])
   items        PurchaseOrderItem[]
 
   @@map("purchase_orders")
@@ -2238,6 +2245,36 @@ model ReplenishmentRun {
 
   @@index([organizationId, status])
   @@map("replenishment_runs")
+}
+
+// ─── ONLINE STOREFRONT (public multi-channel ordering) ───────────────────────
+// A merchant-branded web store per location: customers browse the published
+// catalog and place PICKUP / CURBSIDE / DELIVERY / SHIP orders without an
+// account. Stock numbers are the same inventory the till decrements, so the
+// web can never oversell the shop floor. Orders carry a claimCode so the
+// customer can check status without logging in.
+model Storefront {
+  id              String   @id @default(uuid())
+  organizationId  String
+  locationId      String?
+  slug            String   @unique // public URL: /shop/:slug
+  name            String   // e.g. "Downtown Counter"
+  isEnabled       Boolean  @default(false)
+  fulfillmentTypes Json?   // ["PICKUP","DELIVERY",...] subset offered to customers
+  pickupSlotsJson Json?    // [{day, slots:["10:00","12:30"]}] — null = during trading hours
+  deliveryFee     Decimal? @db.Decimal(10, 2)
+  minOrderAmount  Decimal? @db.Decimal(10, 2)
+  payOnPickup     Boolean  @default(true) // false = card online required before submit
+  headerText      String?
+  themeColor      String?  // brand accent for the public page
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  location     Location?    @relation(fields: [locationId], references: [id])
+
+  @@index([organizationId, isEnabled])
+  @@map("storefronts")
 }
 
 // ═══ VERTICAL SOLUTIONS ═══

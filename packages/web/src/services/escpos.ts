@@ -234,3 +234,93 @@ export function cashDrawerBytes(pin: 0 | 1 = 0, onMs = 25, offMs = 250): Uint8Ar
   const t2 = Math.min(255, Math.round(offMs / 2));
   return new Uint8Array([ESC, 0x70, pin, t1 & 0xff, t2 & 0xff]);
 }
+
+// ─── Shelf-edge / product labels ─────────────────────────────────────────────
+// A label is not a receipt: one item, a big price, a scannable bar, and a cut.
+// Same byte builder discipline as buildReceipt — pure, deterministic, testable.
+
+export interface LabelData {
+  /** Product name; bold, and wrapped over up to two rows. */
+  name: string;
+  /** Price printed large; omit for an info-only label. */
+  price?: number | null;
+  currencySymbol?: string;
+  sku?: string | null;
+  /** Value encoded into the CODE128 bar; the SKU is used when omitted. */
+  barcode?: string | null;
+  storeName?: string;
+  /** Small line under the name, e.g. "Organic · 500 g". */
+  subtitle?: string | null;
+  category?: string | null;
+}
+
+export type LabelSize = 'SMALL' | 'MEDIUM' | 'LARGE';
+
+/** Size → blank lines fed after a label, so a batch tears cleanly at the gap. */
+const LABEL_FEED: Record<LabelSize, number> = { SMALL: 2, MEDIUM: 3, LARGE: 4 };
+
+/**
+ * One label: store, name, price, barcode, feed. Alignment is centered because
+ * shelf labels are stuck on by eye, not measured.
+ */
+export function buildLabel(data: LabelData, options: { width?: PaperWidth; size?: LabelSize; showSku?: boolean } = {}): Uint8Array {
+  const width = options.width ?? 32;
+  const size = options.size ?? 'MEDIUM';
+  const sym = data.currencySymbol ?? '$';
+  const parts: Uint8Array[] = [CMD.align(1)];
+
+  if (data.storeName) parts.push(encodeText(data.storeName.toUpperCase().slice(0, width)), CMD.LF);
+  parts.push(
+    CMD.bold(true),
+    CMD.size(size === 'LARGE' ? 0x11 : 0x01),
+    encodeText(fitText(data.name, width, size === 'LARGE' ? 1 : 2)),
+    CMD.size(0x00),
+    CMD.bold(false),
+    CMD.LF
+  );
+  if (data.subtitle) parts.push(encodeText(String(data.subtitle).slice(0, width)), CMD.LF);
+  if (data.category) parts.push(encodeText(String(data.category).slice(0, width)), CMD.LF);
+  if (data.price != null && Number.isFinite(Number(data.price))) {
+    parts.push(CMD.bold(true), CMD.size(0x11), encodeText(money(Number(data.price), sym)), CMD.size(0x00), CMD.bold(false), CMD.LF);
+  }
+  if (options.showSku !== false && data.sku) parts.push(encodeText(`SKU ${String(data.sku).slice(0, width)}`), CMD.LF);
+
+  const code = data.barcode || data.sku;
+  if (code) {
+    const bc = barcodeBytes(code);
+    if (bc.length) parts.push(bc, CMD.LF, encodeText(String(code).slice(0, width)), CMD.LF);
+  }
+  parts.push(CMD.feed(LABEL_FEED[size]));
+  return concatBytes(...parts);
+}
+
+/**
+ * A whole run of labels in one stream, closed with a cut so the batch separates
+ * from whatever the printer last spat out.
+ */
+export function buildLabelBatch(labels: LabelData[], options: { width?: PaperWidth; size?: LabelSize; cut?: boolean } = {}): Uint8Array {
+  const parts: Uint8Array[] = [CMD.INIT];
+  for (const label of labels) parts.push(buildLabel(label, options));
+  if (options.cut !== false) parts.push(CMD.CUT);
+  return concatBytes(...parts);
+}
+
+/** Wrap text into at most `lines` rows no wider than `width` characters. */
+function fitText(text: string, width: number, lines: number): string {
+  const words = String(text ?? '').split(/\s+/).filter(Boolean);
+  const rows: string[] = [];
+  let current = '';
+  for (const word of words) {
+    const candidate = current ? `${current} ${word}` : word;
+    if (candidate.length > width && current) {
+      rows.push(current);
+      current = word;
+      if (rows.length === lines) break;
+    } else {
+      current = candidate;
+    }
+  }
+  if (current && rows.length < lines) rows.push(current);
+  const joined = rows.join('\n');
+  return joined.length > width * lines ? joined.slice(0, width * lines) : joined;
+}

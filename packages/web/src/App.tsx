@@ -31,6 +31,9 @@ const AccountingPage = lazy(() => import('./pages/AccountingPage'));
 const EmployeesPage = lazy(() => import('./pages/EmployeesPage'));
 const SuppliersPage = lazy(() => import('./pages/SuppliersPage'));
 const PurchasingPage = lazy(() => import('./pages/PurchasingPage'));
+const StorefrontPage = lazy(() => import('./pages/StorefrontPage'));
+const LabelsPage = lazy(() => import('./pages/LabelsPage'));
+const DeliveryPage = lazy(() => import('./pages/DeliveryPage'));
 const RetailPage = lazy(() => import('./pages/RetailPage'));
 const CommercePage = lazy(() => import('./pages/CommercePage'));
 const CatalogPage = lazy(() => import('./pages/CatalogPage'));
@@ -60,6 +63,7 @@ const MediaPage = lazy(() => import('./pages/MediaPage'));
 // Public, unauthenticated guest pages (payment checkout + scan-to-order)
 const PayLinkPage = lazy(() => import('./pages/PayLinkPage'));
 const GuestOrderPage = lazy(() => import('./pages/GuestOrderPage'));
+const ShopPage = lazy(() => import('./pages/ShopPage'));
 // Global-expansion surfaces: fiscal, rails, agentic ops, verticals, finance,
 // agent commerce, mesh, franchise, ecosystem, benchmarking
 const FiscalizationPage = lazy(() => import('./pages/FiscalizationPage'));
@@ -93,15 +97,18 @@ function App() {
     loadFromStorage();
   }, [loadFromStorage]);
 
-  // Public guest surfaces (§9 payment-link checkout, §17 scan-to-order) render
-  // regardless of auth state and never mount the authenticated shell — a customer
-  // scanning a QR code or clicking a pay link has no account in this system.
-  if (/^\/(pay|order)\//.test(location.pathname)) {
+  // Public guest surfaces (§9 payment-link checkout, §17 scan-to-order, online
+  // storefront shop) render regardless of auth state and never mount the
+  // authenticated shell — a customer scanning a QR code or browsing the web shop
+  // has no account in this system.
+  if (/^\/(pay|order|shop)\//.test(location.pathname)) {
     return (
       <Suspense fallback={<RouteFallback />}>
         <Routes>
           <Route path="/pay/:token" element={<PayLinkPage />} />
           <Route path="/order/:token" element={<GuestOrderPage />} />
+          <Route path="/shop/:slug" element={<ShopPage />} />
+          <Route path="/shop/:slug/status/:token" element={<ShopPage />} />
         </Routes>
       </Suspense>
     );
@@ -135,6 +142,9 @@ function App() {
           <Route path="/employees" element={<EmployeesPage />} />
           <Route path="/suppliers" element={<SuppliersPage />} />
           <Route path="/purchasing" element={<PurchasingPage />} />
+          <Route path="/storefront" element={<StorefrontPage />} />
+          <Route path="/labels" element={<LabelsPage />} />
+          <Route path="/delivery" element={<DeliveryPage />} />
           <Route path="/loyalty" element={<LoyaltyPage />} />
           <Route path="/accounting" element={<AccountingPage />} />
           <Route path="/webhooks" element={<WebhooksPage />} />

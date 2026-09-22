@@ -2,8 +2,15 @@ import { Router, Response } from 'express';
 import { prisma } from '../db/client.js';
 import { AuthRequest, authMiddleware } from '../middleware/auth.js';
 import { handleError } from '../middleware/error.js';
+import { buildPeakHeatmap, detectDeadStock, monthsOfCover, type StockRow } from '../services/tradingPatterns.js';
 
 const router = Router();
+
+const num = (value: unknown, fallback: number) => {
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+};
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 // GET /api/reports/today - Today's snapshot
 router.get('/today', authMiddleware, async (req: AuthRequest, res: Response) => {
@@ -314,6 +321,159 @@ router.get('/inventory', authMiddleware, async (req: AuthRequest, res: Response)
           outOfStockCount,
         },
         items,
+      },
+    });
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
+// GET /api/reports/peak-hours - day × hour trading heatmap
+// Answers "when do I need staff?" in the store's own timezone, and separates
+// the online channel so web-order surges are not mistaken for a footfall peak.
+router.get('/peak-hours', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const orgId = req.user!.organizationId!;
+    const days = clamp(num(req.query.days, 90), 7, 365);
+    const locationId = req.query.locationId ? String(req.query.locationId) : undefined;
+    const since = new Date(Date.now() - days * 86_400_000);
+
+    const [settings, orders] = await Promise.all([
+      prisma.storeSettings.findUnique({ where: { organizationId: orgId }, select: { timezone: true } }),
+      prisma.order.findMany({
+        where: {
+          organizationId: orgId,
+          status: { in: ['PAID', 'COMPLETED'] },
+          createdAt: { gte: since },
+          ...(locationId ? { locationId } : {}),
+        },
+        select: { createdAt: true, totalAmount: true, channel: true },
+      }),
+    ]);
+
+    // Prisma hands back Decimal money; the heatmap works in plain numbers.
+    const sliced = orders.map((o) => ({ createdAt: o.createdAt, totalAmount: Number(o.totalAmount), channel: o.channel }));
+
+    const all = buildPeakHeatmap(sliced, { timezone: settings?.timezone, windowDays: days });
+    const onlineOrders = sliced.filter((o) => o.channel === 'WEBSITE');
+    // The online grid is returned without its 168 cells — the UI only needs
+    // where the web peaks, and the walk-in peak is the all-minus-online story.
+    const online = onlineOrders.length ? buildPeakHeatmap(onlineOrders, { timezone: settings?.timezone, windowDays: days }) : null;
+
+    res.json({
+      success: true,
+      data: {
+        days,
+        locationId: locationId || null,
+        timezone: all.timezone,
+        grid: all.grid,
+        byDay: all.byDay,
+        byHour: all.byHour,
+        busiest: all.busiest,
+        quietest: all.quietest,
+        peak: all.peak,
+        concentration: all.concentration,
+        totalOrders: all.totalOrders,
+        totalRevenue: all.totalRevenue,
+        online: online
+          ? { orders: online.totalOrders, revenue: online.totalRevenue, peak: online.peak, busiest: online.busiest, byDay: online.byDay, byHour: online.byHour }
+          : null,
+      },
+    });
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
+// GET /api/reports/dead-stock - what is on the shelf but not leaving it
+router.get('/dead-stock', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const orgId = req.user!.organizationId!;
+    const windowDays = clamp(num(req.query.days, 365), 30, 730);
+    const slowDays = clamp(num(req.query.slowDays, 30), 7, 365);
+    const deadDays = clamp(num(req.query.deadDays, 60), slowDays + 1, 730);
+    const frozenDays = clamp(num(req.query.frozenDays, 120), deadDays + 1, 1095);
+    const since = new Date(Date.now() - windowDays * 86_400_000);
+
+    const [balances, orders] = await Promise.all([
+      prisma.inventoryBalance.findMany({
+        where: { product: { organizationId: orgId, isActive: true } },
+        include: {
+          product: { select: { id: true, name: true, sku: true, type: true, price: true, costPrice: true, createdAt: true, category: { select: { name: true } } } },
+          movements: { orderBy: { createdAt: 'desc' }, take: 1, select: { createdAt: true } },
+        },
+      }),
+      prisma.order.findMany({
+        where: { organizationId: orgId, status: { in: ['PAID', 'COMPLETED'] }, createdAt: { gte: since } },
+        select: { createdAt: true, items: { select: { productId: true, quantity: true } } },
+      }),
+    ]);
+
+    // Last sale + units sold per product, straight from the order history.
+    const lastSold = new Map<string, number>();
+    const soldUnits = new Map<string, number>();
+    for (const order of orders) {
+      const at = order.createdAt.getTime();
+      for (const item of order.items) {
+        if (!lastSold.has(item.productId) || lastSold.get(item.productId)! < at) lastSold.set(item.productId, at);
+        soldUnits.set(item.productId, (soldUnits.get(item.productId) || 0) + item.quantity);
+      }
+    }
+
+    // Balances are per location: a product is dead only when it is dead everywhere.
+    const byProduct = new Map<string, StockRow & { soldInWindow: number }>();
+    let totalCostOnHand = 0;
+    for (const b of balances) {
+      const p = b.product;
+      const cost = Number(p.costPrice || 0);
+      totalCostOnHand += cost * b.quantity;
+      const lastTouched = b.movements[0]?.createdAt || p.createdAt;
+      const existing = byProduct.get(p.id);
+      if (existing) {
+        existing.quantity += b.quantity;
+        const touched = new Date(lastTouched).getTime();
+        if (Number.isFinite(touched) && touched > new Date(existing.lastTouchedAt!).getTime()) existing.lastTouchedAt = new Date(touched);
+      } else {
+        byProduct.set(p.id, {
+          productId: p.id,
+          name: p.name,
+          sku: p.sku,
+          type: p.type,
+          quantity: b.quantity,
+          costPrice: cost,
+          price: Number(p.price || 0),
+          lastSoldAt: lastSold.has(p.id) ? new Date(lastSold.get(p.id)!) : null,
+          lastTouchedAt: new Date(lastTouched),
+          categoryName: p.category?.name ?? null,
+          soldInWindow: soldUnits.get(p.id) || 0,
+        });
+      }
+    }
+
+    const rows = [...byProduct.values()];
+    const { items, summary, thresholds } = detectDeadStock(rows, { slowDays, deadDays, frozenDays });
+    const withCover = items.map((item) => {
+      const row = byProduct.get(item.productId)!;
+      return {
+        ...item,
+        soldInWindow: row.soldInWindow,
+        monthsOfCover: monthsOfCover(item.quantity, row.soldInWindow, windowDays),
+      };
+    });
+
+    res.json({
+      success: true,
+      data: {
+        windowDays,
+        thresholds,
+        items: withCover,
+        summary: {
+          ...summary,
+          skusTracked: rows.length,
+          costOnHand: Math.round(totalCostOnHand * 100) / 100,
+          // The headline number: "x% of my working capital is not moving".
+          pctOfStockValue: totalCostOnHand > 0 ? Math.round((summary.costTied / totalCostOnHand) * 10000) / 100 : 0,
+        },
       },
     });
   } catch (error) {

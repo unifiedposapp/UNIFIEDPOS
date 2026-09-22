@@ -55,6 +55,8 @@ import {
   Scale,
   Repeat,
   CandlestickChart,
+  Tags,
+  Navigation,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
@@ -79,6 +81,8 @@ const navGroups: { labelKey: TranslationKey; items: { to: string; labelKey: Tran
       { to: '/commerce', labelKey: 'nav.commerce', icon: Globe },
       { to: '/payments', labelKey: 'nav.payments', icon: CreditCard },
       { to: '/payment-links', labelKey: 'nav.paymentLinks', icon: Link2 },
+      { to: '/storefront', labelKey: 'nav.storefront', icon: Store },
+      { to: '/delivery', labelKey: 'nav.delivery', icon: Navigation },
     ],
   },
   {
@@ -86,6 +90,7 @@ const navGroups: { labelKey: TranslationKey; items: { to: string; labelKey: Tran
     items: [
       { to: '/inventory', labelKey: 'nav.inventory', icon: Package },
       { to: '/catalog', labelKey: 'nav.catalog', icon: Boxes },
+      { to: '/labels', labelKey: 'nav.labels', icon: Tags },
       { to: '/media', labelKey: 'nav.media', icon: Images },
       { to: '/transfers', labelKey: 'nav.transfers', icon: ArrowRightLeft },
       { to: '/purchasing', labelKey: 'nav.purchasing', icon: ShoppingBag },

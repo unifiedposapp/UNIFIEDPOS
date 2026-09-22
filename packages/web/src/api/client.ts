@@ -362,9 +362,14 @@ export const api = {
     request<any>(`/suppliers/${id}`, { method: 'DELETE' }),
 
   // Purchasing
-  getPurchaseOrders: () => request<any>('/purchasing/orders'),
+  getPurchaseOrders: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/purchasing/orders${query}`);
+  },
   createPurchaseOrder: (data: any) =>
     request<any>('/purchasing/orders', { method: 'POST', body: JSON.stringify(data) }),
+  deletePurchaseOrder: (id: string) =>
+    request<any>(`/purchasing/orders/${id}`, { method: 'DELETE' }),
   receivePurchaseOrder: (id: string, items: any[]) =>
     request<any>(`/purchasing/orders/${id}/receive`, { method: 'POST', body: JSON.stringify({ items }) }),
 
@@ -1206,4 +1211,59 @@ export const api = {
   discoverSso: (email: string) => request<any>(`/sso/discover?email=${encodeURIComponent(email)}`),
   /** Full browser-navigation URL that starts an SSO login for a connection. */
   ssoAuthorizeUrl: (connectionId: string) => `${API_BASE}/sso/authorize?connectionId=${encodeURIComponent(connectionId)}`,
+
+  // ── Online storefront: merchant setup + the public shop (no auth) ──
+  getStorefronts: () => request<any>('/storefront'),
+  createStorefront: (data: any) => request<any>('/storefront', { method: 'POST', body: JSON.stringify(data) }),
+  updateStorefront: (id: string, data: any) =>
+    request<any>(`/storefront/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteStorefront: (id: string) => request<any>(`/storefront/${id}`, { method: 'DELETE' }),
+  getStorefrontOrders: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/storefront/orders${query}`);
+  },
+  setStorefrontOrderStatus: (id: string, status: string, note?: string) =>
+    request<any>(`/storefront/orders/${id}/status`, { method: 'POST', body: JSON.stringify({ status, note }) }),
+  getStorefrontOverview: () => request<any>('/storefront/overview'),
+  // Public, unauthenticated shop surface.
+  getPublicStorefront: (slug: string) => request<any>(`/storefront/public/${encodeURIComponent(slug)}`),
+  placeStorefrontOrder: (slug: string, data: any) =>
+    request<any>(`/storefront/public/${encodeURIComponent(slug)}/order`, { method: 'POST', body: JSON.stringify(data) }),
+  getStorefrontOrderStatus: (slug: string, token: string) =>
+    request<any>(`/storefront/public/${encodeURIComponent(slug)}/order/${encodeURIComponent(token)}`),
+
+  // ── Barcode labels ──
+  buildLabels: (data: { productIds?: string[]; includeAll?: boolean; categoryId?: string; missingBarcodesOnly?: boolean; copies?: number; persistBarcodes?: boolean }) =>
+    request<any>('/products/labels', { method: 'POST', body: JSON.stringify(data) }),
+  scanProduct: (code: string) => request<any>(`/products/scan/${encodeURIComponent(code)}`),
+
+  // ── Trading-pattern reports ──
+  getPeakHoursReport: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/reports/peak-hours${query}`);
+  },
+  getDeadStockReport: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/reports/dead-stock${query}`);
+  },
+
+  // ── Purchasing: real purchase orders with a send/receive lifecycle ──
+  getPurchaseOrderSummary: () => request<any>('/purchasing/summary'),
+  updatePurchaseOrder: (id: string, data: any) =>
+    request<any>(`/purchasing/orders/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  sendPurchaseOrder: (id: string) => request<any>(`/purchasing/orders/${id}/send`, { method: 'POST' }),
+  cancelPurchaseOrder: (id: string) => request<any>(`/purchasing/orders/${id}/cancel`, { method: 'POST' }),
+  getSupplierOrders: (supplierId: string) => request<any>(`/purchasing/suppliers/${supplierId}/orders`),
+
+  // ── Delivery channels ──
+  getDeliveryChannels: () => request<any>('/delivery/channels'),
+  getDeliveryConnections: () => request<any>('/delivery/connections'),
+  connectDeliveryChannel: (data: any) => request<any>('/delivery/connect', { method: 'POST', body: JSON.stringify(data) }),
+  disconnectDeliveryChannel: (id: string) => request<any>(`/delivery/connect/${id}`, { method: 'DELETE' }),
+  pingDeliveryChannel: (id: string) => request<any>(`/delivery/connect/${id}/ping`, { method: 'POST' }),
+  getDeliveryQueue: () => request<any>('/delivery/queue'),
+  dispatchToChannel: (orderId: string, data?: { provider?: string; notes?: string }) =>
+    request<any>(`/delivery/orders/${orderId}/dispatch`, { method: 'POST', body: JSON.stringify(data || {}) }),
+  trackDelivery: (orderId: string) => request<any>(`/delivery/orders/${orderId}/track`, { method: 'POST' }),
+  getDeliveryOverview: () => request<any>('/delivery/overview'),
 };

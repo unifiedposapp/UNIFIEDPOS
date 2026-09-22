@@ -679,7 +679,50 @@ Recurring revenue runs through exactly the same money path as a one-off sale.
 - Directory sync (SCIM 2.0) lets your identity provider create, update and deactivate staff accounts as roles change, always scoped to your organization. Deactivating is never destructive, and the last active owner of an organization cannot be removed by directory sync.
 - Trust is fail-closed: unsigned SAML assertions, mismatched issuers, wrong audience, expired tokens and replayed nonces are all refused.
 
-## 33. Getting Help
+## 33. Storefront, Delivery, Labels and Trading Insights
+
+This group turns the back office outward and onward: a public online shop, real purchase orders that reach your suppliers, printable barcode labels, delivery-partner connectors, and the two reports that tell you *when* you trade and *what* is not selling. Each is a tick box away, not a second system.
+
+### 33.1 Online Storefront and click & collect
+
+Give customers a branded web shop that draws on the same catalog, stock and orders you already manage.
+
+- Open **Sell > Store** (Storefront) to configure a shop: enable it, choose its address (slug), pick-up versus delivery options, collection time slots, a delivery fee, a minimum order, whether payment is taken on pick-up, a header message and a theme colour.
+- Customers visit the public shop at `/shop/your-slug`, browse what is in stock, build a basket and place an order for collection or delivery. They receive a status link (`/shop/your-slug/status/…`) to follow their order without signing in.
+- Every storefront order drops straight into **Orders** and the fulfillment pipeline with its own storefront reference, so the register, the kitchen and the reports all see it. Use the Storefront queue tab to accept, prepare or hand over orders.
+- Storefronts are scoped to your organization and location, and never expose another tenant's catalog.
+
+### 33.2 Purchase orders that reach suppliers
+
+Section 8 described purchasing; it is now a full order lifecycle rather than a single entry.
+
+- Create a purchase order as a **draft**, add lines from your product catalog (cost defaults to the product cost price), then **Create and send** to email the supplier directly.
+- Receiving can be **partial**: enter the quantities that actually arrived and the order moves to **PARTIAL**, updating stock and writing a single expense ledger entry per receipt. Receiving is the moment stock and accounts move — sending an email never commits money.
+- Orders generated automatically by replenishment carry a provenance badge so you can see they originated from a forecast run, and every order can be tied to a **location**.
+- Drafts can be edited or deleted; sent orders can be received or cancelled with a reason.
+
+### 33.3 Barcode and shelf-edge labels
+
+- Open **Merchandise > Labels**, select the products to label and choose a label size.
+- Each label carries the product name, price and a scannable code. Manufacturer barcodes are kept as-is; products without one get a stable, internally generated EAN-13; codes with letters fall back to CODE128.
+- Print a formatted sheet from the browser, or send the run straight to a connected ESC/POS label printer.
+
+### 33.4 Delivery-channel connectors
+
+Connect outside aggregators and own-fleet couriers without custom code.
+
+- Open **Sell > Delivery** and add a connection: pick a channel from the catalog, set its name, and supply the API key and webhook secret. Secrets are stored encrypted and are write-only — leaving a field blank keeps the stored value.
+- Point the partner at your callback URL (`/api/delivery/webhooks/<provider>`). Inbound status updates are verified with a signed HMAC header and a replay window before they touch an order, and progress only ever moves forward, so a late message cannot rewind a delivered order.
+- Dispatch an order to a connected channel to get tracking; without a live dispatch URL the platform runs in an explicitly **simulated** mode so you can test the whole flow safely. The page shows per-channel performance and a live dispatch queue.
+
+### 33.5 Peak-hours and dead-stock reports
+
+Two reports that turn raw history into decisions.
+
+- **Reports > Trading patterns** renders a Monday-first day-by-hour heatmap computed in each store's own time zone, with the busiest and quietest slots, revenue per slot and a trade-concentration figure — the evidence for rota and stock decisions.
+- **Reports > Dead stock** flags lines that have not sold, grades them SLOW / DEAD / FROZEN, estimates months of cover, ranks them by the cash actually tied up, and suggests an action (promote, discount, transfer or write off).
+
+## 34. Getting Help
 
 - Use this manual at any time from the footer link: User Manual (PDF).
 - Review the legal and policy documents from the footer and the Compliance Center.

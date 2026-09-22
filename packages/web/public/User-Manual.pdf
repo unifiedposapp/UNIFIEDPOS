@@ -4,7 +4,7 @@
 << /Type /Catalog /Pages 2 0 R >>
 endobj
 2 0 obj
-<< /Type /Pages /Count 46 /Kids [7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R 23 0 R 25 0 R 27 0 R 29 0 R 31 0 R 33 0 R 35 0 R 37 0 R 39 0 R 41 0 R 43 0 R 45 0 R 47 0 R 49 0 R 51 0 R 53 0 R 55 0 R 57 0 R 59 0 R 61 0 R 63 0 R 65 0 R 67 0 R 69 0 R 71 0 R 73 0 R 75 0 R 77 0 R 79 0 R 81 0 R 83 0 R 85 0 R 87 0 R 89 0 R 91 0 R 93 0 R 95 0 R 97 0 R] >>
+<< /Type /Pages /Count 48 /Kids [7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R 23 0 R 25 0 R 27 0 R 29 0 R 31 0 R 33 0 R 35 0 R 37 0 R 39 0 R 41 0 R 43 0 R 45 0 R 47 0 R 49 0 R 51 0 R 53 0 R 55 0 R 57 0 R 59 0 R 61 0 R 63 0 R 65 0 R 67 0 R 69 0 R 71 0 R 73 0 R 75 0 R 77 0 R 79 0 R 81 0 R 83 0 R 85 0 R 87 0 R 89 0 R 91 0 R 93 0 R 95 0 R 97 0 R 99 0 R 101 0 R] >>
 endobj
 3 0 obj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
@@ -216,7 +216,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 12 0 R >>
 endobj
 12 0 obj
-<< /Length 1135 >>
+<< /Length 1380 >>
 stream
 0.08 0.08 0.09 rg
 BT /F1 11.5 Tf 1 0 0 1 68.00 652.00 Tm (30. Roles at a Glance) Tj ET
@@ -234,10 +234,15 @@ BT /F1 11.5 Tf 1 0 0 1 68.00 614.00 Tm (32. Global Expansion Modules) Tj ET
 BT /F2 11.5 Tf 1 0 0 1 535.21 614.00 Tm (41) Tj ET
 0.80 0.82 0.86 RG 0.4 w 68.00 609.00 m 548.00 609.00 l S
 0.08 0.08 0.09 rg
-BT /F1 11.5 Tf 1 0 0 1 68.00 595.00 Tm (33. Getting Help) Tj ET
+BT /F1 11.5 Tf 1 0 0 1 68.00 595.00 Tm (33. Storefront, Delivery, Labels and Trading Insights) Tj ET
 0.11 0.19 0.44 rg
 BT /F2 11.5 Tf 1 0 0 1 535.21 595.00 Tm (46) Tj ET
 0.80 0.82 0.86 RG 0.4 w 68.00 590.00 m 548.00 590.00 l S
+0.08 0.08 0.09 rg
+BT /F1 11.5 Tf 1 0 0 1 68.00 576.00 Tm (34. Getting Help) Tj ET
+0.11 0.19 0.44 rg
+BT /F2 11.5 Tf 1 0 0 1 535.21 576.00 Tm (48) Tj ET
+0.80 0.82 0.86 RG 0.4 w 68.00 571.00 m 548.00 571.00 l S
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
 BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
@@ -6064,11 +6069,185 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 98 0 R >>
 endobj
 98 0 obj
+<< /Length 5871 >>
+stream
+0.11 0.19 0.44 rg
+0.11 0.19 0.44 rg
+BT /F2 18 Tf 1 0 0 1 64.00 692.00 Tm (33. Storefront, Delivery, Labels and Trading Insights) Tj ET
+0.70 0.53 0.14 RG 1.4 w 64.00 684.00 m 548.00 684.00 l S
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 662.00 Tm (This group turns the back office outward and onward: a public online shop, real purchase orders) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 647.00 Tm (that reach your suppliers, printable barcode labels, delivery-partner connectors, and the two reports) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 632.00 Tm (that tell you when you trade and what is not selling. Each is a tick box away, not a second system.) Tj ET
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 606.00 Tm (33.1 Online Storefront and click & collect) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 588.00 Tm (Give customers a branded web shop that draws on the same catalog, stock and orders you already) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 573.00 Tm (manage.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 553.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 553.00 Tm (Open Sell > Store \(Storefront\) to configure a shop: enable it, choose its address \(slug\), pick-up) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 538.00 Tm (versus delivery options, collection time slots, a delivery fee, a minimum order, whether payment) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 523.00 Tm (is taken on pick-up, a header message and a theme colour.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 506.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 506.00 Tm (Customers visit the public shop at /shop/your-slug, browse what is in stock, build a basket and) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 491.00 Tm (place an order for collection or delivery. They receive a status link \(/shop/your-slug/status/...\) to) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 476.00 Tm (follow their order without signing in.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 459.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 459.00 Tm (Every storefront order drops straight into Orders and the fulfillment pipeline with its own) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 444.00 Tm (storefront reference, so the register, the kitchen and the reports all see it. Use the Storefront) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 429.00 Tm (queue tab to accept, prepare or hand over orders.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 412.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 412.00 Tm (Storefronts are scoped to your organization and location, and never expose another tenant's) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 397.00 Tm (catalog.) Tj ET
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 374.00 Tm (33.2 Purchase orders that reach suppliers) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 356.00 Tm (Section 8 described purchasing; it is now a full order lifecycle rather than a single entry.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 336.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 336.00 Tm (Create a purchase order as a draft, add lines from your product catalog \(cost defaults to the) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 321.00 Tm (product cost price\), then Create and send to email the supplier directly.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 304.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 304.00 Tm (Receiving can be partial: enter the quantities that actually arrived and the order moves to) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 289.00 Tm (PARTIAL, updating stock and writing a single expense ledger entry per receipt. Receiving is) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 274.00 Tm (the moment stock and accounts move - sending an email never commits money.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 257.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 257.00 Tm (Orders generated automatically by replenishment carry a provenance badge so you can see) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 242.00 Tm (they originated from a forecast run, and every order can be tied to a location.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 225.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 225.00 Tm (Drafts can be edited or deleted; sent orders can be received or cancelled with a reason.) Tj ET
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 202.00 Tm (33.3 Barcode and shelf-edge labels) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 184.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 184.00 Tm (Open Merchandise > Labels, select the products to label and choose a label size.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 167.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 167.00 Tm (Each label carries the product name, price and a scannable code. Manufacturer barcodes are) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 152.00 Tm (kept as-is; products without one get a stable, internally generated EAN-13; codes with letters) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 137.00 Tm (fall back to CODE128.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 120.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 120.00 Tm (Print a formatted sheet from the browser, or send the run straight to a connected ESC/POS) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 105.00 Tm (label printer.) Tj ET
+0.35 0.38 0.43 rg
+0.35 0.38 0.43 rg
+BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
+0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
+0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
+0.35 0.38 0.43 rg
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 46) Tj ET
+endstream
+endobj
+99 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 100 0 R >>
+endobj
+100 0 obj
+<< /Length 3283 >>
+stream
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 686.00 Tm (33.4 Delivery-channel connectors) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 668.00 Tm (Connect outside aggregators and own-fleet couriers without custom code.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 648.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 648.00 Tm (Open Sell > Delivery and add a connection: pick a channel from the catalog, set its name, and) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 633.00 Tm (supply the API key and webhook secret. Secrets are stored encrypted and are write-only -) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 618.00 Tm (leaving a field blank keeps the stored value.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 601.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 601.00 Tm (Point the partner at your callback URL \(/api/delivery/webhooks/<provider>\). Inbound status) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 586.00 Tm (updates are verified with a signed HMAC header and a replay window before they touch an) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 571.00 Tm (order, and progress only ever moves forward, so a late message cannot rewind a delivered) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 556.00 Tm (order.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 539.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 539.00 Tm (Dispatch an order to a connected channel to get tracking; without a live dispatch URL the) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 524.00 Tm (platform runs in an explicitly simulated mode so you can test the whole flow safely. The page) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 509.00 Tm (shows per-channel performance and a live dispatch queue.) Tj ET
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 486.00 Tm (33.5 Peak-hours and dead-stock reports) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 468.00 Tm (Two reports that turn raw history into decisions.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 448.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 448.00 Tm (Reports > Trading patterns renders a Monday-first day-by-hour heatmap computed in each) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 433.00 Tm (store's own time zone, with the busiest and quietest slots, revenue per slot and a) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 418.00 Tm (trade-concentration figure - the evidence for rota and stock decisions.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 401.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 401.00 Tm (Reports > Dead stock flags lines that have not sold, grades them SLOW / DEAD / FROZEN,) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 386.00 Tm (estimates months of cover, ranks them by the cash actually tied up, and suggests an action) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 371.00 Tm (\(promote, discount, transfer or write off\).) Tj ET
+0.35 0.38 0.43 rg
+0.35 0.38 0.43 rg
+BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
+0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
+0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
+0.35 0.38 0.43 rg
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 47) Tj ET
+endstream
+endobj
+101 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 102 0 R >>
+endobj
+102 0 obj
 << /Length 1412 >>
 stream
 0.11 0.19 0.44 rg
 0.11 0.19 0.44 rg
-BT /F2 18 Tf 1 0 0 1 64.00 692.00 Tm (33. Getting Help) Tj ET
+BT /F2 18 Tf 1 0 0 1 64.00 692.00 Tm (34. Getting Help) Tj ET
 0.70 0.53 0.14 RG 1.4 w 64.00 684.00 m 548.00 684.00 l S
 0.70 0.53 0.14 rg
 BT /F1 11 Tf 1 0 0 1 68.00 662.00 Tm (•) Tj ET
@@ -6095,112 +6274,116 @@ BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
 0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
 0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
 0.35 0.38 0.43 rg
-BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 46) Tj ET
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 48) Tj ET
 endstream
 endobj
 xref
-0 99
+0 103
 0000000000 65535 f
 0000000015 00000 n
 0000000064 00000 n
-0000000436 00000 n
-0000000533 00000 n
-0000000635 00000 n
-0000000740 00000 n
-0000000994 00000 n
-0000001140 00000 n
-0000002618 00000 n
-0000002765 00000 n
-0000009504 00000 n
-0000009652 00000 n
-0000010840 00000 n
-0000010988 00000 n
-0000015303 00000 n
-0000015451 00000 n
-0000020742 00000 n
-0000020890 00000 n
-0000023400 00000 n
-0000023548 00000 n
-0000031661 00000 n
-0000031809 00000 n
-0000045308 00000 n
-0000045456 00000 n
-0000050852 00000 n
-0000051000 00000 n
-0000054557 00000 n
-0000054705 00000 n
-0000063047 00000 n
-0000063195 00000 n
-0000073413 00000 n
-0000073561 00000 n
-0000074357 00000 n
-0000074505 00000 n
-0000083369 00000 n
-0000083517 00000 n
-0000084314 00000 n
-0000084462 00000 n
-0000092214 00000 n
-0000092362 00000 n
-0000100075 00000 n
-0000100223 00000 n
-0000108350 00000 n
-0000108498 00000 n
-0000117514 00000 n
-0000117662 00000 n
-0000126279 00000 n
-0000126427 00000 n
-0000128021 00000 n
-0000128169 00000 n
-0000136358 00000 n
-0000136506 00000 n
-0000143983 00000 n
-0000144131 00000 n
-0000152685 00000 n
-0000152833 00000 n
-0000162794 00000 n
-0000162942 00000 n
-0000166424 00000 n
-0000166572 00000 n
-0000174201 00000 n
-0000174349 00000 n
-0000182759 00000 n
-0000182907 00000 n
-0000190867 00000 n
-0000191015 00000 n
-0000192312 00000 n
-0000192460 00000 n
-0000199813 00000 n
-0000199961 00000 n
-0000208462 00000 n
-0000208610 00000 n
-0000216248 00000 n
-0000216396 00000 n
-0000224460 00000 n
-0000224608 00000 n
-0000233544 00000 n
-0000233692 00000 n
-0000235679 00000 n
-0000235827 00000 n
-0000239302 00000 n
-0000239450 00000 n
-0000240822 00000 n
-0000240970 00000 n
-0000242668 00000 n
-0000242816 00000 n
-0000249369 00000 n
-0000249517 00000 n
-0000255042 00000 n
-0000255190 00000 n
-0000260534 00000 n
-0000260682 00000 n
-0000266392 00000 n
-0000266540 00000 n
-0000272316 00000 n
-0000272464 00000 n
-0000274616 00000 n
-0000274764 00000 n
+0000000451 00000 n
+0000000548 00000 n
+0000000650 00000 n
+0000000755 00000 n
+0000001009 00000 n
+0000001155 00000 n
+0000002633 00000 n
+0000002780 00000 n
+0000009519 00000 n
+0000009667 00000 n
+0000011100 00000 n
+0000011248 00000 n
+0000015563 00000 n
+0000015711 00000 n
+0000021002 00000 n
+0000021150 00000 n
+0000023660 00000 n
+0000023808 00000 n
+0000031921 00000 n
+0000032069 00000 n
+0000045568 00000 n
+0000045716 00000 n
+0000051112 00000 n
+0000051260 00000 n
+0000054817 00000 n
+0000054965 00000 n
+0000063307 00000 n
+0000063455 00000 n
+0000073673 00000 n
+0000073821 00000 n
+0000074617 00000 n
+0000074765 00000 n
+0000083629 00000 n
+0000083777 00000 n
+0000084574 00000 n
+0000084722 00000 n
+0000092474 00000 n
+0000092622 00000 n
+0000100335 00000 n
+0000100483 00000 n
+0000108610 00000 n
+0000108758 00000 n
+0000117774 00000 n
+0000117922 00000 n
+0000126539 00000 n
+0000126687 00000 n
+0000128281 00000 n
+0000128429 00000 n
+0000136618 00000 n
+0000136766 00000 n
+0000144243 00000 n
+0000144391 00000 n
+0000152945 00000 n
+0000153093 00000 n
+0000163054 00000 n
+0000163202 00000 n
+0000166684 00000 n
+0000166832 00000 n
+0000174461 00000 n
+0000174609 00000 n
+0000183019 00000 n
+0000183167 00000 n
+0000191127 00000 n
+0000191275 00000 n
+0000192572 00000 n
+0000192720 00000 n
+0000200073 00000 n
+0000200221 00000 n
+0000208722 00000 n
+0000208870 00000 n
+0000216508 00000 n
+0000216656 00000 n
+0000224720 00000 n
+0000224868 00000 n
+0000233804 00000 n
+0000233952 00000 n
+0000235939 00000 n
+0000236087 00000 n
+0000239562 00000 n
+0000239710 00000 n
+0000241082 00000 n
+0000241230 00000 n
+0000242928 00000 n
+0000243076 00000 n
+0000249629 00000 n
+0000249777 00000 n
+0000255302 00000 n
+0000255450 00000 n
+0000260794 00000 n
+0000260942 00000 n
+0000266652 00000 n
+0000266800 00000 n
+0000272576 00000 n
+0000272724 00000 n
+0000274876 00000 n
+0000275024 00000 n
+0000280948 00000 n
+0000281097 00000 n
+0000284434 00000 n
+0000284584 00000 n
 trailer
-<< /Size 99 /Root 1 0 R /Info 6 0 R >>
+<< /Size 103 /Root 1 0 R /Info 6 0 R >>
 startxref
-276229
+286050
 %%EOF

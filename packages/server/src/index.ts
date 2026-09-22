@@ -39,6 +39,8 @@ import fraudRoutes from './routes/fraud.js';
 import paymentLinkRoutes from './routes/paymentLinks.js';
 import restaurantExtRoutes from './routes/restaurantExt.js';
 import publicOrderingRoutes from './routes/publicOrdering.js';
+import storefrontRoutes from './routes/storefront.js';
+import deliveryRoutes, { deliveryWebhookHandler } from './routes/delivery.js';
 import realtimeRoutes from './routes/realtime.js';
 import pushRoutes from './routes/push.js';
 import aiAnalyticsRoutes from './routes/aiAnalytics.js';
@@ -165,6 +167,11 @@ app.use(
 // route is mounted BEFORE the global JSON body parser below.
 app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), stripeWebhookHandler);
 
+// Delivery-partner status callbacks are HMAC-verified the same way: raw bytes,
+// any content type, on both API prefixes.
+app.post('/api/delivery/webhooks/:provider', express.raw({ type: () => true }), deliveryWebhookHandler);
+app.post('/api/v1/delivery/webhooks/:provider', express.raw({ type: () => true }), deliveryWebhookHandler);
+
 app.use(express.json({ limit: '12mb' })); // Raised limit: Settings branding stores base64 logo/media uploads
 app.use(express.urlencoded({ extended: false, limit: '2mb' })); // SAML POST-binding ACS sends form-encoded SAMLResponse (§sso)
 app.use(cookieParser()); // Parse cookies so the httpOnly session + CSRF cookies are readable (§37)
@@ -218,6 +225,8 @@ const routeTable: { path: string; stack: any[] }[] = [
   { path: '/fraud', stack: [fraudRoutes] }, // §37 fraud alert queue
   { path: '/payment-links', stack: [paymentLinkRoutes] }, // §9 payment links (+ public checkout)
   { path: '/public', stack: [publicOrderingRoutes] }, // §17 public guest QR ordering (no auth)
+  { path: '/storefront', stack: [storefrontRoutes] }, // online storefront: merchant CRUD + public /storefront/public/:slug shop
+  { path: '/delivery', stack: [deliveryRoutes] }, // delivery-channel connections + dispatch queue (status callbacks are raw-mounted above)
   { path: '/realtime', stack: [realtimeRoutes] }, // Real-time SSE stream (eventBus bridge)
   { path: '/push', stack: [pushRoutes] }, // Web Push (VAPID) subscriptions
   { path: '/media', stack: [mediaRoutes] }, // Media asset library (S3/DB adapter)

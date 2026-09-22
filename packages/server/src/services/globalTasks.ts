@@ -261,6 +261,7 @@ export async function approveReplenishmentRun(organizationId: string, runId: str
           data: {
             organizationId,
             supplierId,
+            replenishmentRunId: run.id,
             status: 'DRAFT',
             totalAmount: total,
             expectedDate: new Date(Date.now() + 7 * DAY_MS),

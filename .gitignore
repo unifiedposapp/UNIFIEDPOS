@@ -4,6 +4,7 @@ node_modules/
 # Build output
 dist/
 build/
+*.tsbuildinfo
 
 # Environment
 .env
@@ -29,3 +30,7 @@ packages/server/prisma/*.db
 
 # Testing
 coverage/
+
+# Deployment snapshots (build artifacts, kept out of the repo)
+*-Deployment.zip
+Unified POS Deployment*.zip
