@@ -74,13 +74,15 @@ export default function PurchasingPage() {
     const [poRes, supRes, prodRes, locRes, sumRes] = await Promise.all([
       api.getPurchaseOrders(Object.keys(query).length ? query : undefined),
       api.getSuppliers(),
-      api.getProducts(),
+      // Products come back paginated ({ data: { items } }); request a large page
+      // so every line's product dropdown can see the full catalog.
+      api.getProducts({ pageSize: '1000' }),
       api.getLocations(),
       api.getPurchaseOrderSummary(),
     ]);
     setOrders(poRes.data || []);
     setSuppliers(supRes.data || []);
-    setProducts(prodRes.data || []);
+    setProducts(prodRes.data?.items || []);
     setLocations(locRes.data || []);
     setSummary(sumRes.data);
   }, [statusFilter, supplierFilter]);

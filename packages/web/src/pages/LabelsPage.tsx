@@ -59,8 +59,10 @@ export default function LabelsPage() {
   const [notice, setNotice] = useState('');
 
   const load = useCallback(async () => {
-    const [prods, cats] = await Promise.all([api.getProducts(), api.getCategories()]);
-    setProducts(prods.data || []);
+    // /inventory/products is paginated ({ data: { items } }); ask for a big page
+    // so the whole catalog is selectable, and read `.items` (not `.data`).
+    const [prods, cats] = await Promise.all([api.getProducts({ pageSize: '1000' }), api.getCategories()]);
+    setProducts(prods.data?.items || []);
     setCategories(cats.data || []);
   }, []);
   useEffect(() => {

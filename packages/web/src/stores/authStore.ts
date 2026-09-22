@@ -32,12 +32,61 @@ interface AuthState {
   loadFromStorage: () => void;
 }
 
+/**
+ * Reads any persisted session synchronously. Used both to seed the store at
+ * module load (so the very first render already knows whether a user is
+ * authenticated) and by loadFromStorage. Without eager seeding, a hard refresh
+ * on a deep route (e.g. /labels) painted one frame as "signed out", tripping
+ * the catch-all <Navigate to="/login"> before the hydrate effect could run, and
+ * the intended route was lost. Guarded for non-browser (test/SSR) contexts.
+ */
+interface AuthSnapshot {
+  user: User | null;
+  employee: Employee | null;
+  organization: Organization | null;
+  token: string | null;
+  isAuthenticated: boolean;
+}
+
+function readStoredAuth(): AuthSnapshot {
+  const empty: AuthSnapshot = { user: null, employee: null, organization: null, token: null, isAuthenticated: false };
+  try {
+    if (typeof localStorage === 'undefined') return empty;
+    const token = localStorage.getItem('pos_token');
+    const userStr = localStorage.getItem('pos_user');
+    if (!token || !userStr) return empty;
+    const employeeStr = localStorage.getItem('pos_employee');
+    const orgStr = localStorage.getItem('pos_organization');
+    return {
+      user: JSON.parse(userStr),
+      token,
+      employee: employeeStr ? JSON.parse(employeeStr) : null,
+      organization: orgStr ? JSON.parse(orgStr) : null,
+      isAuthenticated: true,
+    };
+  } catch {
+    // Corrupt payload: clear it and treat as signed out.
+    try {
+      localStorage.removeItem('pos_token');
+      localStorage.removeItem('pos_user');
+      localStorage.removeItem('pos_employee');
+      localStorage.removeItem('pos_organization');
+    } catch {
+      /* ignore */
+    }
+    return empty;
+  }
+}
+
+// Seed eagerly at module evaluation so the first render is already correct.
+const boot = readStoredAuth();
+
 export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  employee: null,
-  organization: null,
-  token: null,
-  isAuthenticated: false,
+  user: boot.user,
+  employee: boot.employee,
+  organization: boot.organization,
+  token: boot.token,
+  isAuthenticated: boot.isAuthenticated,
 
   login: (user, token, employee, organization) => {
     localStorage.setItem('pos_token', token);
@@ -58,23 +107,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ user: null, employee: null, organization: null, token: null, isAuthenticated: false });
   },
 
-  loadFromStorage: () => {
-    const token = localStorage.getItem('pos_token');
-    const userStr = localStorage.getItem('pos_user');
-    const employeeStr = localStorage.getItem('pos_employee');
-    const orgStr = localStorage.getItem('pos_organization');
-    if (token && userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        const employee = employeeStr ? JSON.parse(employeeStr) : null;
-        const organization = orgStr ? JSON.parse(orgStr) : null;
-        set({ user, token, employee, organization, isAuthenticated: true });
-      } catch {
-        localStorage.removeItem('pos_token');
-        localStorage.removeItem('pos_user');
-        localStorage.removeItem('pos_employee');
-        localStorage.removeItem('pos_organization');
-      }
-    }
-  },
+  // Re-run the synchronous read and overwrite state. Idempotent, and safe to
+  // call from App's mount effect (kept for backwards compatibility / forced
+  // re-hydration); the eager `boot` already covers the first-render case.
+  loadFromStorage: () => set(readStoredAuth()),
 }));

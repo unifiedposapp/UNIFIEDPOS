@@ -1,4 +1,4 @@
-import { useEffect, lazy, Suspense } from 'react';
+import { useEffect, lazy, Suspense, Component, type ErrorInfo, type ReactNode } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
 import Layout from './components/Layout';
@@ -89,6 +89,41 @@ function RouteFallback() {
   );
 }
 
+/**
+ * Catches a render-time throw in any routed page. Without it, a single bad
+ * component unmounts the entire React tree and the app shows a blank white
+ * screen (URL still looks healthy, which is the confusing part). Keyed by the
+ * route in <App>, so clicking any sidebar link remounts and recovers.
+ */
+class RouteErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
+  state: { error: Error | null } = { error: null };
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error('Route crashed:', error, info);
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="m-6 rounded-xl border border-rose-200 bg-rose-50 p-6 text-center">
+          <h2 className="font-display text-lg font-semibold text-rose-800">This page failed to load</h2>
+          <p className="mx-auto mt-1 max-w-md text-sm text-rose-700">
+            {this.state.error.message || 'An unexpected error occurred while rendering this screen.'}
+          </p>
+          <button
+            onClick={() => this.setState({ error: null })}
+            className="mt-4 rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700"
+          >
+            Try again
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function App() {
   const { isAuthenticated, loadFromStorage } = useAuthStore();
   const location = useLocation();
@@ -130,6 +165,7 @@ function App() {
 
   return (
     <Layout>
+      <RouteErrorBoundary key={location.pathname}>
       <Suspense fallback={<RouteFallback />}>
         <Routes>
           <Route path="/pos" element={<POSPage />} />
@@ -189,6 +225,7 @@ function App() {
           <Route path="*" element={<Navigate to="/pos" replace />} />
         </Routes>
       </Suspense>
+      </RouteErrorBoundary>
     </Layout>
   );
 }
