@@ -6178,7 +6178,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 100 0 R >>
 endobj
 100 0 obj
-<< /Length 3283 >>
+<< /Length 4364 >>
 stream
 0.11 0.19 0.44 rg
 BT /F2 13 Tf 1 0 0 1 64.00 686.00 Tm (33.4 Delivery-channel connectors) Tj ET
@@ -6195,41 +6195,57 @@ BT /F1 11 Tf 1 0 0 1 84.00 618.00 Tm (leaving a field blank keeps the stored val
 0.70 0.53 0.14 rg
 BT /F1 11 Tf 1 0 0 1 68.00 601.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 601.00 Tm (Point the partner at your callback URL \(/api/delivery/webhooks/<provider>\). Inbound status) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 601.00 Tm (The channel catalog is global by design, grouped by region so no part of the world is missing:) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 586.00 Tm (updates are verified with a signed HMAC header and a replay window before they touch an) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 586.00 Tm (the Americas \(DoorDash Drive, Rappi, iFood, DiDi Food\), Europe \(Deliveroo, Glovo, Wolt\), the) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 571.00 Tm (order, and progress only ever moves forward, so a late message cannot rewind a delivered) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 571.00 Tm (Middle East \(Talabat, Getir, Yango\), Africa \(Bolt Food, GIG Logistics, Kudi, Jumia Express\),) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 556.00 Tm (order.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 556.00 Tm (South Asia \(Swiggy, Zomato, Dunzo, Shadowfax, Delhivery, Porter\), East Asia \(Meituan,) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 541.00 Tm (Ele.me, Dada\), Southeast Asia \(Grab, foodpanda, Lalamove\), the CIS \(Yandex\) and Oceania) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 526.00 Tm (\(EASI, Sendle\) - plus your own fleet and a universal bring-your-own-API connector for) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 511.00 Tm (anything local.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 539.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 494.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 539.00 Tm (Dispatch an order to a connected channel to get tracking; without a live dispatch URL the) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 494.00 Tm (Point the partner at your callback URL \(/api/delivery/webhooks/<provider>\). Inbound status) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 524.00 Tm (platform runs in an explicitly simulated mode so you can test the whole flow safely. The page) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 479.00 Tm (updates are verified with a signed HMAC header and a replay window before they touch an) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 509.00 Tm (shows per-channel performance and a live dispatch queue.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 464.00 Tm (order, and progress only ever moves forward, so a late message cannot rewind a delivered) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 449.00 Tm (order.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 432.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 432.00 Tm (Dispatch an order to a connected channel to get tracking; without a live dispatch URL the) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 417.00 Tm (platform runs in an explicitly simulated mode so you can test the whole flow safely. The page) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 402.00 Tm (shows per-channel performance and a live dispatch queue.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 486.00 Tm (33.5 Peak-hours and dead-stock reports) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 379.00 Tm (33.5 Peak-hours and dead-stock reports) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 468.00 Tm (Two reports that turn raw history into decisions.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 361.00 Tm (Two reports that turn raw history into decisions.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 448.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 341.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 448.00 Tm (Reports > Trading patterns renders a Monday-first day-by-hour heatmap computed in each) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 341.00 Tm (Reports > Trading patterns renders a Monday-first day-by-hour heatmap computed in each) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 433.00 Tm (store's own time zone, with the busiest and quietest slots, revenue per slot and a) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 326.00 Tm (store's own time zone, with the busiest and quietest slots, revenue per slot and a) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 418.00 Tm (trade-concentration figure - the evidence for rota and stock decisions.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 311.00 Tm (trade-concentration figure - the evidence for rota and stock decisions.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 401.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 294.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 401.00 Tm (Reports > Dead stock flags lines that have not sold, grades them SLOW / DEAD / FROZEN,) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 294.00 Tm (Reports > Dead stock flags lines that have not sold, grades them SLOW / DEAD / FROZEN,) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 386.00 Tm (estimates months of cover, ranks them by the cash actually tied up, and suggests an action) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 279.00 Tm (estimates months of cover, ranks them by the cash actually tied up, and suggests an action) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 371.00 Tm (\(promote, discount, transfer or write off\).) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 264.00 Tm (\(promote, discount, transfer or write off\).) Tj ET
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
 BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
@@ -6380,10 +6396,10 @@ xref
 0000275024 00000 n
 0000280948 00000 n
 0000281097 00000 n
-0000284434 00000 n
-0000284584 00000 n
+0000285515 00000 n
+0000285665 00000 n
 trailer
 << /Size 103 /Root 1 0 R /Info 6 0 R >>
 startxref
-286050
+287131
 %%EOF

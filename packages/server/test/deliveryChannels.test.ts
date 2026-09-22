@@ -108,6 +108,31 @@ describe('channel catalog', () => {
     expect(keys).toContain('own_fleet');
     expect(keys).toContain('generic');
   });
+
+  it('tags every channel with a region so coverage is auditable', () => {
+    for (const c of DELIVERY_CHANNELS) expect(c.region?.trim()).toBeTruthy();
+  });
+
+  it('covers every inhabited continent, including Africa', () => {
+    const regions = new Set(DELIVERY_CHANNELS.map((c) => c.region));
+    for (const r of ['Africa', 'Americas', 'Europe', 'Asia', 'Oceania']) {
+      // Asia is split into sub-regions; accept any region that mentions it.
+      const hit = r === 'Asia'
+        ? [...regions].some((x) => x.includes('Asia'))
+        : regions.has(r);
+      expect(hit, `missing region: ${r}`).toBe(true);
+    }
+    // The gap the world had: named African networks must be listed.
+    const africa = DELIVERY_CHANNELS.filter((c) => c.region === 'Africa').map((c) => c.provider);
+    expect(africa).toEqual(expect.arrayContaining(['boltfood', 'giglogistics', 'kudi', 'jumia']));
+  });
+
+  it('resolves newly added global providers', () => {
+    expect(findChannel('swiggy')?.region).toBe('South Asia');
+    expect(findChannel('ifood')?.region).toBe('Americas');
+    expect(findChannel('meituan')?.region).toBe('East Asia');
+    expect(findChannel('boltfood')?.name).toBe('Bolt Food');
+  });
 });
 
 // ─── Signature scheme ───────────────────────────────────────────────────────

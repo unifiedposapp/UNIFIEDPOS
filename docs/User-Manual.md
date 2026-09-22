@@ -712,6 +712,7 @@ Section 8 described purchasing; it is now a full order lifecycle rather than a s
 Connect outside aggregators and own-fleet couriers without custom code.
 
 - Open **Sell > Delivery** and add a connection: pick a channel from the catalog, set its name, and supply the API key and webhook secret. Secrets are stored encrypted and are write-only — leaving a field blank keeps the stored value.
+- The channel catalog is **global by design**, grouped by region so no part of the world is missing: the Americas (DoorDash Drive, Rappi, iFood, DiDi Food), Europe (Deliveroo, Glovo, Wolt), the Middle East (Talabat, Getir, Yango), **Africa (Bolt Food, GIG Logistics, Kudi, Jumia Express)**, South Asia (Swiggy, Zomato, Dunzo, Shadowfax, Delhivery, Porter), East Asia (Meituan, Ele.me, Dada), Southeast Asia (Grab, foodpanda, Lalamove), the CIS (Yandex) and Oceania (EASI, Sendle) — plus your own fleet and a universal bring-your-own-API connector for anything local.
 - Point the partner at your callback URL (`/api/delivery/webhooks/<provider>`). Inbound status updates are verified with a signed HMAC header and a replay window before they touch an order, and progress only ever moves forward, so a late message cannot rewind a delivered order.
 - Dispatch an order to a connected channel to get tracking; without a live dispatch URL the platform runs in an explicitly **simulated** mode so you can test the whole flow safely. The page shows per-channel performance and a live dispatch queue.
 

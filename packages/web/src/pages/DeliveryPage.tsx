@@ -13,6 +13,7 @@ import {
   ChevronDown,
   ChevronUp,
   Zap,
+  Globe2,
   AlertTriangle,
 } from 'lucide-react';
 
@@ -58,6 +59,21 @@ const blankDraft = {
   autoDispatch: false,
   active: true,
 };
+
+/** Bucket the flat catalog by its `region`, preserving first-seen order. */
+function groupChannelsByRegion(channels: any[]): [string, any[]][] {
+  const order: string[] = [];
+  const buckets: Record<string, any[]> = {};
+  for (const c of channels) {
+    const region = c.region || 'Other';
+    if (!buckets[region]) {
+      buckets[region] = [];
+      order.push(region);
+    }
+    buckets[region].push(c);
+  }
+  return order.map((region) => [region, buckets[region]] as [string, any[]]);
+}
 
 export default function DeliveryPage() {
   const [channels, setChannels] = useState<any[]>([]);
@@ -387,26 +403,39 @@ export default function DeliveryPage() {
       </section>
 
       {/* Catalog */}
-      <section className="space-y-3">
-        <h2 className="font-display text-lg font-semibold text-ink-900">Available channels</h2>
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {channels.map((c) => (
-            <div key={c.provider} className={`rounded-xl border p-4 ${c.connected ? 'border-emerald-200 bg-emerald-50/40' : 'border-ink-100 bg-white'}`}>
-              <div className="flex items-center justify-between gap-2">
-                <h3 className="font-semibold text-ink-900">{c.name}</h3>
-                {c.connected && <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-700">connected</span>}
-              </div>
-              <div className="text-[11px] uppercase tracking-wide text-ink-400">{c.markets}</div>
-              <p className="mt-2 text-xs leading-relaxed text-ink-500">{c.blurb}</p>
-              <button
-                onClick={() => startConnect(c.provider)}
-                className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-ink-200 bg-white px-3 py-1.5 text-xs font-medium text-ink-700 hover:bg-ink-50"
-              >
-                <Plug size={12} /> {c.connected ? 'Reconfigure' : 'Connect'}
-              </button>
-            </div>
-          ))}
+      <section className="space-y-5">
+        <div>
+          <h2 className="font-display text-lg font-semibold text-ink-900">Available channels</h2>
+          <p className="text-sm text-ink-400">
+            {channels.length} courier networks across {groupChannelsByRegion(channels).length} regions - every part of the world is covered.
+          </p>
         </div>
+        {groupChannelsByRegion(channels).map(([region, list]) => (
+          <div key={region} className="space-y-3">
+            <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink-400">
+              <Globe2 size={13} className="text-gold-500" /> {region}
+              <span className="rounded-full bg-ink-100 px-1.5 py-0.5 text-[10px] text-ink-500">{list.length}</span>
+            </h3>
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+              {list.map((c) => (
+                <div key={c.provider} className={`rounded-xl border p-4 ${c.connected ? 'border-emerald-200 bg-emerald-50/40' : 'border-ink-100 bg-white'}`}>
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-semibold text-ink-900">{c.name}</h3>
+                    {c.connected && <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-700">connected</span>}
+                  </div>
+                  <div className="text-[11px] uppercase tracking-wide text-ink-400">{c.markets}</div>
+                  <p className="mt-2 text-xs leading-relaxed text-ink-500">{c.blurb}</p>
+                  <button
+                    onClick={() => startConnect(c.provider)}
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-ink-200 bg-white px-3 py-1.5 text-xs font-medium text-ink-700 hover:bg-ink-50"
+                  >
+                    <Plug size={12} /> {c.connected ? 'Reconfigure' : 'Connect'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
       </section>
 
       {/* Dispatch queue */}

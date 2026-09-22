@@ -112,23 +112,74 @@ export interface DeliveryChannel {
   provider: string;
   name: string;
   markets: string;
+  /** Continent/region bucket so the catalog can prove global coverage. */
+  region: string;
   /** True when the channel is a bring-your-own-endpoint partner connection. */
   hosted: boolean;
   blurb: string;
 }
 
-/** Catalog of channels the dispatcher understands. */
+/**
+ * Catalog of channels the dispatcher understands. The breadth is deliberate: a
+ * merchant in Lagos, Mumbai, Sao Paulo, Jakarta or Nairobi should find their
+ * local network already listed, not have to file a feature request. Every entry
+ * is still the same bring-your-own-credentials contract - listing a partner here
+ * adds no endpoint we pretend to know, it only names the market so the merchant
+ * wiring their own partner credentials has a place to file them.
+ */
 export const DELIVERY_CHANNELS: DeliveryChannel[] = [
-  { provider: 'own_fleet', name: 'Own fleet', markets: 'Anywhere', hosted: false, blurb: 'Your own riders; status comes back through your POS or the webhook below.' },
-  { provider: 'generic', name: 'Universal partner API', markets: 'Anywhere', hosted: true, blurb: 'Any aggregator exposing an HTTP dispatch endpoint and an HMAC shared secret.' },
-  { provider: 'doordash', name: 'DoorDash Drive', markets: 'US, CA', hosted: true, blurb: 'On-demand courier capacity; connect with the credentials DoorDash issued you.' },
-  { provider: 'deliveroo', name: 'Deliveroo Editions', markets: 'UK, EU, ME', hosted: true, blurb: 'Marketplace logistics; dispatch is pushed to your Editions endpoint.' },
-  { provider: 'ubereats', name: 'Uber Direct', markets: 'Global', hosted: true, blurb: 'Third-party delivery via Uber Direct, configured per city.' },
-  { provider: 'glovo', name: 'Glovo', markets: 'EU, LATAM, ME', hosted: true, blurb: 'Multi-category couriers with per-order pricing.' },
-  { provider: 'wolt', name: 'Wolt Delivery', markets: 'EU, JP', hosted: true, blurb: 'Wolt-compatible courier network.' },
-  { provider: 'grab', name: 'GrabExpress', markets: 'SEA', hosted: true, blurb: 'Southeast Asia instant courier.' },
-  { provider: 'talabat', name: 'Talabat', markets: 'ME', hosted: true, blurb: 'Middle East marketplace logistics.' },
-  { provider: 'local_courier', name: 'Local courier / 3PL', markets: 'Anywhere', hosted: true, blurb: 'A single assigned courier or van company you pay by invoice.' },
+  // ─── Universal / bring-your-own ───────────────────────────────────────────
+  { provider: 'own_fleet', name: 'Own fleet', markets: 'Anywhere', region: 'Global', hosted: false, blurb: 'Your own riders; status comes back through your POS or the webhook below.' },
+  { provider: 'generic', name: 'Universal partner API', markets: 'Anywhere', region: 'Global', hosted: true, blurb: 'Any aggregator exposing an HTTP dispatch endpoint and an HMAC shared secret.' },
+  { provider: 'local_courier', name: 'Local courier / 3PL', markets: 'Anywhere', region: 'Global', hosted: true, blurb: 'A single assigned courier or van company you pay by invoice.' },
+  { provider: 'ubereats', name: 'Uber Direct', markets: 'Global', region: 'Global', hosted: true, blurb: 'Third-party delivery via Uber Direct, configured per city.' },
+
+  // ─── Americas ──────────────────────────────────────────────────────────────
+  { provider: 'doordash', name: 'DoorDash Drive', markets: 'US, CA', region: 'Americas', hosted: true, blurb: 'On-demand courier capacity; connect with the credentials DoorDash issued you.' },
+  { provider: 'rappi', name: 'Rappi Logistics', markets: 'LATAM', region: 'Americas', hosted: true, blurb: 'Colombia-rooted multi-category delivery across Latin America.' },
+  { provider: 'ifood', name: 'iFood Delivery', markets: 'BR, LATAM', region: 'Americas', hosted: true, blurb: 'Brazil\u0027s dominant food logistics network.' },
+  { provider: 'didifood', name: 'DiDi Food', markets: 'LATAM, ME, AU', region: 'Americas', hosted: true, blurb: 'DiDi on-demand delivery in Latin America and beyond.' },
+
+  // ─── Europe ────────────────────────────────────────────────────────────────
+  { provider: 'deliveroo', name: 'Deliveroo Editions', markets: 'UK, EU, ME', region: 'Europe', hosted: true, blurb: 'Marketplace logistics; dispatch is pushed to your Editions endpoint.' },
+  { provider: 'glovo', name: 'Glovo', markets: 'EU, LATAM, ME, Africa', region: 'Europe', hosted: true, blurb: 'Multi-category couriers with per-order pricing across four continents.' },
+  { provider: 'wolt', name: 'Wolt Delivery', markets: 'EU, JP', region: 'Europe', hosted: true, blurb: 'Wolt-compatible courier network (owned by DoorDash).' },
+
+  // ─── Middle East ───────────────────────────────────────────────────────────
+  { provider: 'talabat', name: 'Talabat', markets: 'ME', region: 'Middle East', hosted: true, blurb: 'Middle East marketplace logistics (Delivery Hero).' },
+  { provider: 'getir', name: 'Getir', markets: 'TR, ME, US', region: 'Middle East', hosted: true, blurb: 'Quick-commerce and instant delivery, Turkey and the Gulf.' },
+  { provider: 'yango', name: 'Yango Deli', markets: 'ME, Africa', region: 'Middle East', hosted: true, blurb: 'Yandex-backed on-demand delivery in the Gulf and Africa.' },
+
+  // ─── Africa ────────────────────────────────────────────────────────────────
+  { provider: 'boltfood', name: 'Bolt Food', markets: 'Africa, EE', region: 'Africa', hosted: true, blurb: 'Bolt on-demand food delivery across African and Eastern-European cities.' },
+  { provider: 'giglogistics', name: 'GIG Logistics', markets: 'NG, GH, Africa', region: 'Africa', hosted: true, blurb: 'West-African last-mile and e-commerce parcel network.' },
+  { provider: 'kudi', name: 'Kudi', markets: 'NG', region: 'Africa', hosted: true, blurb: 'Nigerian on-demand delivery and logistics for businesses.' },
+  { provider: 'jumia', name: 'Jumia Express', markets: 'Africa (pan)', region: 'Africa', hosted: true, blurb: 'Pan-African marketplace fulfilment and last-mile.' },
+
+  // ─── South Asia ────────────────────────────────────────────────────────────
+  { provider: 'swiggy', name: 'Swiggy Delivery', markets: 'IN', region: 'South Asia', hosted: true, blurb: 'India on-demand food and instant delivery.' },
+  { provider: 'zomato', name: 'Zomato Delivery', markets: 'IN', region: 'South Asia', hosted: true, blurb: 'India food-delivery network (now part of Blinkit).' },
+  { provider: 'dunzo', name: 'Dunzo', markets: 'IN', region: 'South Asia', hosted: true, blurb: 'Hyperlocal pick-up-and-drop courier across Indian cities.' },
+  { provider: 'shadowfax', name: 'Shadowfax', markets: 'IN', region: 'South Asia', hosted: true, blurb: 'India\u0027s largest crowdsourced courier and e-commerce last-mile.' },
+  { provider: 'delhivery', name: 'Delhivery', markets: 'IN', region: 'South Asia', hosted: true, blurb: 'Integrated parcel, freight and supply-chain network.' },
+  { provider: 'porter', name: 'Porter', markets: 'IN', region: 'South Asia', hosted: true, blurb: 'Intra-city goods move on bikes, three-wheelers and trucks.' },
+
+  // ─── East Asia ─────────────────────────────────────────────────────────────
+  { provider: 'meituan', name: 'Meituan Delivery', markets: 'CN', region: 'East Asia', hosted: true, blurb: 'China\u0027s largest instant delivery network.' },
+  { provider: 'eleme', name: 'Ele.me Fengniao', markets: 'CN', region: 'East Asia', hosted: true, blurb: 'Alibaba local-services on-demand delivery.' },
+  { provider: 'dada', name: 'Dada Now', markets: 'CN', region: 'East Asia', hosted: true, blurb: 'Instant retail delivery, on the JD.com network.' },
+
+  // ─── Southeast Asia ────────────────────────────────────────────────────────
+  { provider: 'grab', name: 'GrabExpress', markets: 'SEA', region: 'Southeast Asia', hosted: true, blurb: 'Southeast Asia instant courier (Grab).' },
+  { provider: 'foodpanda', name: 'foodpanda', markets: 'APAC', region: 'Southeast Asia', hosted: true, blurb: 'Delivery across South-East Asia and Chinese Taipei.' },
+  { provider: 'lalamove', name: 'Lalamove', markets: 'SEA, CN', region: 'Southeast Asia', hosted: true, blurb: 'On-demand goods delivery across Asian megacities.' },
+
+  // ─── CIS ───────────────────────────────────────────────────────────────────
+  { provider: 'yandex', name: 'Yandex Delivery', markets: 'CIS, TR, EE', region: 'CIS', hosted: true, blurb: 'Yandex on-demand courier across Russia, CIS, Turkey.' },
+
+  // ─── Oceania ───────────────────────────────────────────────────────────────
+  { provider: 'easi', name: 'EASI', markets: 'AU', region: 'Oceania', hosted: true, blurb: 'Australian on-demand and scheduled last-mile delivery.' },
+  { provider: 'sendle', name: 'Sendle', markets: 'AU, NZ', region: 'Oceania', hosted: true, blurb: 'Carbon-neutral small-business parcel courier for AU/NZ.' },
 ];
 
 export function findChannel(provider: string): DeliveryChannel | undefined {
