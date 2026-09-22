@@ -55,6 +55,9 @@ import meshRoutes from './routes/mesh.js';
 import franchiseRoutes from './routes/franchise.js';
 import appsRoutes from './routes/apps.js';
 import benchmarkRoutes from './routes/benchmark.js';
+import fxRoutes from './routes/fx.js';
+import subscriptionRoutes from './routes/subscriptions.js';
+import ssoRoutes from './routes/sso.js';
 import wellKnownRoutes from './routes/wellKnown.js';
 import { requestLogger, errorLogger } from './middleware/logger.js';
 import { apiRateLimiter, authRateLimiter, paymentRateLimiter } from './middleware/rateLimiter.js';
@@ -69,14 +72,16 @@ import { initObservability, metricsMiddleware, renderMetrics, metricsAuthorized,
 import { reviewProductionConfig, formatConfigReview, strictProdConfig } from './services/productionConfig.js';
 import { startScheduler, stopScheduler } from './services/scheduler.js';
 import { registerAllJobs } from './services/scheduledJobs.js';
+import { startPgListener, stopPgListener } from './services/realtime.js';
 import path from 'node:path';
 import fs from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+export { app };
 
 // Initialise error tracking (Sentry) when SENTRY_DSN is configured. No-op otherwise.
 initObservability().catch(() => { /* non-fatal */ });
@@ -161,6 +166,7 @@ app.use(
 app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), stripeWebhookHandler);
 
 app.use(express.json({ limit: '12mb' })); // Raised limit: Settings branding stores base64 logo/media uploads
+app.use(express.urlencoded({ extended: false, limit: '2mb' })); // SAML POST-binding ACS sends form-encoded SAMLResponse (§sso)
 app.use(cookieParser()); // Parse cookies so the httpOnly session + CSRF cookies are readable (§37)
 app.use(requestLogger); // Structured request logging (§39)
 app.use(metricsMiddleware); // In-process request metrics (§39) — exposed at /api/metrics
@@ -225,6 +231,9 @@ const routeTable: { path: string; stack: any[] }[] = [
   { path: '/franchise', stack: [franchiseRoutes] }, // Royalties, transfer pricing, consolidated P&L
   { path: '/apps', stack: [appsRoutes] }, // Ecosystem: partner apps, scopes, custom fields
   { path: '/benchmark', stack: [benchmarkRoutes] }, // Peer benchmarking (k-anonymous, noised)
+  { path: '/fx', stack: [fxRoutes] }, // FX / exchange-rate layer (multi-currency consolidation)
+  { path: '/subscriptions', stack: [subscriptionRoutes] }, // Recurring subscription billing engine
+  { path: '/sso', stack: [ssoRoutes] }, // Enterprise SSO (OIDC/SAML) + SCIM provisioning
 ];
 for (const r of routeTable) {
   app.use(`/api${r.path}`, ...r.stack);
@@ -285,31 +294,39 @@ app.use((err: Error & { status?: number }, req: express.Request, res: express.Re
   res.status(status).json({ success: false, message: status === 500 ? 'Internal server error' : err.message });
 });
 
-const server = app.listen(PORT, () => {
-  console.log(`POS Server listening on port ${PORT} (NODE_ENV=${process.env.NODE_ENV || 'development'})`);
-  // Start background jobs (§19 campaigns, §10 payouts, §29 webhook retry, §37
-  // retention purge, expiry + reconciliation) once HTTP is accepting traffic.
-  registerAllJobs();
-  startScheduler();
-});
-
-// Graceful shutdown — stop accepting connections, drain, then close the DB pool.
-function shutdown(signal: string) {
-  console.log(`\n${signal} received — shutting down gracefully...`);
-  stopScheduler(); // stop background jobs before draining connections
-  server.close(async () => {
-    try {
-      await prisma.$disconnect();
-    } finally {
-      console.log('Closed HTTP server and database connections.');
-      process.exit(0);
-    }
+// Boot side-effects only when executed directly (`tsx src/index.ts`), never on
+// bare `import { app }` — the HTTP integration suites mount the app in-process.
+const isMainProcess = process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url;
+if (isMainProcess) {
+  const server = app.listen(PORT, () => {
+    console.log(`POS Server listening on port ${PORT} (NODE_ENV=${process.env.NODE_ENV || 'development'})`);
+    // Start background jobs (§19 campaigns, §10 payouts, §29 webhook retry, §37
+    // retention purge, expiry + reconciliation) once HTTP is accepting traffic.
+    registerAllJobs();
+    startScheduler();
+    // Multi-replica SSE fan-out (no-op unless REALTIME_MODE=pg-notify).
+    void startPgListener();
   });
-  // Force-exit if connections do not drain in time.
-  setTimeout(() => {
-    console.error('Forced shutdown after timeout.');
-    process.exit(1);
-  }, 10_000).unref();
-}
 
-['SIGTERM', 'SIGINT'].forEach((sig) => process.on(sig, () => shutdown(sig)));
+  // Graceful shutdown — stop accepting connections, drain, then close the DB pool.
+  function shutdown(signal: string) {
+    console.log(`\n${signal} received — shutting down gracefully...`);
+    stopScheduler(); // stop background jobs before draining connections
+    void stopPgListener();
+    server.close(async () => {
+      try {
+        await prisma.$disconnect();
+      } finally {
+        console.log('Closed HTTP server and database connections.');
+        process.exit(0);
+      }
+    });
+    // Force-exit if connections do not drain in time.
+    setTimeout(() => {
+      console.error('Forced shutdown after timeout.');
+      process.exit(1);
+    }, 10_000).unref();
+  }
+
+  ['SIGTERM', 'SIGINT'].forEach((sig) => process.on(sig, () => shutdown(sig)));
+}

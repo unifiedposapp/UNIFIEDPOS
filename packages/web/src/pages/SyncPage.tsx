@@ -175,7 +175,7 @@ export default function SyncPage() {
                   <p className="font-medium text-sm">{d.deviceName}</p>
                   <p className="text-xs text-gray-500">{d.deviceId.slice(0, 12)}… · {d.transactionCount} tx</p>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <span className="text-xs bg-gray-100 rounded px-2 py-0.5">{d.status}</span>
                   <p className="text-xs text-gray-400 mt-1">{d.lastSyncAt ? new Date(d.lastSyncAt).toLocaleString() : 'never'}</p>
                 </div>
@@ -191,12 +191,12 @@ export default function SyncPage() {
           <table className="w-full text-sm">
             <thead className="text-xs text-gray-500 uppercase border-b">
               <tr>
-                <th className="text-left px-3 py-2">Type</th>
-                <th className="text-left px-3 py-2">Transaction</th>
-                <th className="text-left px-3 py-2">Seq</th>
-                <th className="text-left px-3 py-2">Status</th>
-                <th className="text-left px-3 py-2">Device Time</th>
-                <th className="text-left px-3 py-2">Synced</th>
+                <th className="text-start px-3 py-2">Type</th>
+                <th className="text-start px-3 py-2">Transaction</th>
+                <th className="text-start px-3 py-2">Seq</th>
+                <th className="text-start px-3 py-2">Status</th>
+                <th className="text-start px-3 py-2">Device Time</th>
+                <th className="text-start px-3 py-2">Synced</th>
               </tr>
             </thead>
             <tbody className="divide-y">

@@ -155,10 +155,10 @@ export default function EnterprisePage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Location</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Region</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium">Orders</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium">Revenue</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Location</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Region</th>
+                  <th className="text-end px-4 py-3 text-sm font-medium">Orders</th>
+                  <th className="text-end px-4 py-3 text-sm font-medium">Revenue</th>
                 </tr>
               </thead>
               <tbody>
@@ -166,8 +166,8 @@ export default function EnterprisePage() {
                   <tr key={l.id} className="border-b hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm">{l.name}</td>
                     <td className="px-4 py-3 text-sm text-gray-500">{l.region}</td>
-                    <td className="px-4 py-3 text-sm text-right font-mono">{l.orders}</td>
-                    <td className="px-4 py-3 text-sm text-right font-mono">{money(l.revenue)}</td>
+                    <td className="px-4 py-3 text-sm text-end font-mono">{l.orders}</td>
+                    <td className="px-4 py-3 text-sm text-end font-mono">{money(l.revenue)}</td>
                   </tr>
                 ))}
                 {(!overview.locations || overview.locations.length === 0) && (
@@ -237,10 +237,10 @@ export default function EnterprisePage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="text-left px-4 py-2 text-sm font-medium">Continent</th>
-                  <th className="text-left px-4 py-2 text-sm font-medium">Sub-region</th>
-                  <th className="text-right px-4 py-2 text-sm font-medium">Nations</th>
-                  <th className="text-right px-4 py-2 text-sm font-medium">Covered</th>
+                  <th className="text-start px-4 py-2 text-sm font-medium">Continent</th>
+                  <th className="text-start px-4 py-2 text-sm font-medium">Sub-region</th>
+                  <th className="text-end px-4 py-2 text-sm font-medium">Nations</th>
+                  <th className="text-end px-4 py-2 text-sm font-medium">Covered</th>
                 </tr>
               </thead>
               <tbody>
@@ -248,8 +248,8 @@ export default function EnterprisePage() {
                   <tr key={`${s.continent}-${s.subregion}`} className="border-b hover:bg-gray-50">
                     <td className="px-4 py-2 text-sm">{s.continent}</td>
                     <td className="px-4 py-2 text-sm">{s.subregion}</td>
-                    <td className="px-4 py-2 text-sm text-right font-mono">{s.total}</td>
-                    <td className="px-4 py-2 text-sm text-right">
+                    <td className="px-4 py-2 text-sm text-end font-mono">{s.total}</td>
+                    <td className="px-4 py-2 text-sm text-end">
                       <span className={`px-2 py-0.5 rounded text-xs ${s.complete ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>{s.covered}/{s.total}</span>
                     </td>
                   </tr>
@@ -295,10 +295,10 @@ export default function EnterprisePage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Region</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Type</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium">Nations</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Locations</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Region</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Type</th>
+                  <th className="text-end px-4 py-3 text-sm font-medium">Nations</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Locations</th>
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>
@@ -311,9 +311,9 @@ export default function EnterprisePage() {
                         {r.type === 'GLOBAL' ? 'Global' : 'Custom'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-right font-mono">{r.countryCount ?? '-'}</td>
+                    <td className="px-4 py-3 text-sm text-end font-mono">{r.countryCount ?? '-'}</td>
                     <td className="px-4 py-3 text-sm">{(r.locations || []).map((l: any) => l.name).join(', ') || '-'}</td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-end">
                       {r.type !== 'GLOBAL' && (
                         <button onClick={() => removeRegion(r.id)} className="text-red-500 hover:text-red-700"><Trash2 size={16} /></button>
                       )}
@@ -350,10 +350,10 @@ export default function EnterprisePage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Warehouse</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Address</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Manager</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Phone</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Warehouse</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Address</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Manager</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Phone</th>
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>
@@ -364,7 +364,7 @@ export default function EnterprisePage() {
                     <td className="px-4 py-3 text-sm text-gray-500">{w.address || '-'}</td>
                     <td className="px-4 py-3 text-sm">{w.manager || '-'}</td>
                     <td className="px-4 py-3 text-sm text-gray-500">{w.phone || '-'}</td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-end">
                       <button onClick={() => removeWarehouse(w.id)} className="text-red-500 hover:text-red-700"><Trash2 size={16} /></button>
                     </td>
                   </tr>
@@ -382,9 +382,9 @@ export default function EnterprisePage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="text-left px-4 py-3 text-sm font-medium">Location</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">Status</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">Assign Region</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Location</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Status</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Assign Region</th>
               </tr>
             </thead>
             <tbody>

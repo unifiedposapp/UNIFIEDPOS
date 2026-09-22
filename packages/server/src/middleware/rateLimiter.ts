@@ -47,6 +47,13 @@ function sendRateLimitResponse(
   maxRequests: number,
   resetAt: number,
 ): void {
+  // Automated suites (tenant-isolation, money-path HTTP) make many requests per
+  // second from one IP; abuse limiting is exactly what they must not trip.
+  if (process.env.NODE_ENV === 'test') {
+    next();
+    return;
+  }
+
   res.setHeader('X-RateLimit-Limit', maxRequests);
   res.setHeader('X-RateLimit-Remaining', Math.max(0, maxRequests - count));
   res.setHeader('X-RateLimit-Reset', new Date(resetAt).toISOString());

@@ -1156,4 +1156,50 @@ export const api = {
     const query = params ? '?' + new URLSearchParams(params).toString() : '';
     return request<any>(`/benchmark/cohort/${metric}${query}`);
   },
+
+  // ── FX / exchange-rate layer (multi-currency consolidation) ──
+  getFxRates: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/fx/rates${query}`);
+  },
+  getFxProvider: () => request<any>('/fx/provider'),
+  fxConvert: (data: { amount: number; from: string; to: string; at?: string; maxAgeDays?: number }) =>
+    request<any>('/fx/convert', { method: 'POST', body: JSON.stringify(data) }),
+  importFxRates: (data: { rates: { from: string; to: string; rate: number; effectiveDate?: string; source?: string }[]; source?: string; fetchLive?: boolean }) =>
+    request<any>('/fx/import', { method: 'POST', body: JSON.stringify(data) }),
+
+  // ── Recurring subscription billing ──
+  getSubscriptionPlans: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/subscriptions/plans${query}`);
+  },
+  createSubscriptionPlan: (data: any) =>
+    request<any>('/subscriptions/plans', { method: 'POST', body: JSON.stringify(data) }),
+  updateSubscriptionPlan: (id: string, data: any) =>
+    request<any>(`/subscriptions/plans/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteSubscriptionPlan: (id: string) =>
+    request<any>(`/subscriptions/plans/${id}`, { method: 'DELETE' }),
+  getSubscriptions: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/subscriptions${query}`);
+  },
+  createSubscription: (data: any) =>
+    request<any>('/subscriptions', { method: 'POST', body: JSON.stringify(data) }),
+  getSubscription: (id: string) => request<any>(`/subscriptions/${id}`),
+  getSubscriptionInvoices: (id: string) => request<any>(`/subscriptions/${id}/invoices`),
+  cancelSubscription: (id: string, data?: { atPeriodEnd?: boolean; reason?: string }) =>
+    request<any>(`/subscriptions/${id}/cancel`, { method: 'POST', body: JSON.stringify(data || {}) }),
+  reinstateSubscription: (id: string) =>
+    request<any>(`/subscriptions/${id}/reinstate`, { method: 'POST' }),
+  generateSubscriptionInvoices: (data?: { now?: string }) =>
+    request<any>('/subscriptions/generate-invoices', { method: 'POST', body: JSON.stringify(data || {}) }),
+  getSubscriptionOverview: () => request<any>('/subscriptions/overview'),
+
+  // ── Enterprise SSO (OIDC/SAML) + SCIM ──
+  getSsoConnections: () => request<any>('/sso/connections'),
+  saveSsoConnection: (data: { providerType: string; label?: string; clientId?: string; clientSecret?: string; issuer?: string; metadataUrl?: string; domainWhitelist?: string[]; enabled?: boolean }) =>
+    request<any>('/sso/connections', { method: 'POST', body: JSON.stringify(data) }),
+  deleteSsoConnection: (id: string) =>
+    request<any>(`/sso/connections/${id}`, { method: 'DELETE' }),
+  discoverSso: (email: string) => request<any>(`/sso/discover?email=${encodeURIComponent(email)}`),
 };

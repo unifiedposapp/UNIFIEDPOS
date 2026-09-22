@@ -111,11 +111,11 @@ export default function PurchasingPage() {
         <table className="w-full">
           <thead className="bg-gray-50 border-b">
             <tr>
-              <th className="text-left px-4 py-3 text-sm font-medium">Date</th>
-              <th className="text-left px-4 py-3 text-sm font-medium">Description</th>
-              <th className="text-right px-4 py-3 text-sm font-medium">Amount</th>
-              <th className="text-left px-4 py-3 text-sm font-medium">Status</th>
-              <th className="text-right px-4 py-3 text-sm font-medium">Actions</th>
+              <th className="text-start px-4 py-3 text-sm font-medium">Date</th>
+              <th className="text-start px-4 py-3 text-sm font-medium">Description</th>
+              <th className="text-end px-4 py-3 text-sm font-medium">Amount</th>
+              <th className="text-start px-4 py-3 text-sm font-medium">Status</th>
+              <th className="text-end px-4 py-3 text-sm font-medium">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -123,13 +123,13 @@ export default function PurchasingPage() {
               <tr key={o.id} className="border-b hover:bg-gray-50">
                 <td className="px-4 py-3 text-sm">{new Date(o.createdAt).toLocaleDateString()}</td>
                 <td className="px-4 py-3 text-sm">{o.description}</td>
-                <td className="px-4 py-3 text-sm text-right font-mono">${Number(o.amount).toFixed(2)}</td>
+                <td className="px-4 py-3 text-sm text-end font-mono">${Number(o.amount).toFixed(2)}</td>
                 <td className="px-4 py-3">
                   <span className={`text-xs px-2 py-1 rounded ${o.status === 'POSTED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
                     {o.status}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-right">
+                <td className="px-4 py-3 text-end">
                   {o.status === 'DRAFT' && (
                     <button onClick={() => receive(o.id)} className="text-xs bg-teal-100 text-teal-700 px-3 py-1 rounded hover:bg-teal-200 flex items-center gap-1 ml-auto">
                       <Package size={12} /> Receive

@@ -189,10 +189,10 @@ export default function DeveloperPage() {
           <div className="bg-white rounded-lg border">
             <table className="w-full">
               <thead className="bg-gray-50 border-b"><tr>
-                <th className="text-left px-4 py-3 text-sm font-medium">Webhook / Key</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">Events</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">Status</th>
-                <th className="text-right px-4 py-3 text-sm font-medium">OK / Fail</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Webhook / Key</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Events</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Status</th>
+                <th className="text-end px-4 py-3 text-sm font-medium">OK / Fail</th>
                 <th className="px-4 py-3"></th>
               </tr></thead>
               <tbody>
@@ -201,8 +201,8 @@ export default function DeveloperPage() {
                     <td className="px-4 py-3 text-sm font-mono">{w.url}</td>
                     <td className="px-4 py-3 text-xs text-gray-500">{(w.events || []).join(', ')}</td>
                     <td className="px-4 py-3">{badge(w.isActive ? 'ACTIVE' : 'INACTIVE', w.isActive)}</td>
-                    <td className="px-4 py-3 text-sm text-right font-mono">{w.successCount} / {w.failureCount}</td>
-                    <td className="px-4 py-3 text-right"><button onClick={() => testWebhook(w.id)} className="text-xs text-blue-600 hover:underline">Test</button></td>
+                    <td className="px-4 py-3 text-sm text-end font-mono">{w.successCount} / {w.failureCount}</td>
+                    <td className="px-4 py-3 text-end"><button onClick={() => testWebhook(w.id)} className="text-xs text-blue-600 hover:underline">Test</button></td>
                   </tr>
                 ))}
                 {(!keys.webhooks || keys.webhooks.length === 0) && <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-500">No keys / webhooks</td></tr>}
@@ -257,11 +257,11 @@ export default function DeveloperPage() {
           <div className="bg-white rounded-lg border">
             <table className="w-full">
               <thead className="bg-gray-50 border-b"><tr>
-                <th className="text-left px-4 py-3 text-sm font-medium">Name</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">Provider</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">Type</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">Status</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">Last Sync</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Name</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Provider</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Type</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Status</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Last Sync</th>
                 <th className="px-4 py-3"></th>
               </tr></thead>
               <tbody>
@@ -272,7 +272,7 @@ export default function DeveloperPage() {
                     <td className="px-4 py-3 text-sm text-gray-500">{i.type}</td>
                     <td className="px-4 py-3">{badge(i.status, i.status === 'CONNECTED')}</td>
                     <td className="px-4 py-3 text-sm text-gray-500">{i.lastSyncAt ? new Date(i.lastSyncAt).toLocaleString() : '-'}</td>
-                    <td className="px-4 py-3 text-right">{i.status === 'CONNECTED' && <button onClick={() => disconnect(i.id)} className="text-xs text-red-600 hover:underline">Disconnect</button>}</td>
+                    <td className="px-4 py-3 text-end">{i.status === 'CONNECTED' && <button onClick={() => disconnect(i.id)} className="text-xs text-red-600 hover:underline">Disconnect</button>}</td>
                   </tr>
                 ))}
                 {integrations.length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-500">No integrations</td></tr>}

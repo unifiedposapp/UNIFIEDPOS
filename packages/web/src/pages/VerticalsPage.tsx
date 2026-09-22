@@ -132,7 +132,7 @@ export default function VerticalsPage() {
                 </div>
               </Td>
               <Td>{installedCodes.has(s.code) ? <Badge tone="good">INSTALLED</Badge> : <Badge tone="neutral">AVAILABLE</Badge>}</Td>
-              <Td className="text-right"><button className={ghostButton} onClick={() => open(s.code)}>Details</button></Td>
+              <Td className="text-end"><button className={ghostButton} onClick={() => open(s.code)}>Details</button></Td>
             </tr>
           ))}
         </Table>

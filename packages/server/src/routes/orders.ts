@@ -134,8 +134,8 @@ router.get('/held', authMiddleware, async (req: AuthRequest, res: Response) => {
 // GET /api/orders/:id
 router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const order = await prisma.order.findUnique({
-      where: { id: String(req.params.id) },
+    const order = await prisma.order.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
       include: {
         items: true,
         payments: true,

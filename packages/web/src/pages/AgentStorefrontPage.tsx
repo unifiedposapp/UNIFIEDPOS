@@ -238,7 +238,7 @@ export default function AgentStorefrontPage() {
                 <Badge>{m.status}</Badge>
                 {m.rejectReason && <div className="text-xs text-gray-500 mt-0.5 max-w-48">{m.rejectReason}</div>}
               </Td>
-              <Td className="text-right">
+              <Td className="text-end">
                 {(m.status === 'ACTIVE' || m.status === 'EXPIRED') && (
                   <button className={dangerButton} onClick={() => revoke(m.id)}><Ban size={14} /> Revoke</button>
                 )}

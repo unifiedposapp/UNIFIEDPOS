@@ -204,7 +204,7 @@ export default function FinancePage() {
               <Td>{f.termMonths} mo</Td>
               <Td>{Number(f.sweepPercent)}%</Td>
               <Td><Badge>{f.status}</Badge></Td>
-              <Td className="text-right whitespace-nowrap">
+              <Td className="text-end whitespace-nowrap">
                 <button className={ghostButton} onClick={() => openFacility(f.id)}>Schedule</button>
                 {f.status === 'PENDING' && (
                   <>

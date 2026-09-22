@@ -181,7 +181,7 @@ export default function ReceiptPage() {
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900"
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={20} className="rtl:rotate-180" />
           Back
         </button>
         <div className="flex gap-3">
@@ -223,7 +223,7 @@ export default function ReceiptPage() {
             <p className="text-sm text-gray-600">Order Number</p>
             <p className="font-semibold text-lg">{receipt.orderNumber}</p>
           </div>
-          <div className="text-right">
+          <div className="text-end">
             <p className="text-sm text-gray-600">Date</p>
             <p className="font-semibold">{formatDate(receipt.orderDate)}</p>
           </div>
@@ -231,7 +231,7 @@ export default function ReceiptPage() {
             <p className="text-sm text-gray-600">Location</p>
             <p className="font-medium">{receipt.locationName}</p>
           </div>
-          <div className="text-right">
+          <div className="text-end">
             <p className="text-sm text-gray-600">Register</p>
             <p className="font-medium">{receipt.registerName}</p>
           </div>
@@ -239,7 +239,7 @@ export default function ReceiptPage() {
             <p className="text-sm text-gray-600">Cashier</p>
             <p className="font-medium">{receipt.cashierName}</p>
           </div>
-          <div className="text-right">
+          <div className="text-end">
             <p className="text-sm text-gray-600">Status</p>
             <p className="font-medium flex items-center justify-end gap-1">
               <CheckCircle size={16} className="text-green-600" />
@@ -263,10 +263,10 @@ export default function ReceiptPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b-2 border-gray-300">
-                <th className="text-left py-2">Item</th>
+                <th className="text-start py-2">Item</th>
                 <th className="text-center py-2">Qty</th>
-                <th className="text-right py-2">Price</th>
-                <th className="text-right py-2">Total</th>
+                <th className="text-end py-2">Price</th>
+                <th className="text-end py-2">Total</th>
               </tr>
             </thead>
             <tbody>
@@ -280,8 +280,8 @@ export default function ReceiptPage() {
                     )}
                   </td>
                   <td className="text-center py-3">{item.quantity}</td>
-                  <td className="text-right py-3">{formatCurrency(item.unitPrice)}</td>
-                  <td className="text-right py-3 font-medium">{formatCurrency(item.total)}</td>
+                  <td className="text-end py-3">{formatCurrency(item.unitPrice)}</td>
+                  <td className="text-end py-3 font-medium">{formatCurrency(item.total)}</td>
                 </tr>
               ))}
             </tbody>

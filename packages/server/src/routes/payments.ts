@@ -311,8 +311,8 @@ router.get('/settlements', authMiddleware, async (req: AuthRequest, res: Respons
 // GET /api/payments/:id
 router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const payment = await prisma.payment.findUnique({
-      where: { id: String(req.params.id) },
+    const payment = await prisma.payment.findFirst({
+      where: { id: String(req.params.id), order: { organizationId: req.user!.organizationId! } },
       include: {
         order: { select: { orderNumber: true, totalAmount: true, status: true } },
         refunds: true,

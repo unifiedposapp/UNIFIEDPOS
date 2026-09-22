@@ -258,10 +258,10 @@ export default function ReportsPage() {
                 <table className="w-full">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Orders</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Revenue</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Tax</th>
+                      <th className="px-4 py-2 text-start text-xs font-medium text-gray-500 uppercase">Date</th>
+                      <th className="px-4 py-2 text-start text-xs font-medium text-gray-500 uppercase">Orders</th>
+                      <th className="px-4 py-2 text-start text-xs font-medium text-gray-500 uppercase">Revenue</th>
+                      <th className="px-4 py-2 text-start text-xs font-medium text-gray-500 uppercase">Tax</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
@@ -337,10 +337,10 @@ export default function ReportsPage() {
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Hours</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Cost</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Orders</th>
+                    <th className="px-4 py-2 text-start text-xs font-medium text-gray-500 uppercase">Employee</th>
+                    <th className="px-4 py-2 text-start text-xs font-medium text-gray-500 uppercase">Hours</th>
+                    <th className="px-4 py-2 text-start text-xs font-medium text-gray-500 uppercase">Cost</th>
+                    <th className="px-4 py-2 text-start text-xs font-medium text-gray-500 uppercase">Orders</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">

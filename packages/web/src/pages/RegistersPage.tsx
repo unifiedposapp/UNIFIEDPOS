@@ -463,11 +463,11 @@ export default function RegistersPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Drawer</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Last Updated</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Name</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Location</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Drawer</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Last Updated</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -527,11 +527,11 @@ export default function RegistersPage() {
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Register</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cashier</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Opened</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lock</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Register</th>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Cashier</th>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Opened</th>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Lock</th>
+                    <th className="px-6 py-3 text-end text-xs font-medium text-gray-500 uppercase">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -565,7 +565,7 @@ export default function RegistersPage() {
                             <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Active</span>
                           )}
                         </td>
-                        <td className="px-6 py-4 text-sm text-right whitespace-nowrap">
+                        <td className="px-6 py-4 text-sm text-end whitespace-nowrap">
                           {row.locked && (
                             <button
                               onClick={() => handleSupervisorAction('unlock', row)}

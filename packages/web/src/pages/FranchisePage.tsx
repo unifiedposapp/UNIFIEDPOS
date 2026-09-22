@@ -211,7 +211,7 @@ export default function FranchisePage() {
               <Td><Money value={a.minimumMonthly} /></Td>
               <Td>{Number(a.transferMarkupPercent)}%</Td>
               <Td><Badge>{a.status}</Badge></Td>
-              <Td className="text-right whitespace-nowrap">
+              <Td className="text-end whitespace-nowrap">
                 {a.status !== 'ACTIVE' && <button className={ghostButton} onClick={() => setStatus(a.id, 'ACTIVE')}>Activate</button>}
                 {a.status === 'ACTIVE' && (
                   <>
@@ -324,7 +324,7 @@ export default function FranchisePage() {
               <Td className="whitespace-nowrap">{new Date(r.dueDate).toLocaleDateString()}</Td>
               <Td>{r.aging ? <Badge tone={r.aging.bucket === 'CURRENT' ? 'good' : r.aging.bucket === 'OVER_60' ? 'bad' : 'warn'}>{r.aging.bucket} ({r.aging.days}d)</Badge> : <span className="text-gray-400">—</span>}</Td>
               <Td><Badge>{r.status}</Badge></Td>
-              <Td className="text-right whitespace-nowrap">
+              <Td className="text-end whitespace-nowrap">
                 {r.status === 'CALCULATED' && <button className={ghostButton} onClick={() => setAccrualStatus(r.id, 'INVOICED')}>Invoice</button>}
                 {r.status === 'INVOICED' && <button className={ghostButton} onClick={() => setAccrualStatus(r.id, 'PAID')}>Mark paid</button>}
                 {(r.status === 'INVOICED' || r.status === 'CALCULATED') && (

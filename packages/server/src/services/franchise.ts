@@ -13,6 +13,7 @@
 //             intercompany sales and the matching cost of goods, because the
 //             network did not sell to itself.
 import { round2 } from './moneyMath.js';
+import { resolveRate, type RateRow } from './exchangeRates.js';
 
 export type RoyaltyModel = 'PERCENT' | 'TIERED' | 'PER_ITEM' | 'FIXED';
 
@@ -204,21 +205,67 @@ export interface ConsolidatedPnl {
   eliminations: { intercompanyRevenue: number; intercompanyCost: number; unrealisedProfit: number };
   royaltiesDue: number;
   topContributor: string | null;
+  /** The single currency every figure is expressed in. */
+  currency: string;
+  /** Non-fatal notes (e.g. a currency left unconverted because no rate existed). */
+  warnings: string[];
+}
+
+/** Convert `value` from one currency to another via the rate table; null = no path. */
+function fxConvert(value: number, from: string, to: string, rows: RateRow[]): number | null {
+  if (!from || !to || from === to) return value;
+  const resolved = resolveRate(from, to, rows);
+  return resolved ? round2(value * resolved.rate) : null;
 }
 
 /**
  * Sum the entities, then remove the network selling to itself. `unrealisedProfit`
  * is the markup still sitting in the buying entity's stock, which the franchisor
  * recognises only when it reaches a customer.
+ *
+ * A network is rarely single-currency, so every entity is first translated into
+ * the consolidation currency (a Naira branch and a Dollar branch cannot simply
+ * be added). When an entity carries a currency we have no rate for, the caller
+ * decides: `allowCurrencyMismatch` reports it and leaves that entity in its own
+ * currency (a clearly-warned mixed total), otherwise the consolidation refuses
+ * rather than silently mixing units.
  */
-export function consolidatePnl(entities: EntityPnl[], options: { royaltyPercentForEliminations?: number } = {}): ConsolidatedPnl {
+export function consolidatePnl(
+  entities: EntityPnl[],
+  options: {
+    royaltyPercentForEliminations?: number;
+    consolidationCurrency?: string;
+    fxRates?: RateRow[] | null;
+    allowCurrencyMismatch?: boolean;
+  } = {},
+): ConsolidatedPnl {
+  const rates = options.fxRates || [];
+  const present = (entities || []).map((e) => String(e.currency || '').toUpperCase()).filter(Boolean);
+  const consolidationCurrency = (options.consolidationCurrency || present[0] || 'USD').toUpperCase();
+  const warnings: string[] = [];
+
   const rows = (entities || []).map((e) => {
-    const revenue = round2(Math.max(0, Number(e.revenue) || 0));
-    const cogs = round2(Math.max(0, Number(e.costOfGoods) || 0));
-    const labour = round2(Math.max(0, Number(e.labour) || 0));
-    const opex = round2(Math.max(0, Number(e.operatingExpenses) || 0));
-    const icRevenue = round2(Math.max(0, Number(e.intercompanyRevenue) || 0));
-    const icCost = round2(Math.max(0, Number(e.intercompanyCost) || 0));
+    const entityCurrency = String(e.currency || consolidationCurrency).toUpperCase();
+    const needFx = entityCurrency !== consolidationCurrency;
+    const translate = (raw: number, label: string): number => {
+      if (!needFx) return raw;
+      const converted = fxConvert(raw, entityCurrency, consolidationCurrency, rates);
+      if (converted == null) {
+        const msg = `no ${entityCurrency}->${consolidationCurrency} rate for ${e.entityCode} (${label}); left unconverted`;
+        if (!options.allowCurrencyMismatch) {
+          throw Object.assign(new Error(`Currency mismatch: ${msg}`), { code: 'FX_RATE_MISSING' });
+        }
+        if (!warnings.includes(msg)) warnings.push(msg);
+        return raw;
+      }
+      return converted;
+    };
+    const revenue = translate(round2(Math.max(0, Number(e.revenue) || 0)), 'revenue');
+    const cogs = translate(round2(Math.max(0, Number(e.costOfGoods) || 0)), 'costOfGoods');
+    const labour = translate(round2(Math.max(0, Number(e.labour) || 0)), 'labour');
+    const opex = translate(round2(Math.max(0, Number(e.operatingExpenses) || 0)), 'operatingExpenses');
+    const icRevenue = translate(round2(Math.max(0, Number(e.intercompanyRevenue) || 0)), 'intercompanyRevenue');
+    const icCost = translate(round2(Math.max(0, Number(e.intercompanyCost) || 0)), 'intercompanyCost');
     const gross = round2(revenue - cogs);
     return {
       entityCode: e.entityCode,
@@ -231,7 +278,7 @@ export function consolidatePnl(entities: EntityPnl[], options: { royaltyPercentF
       icCost,
       grossProfit: gross,
       ebitda: round2(gross - labour - opex),
-      currency: e.currency ?? null,
+      currency: consolidationCurrency,
     };
   });
 
@@ -267,6 +314,8 @@ export function consolidatePnl(entities: EntityPnl[], options: { royaltyPercentF
     eliminations: { intercompanyRevenue: elimRevenue, intercompanyCost: elimCost, unrealisedProfit },
     royaltiesDue: round2(unrealisedProfit * (Math.max(0, Number(options.royaltyPercentForEliminations) || 0) / 100)),
     topContributor: sorted[0]?.entityCode ?? null,
+    currency: consolidationCurrency,
+    warnings,
   };
 }
 

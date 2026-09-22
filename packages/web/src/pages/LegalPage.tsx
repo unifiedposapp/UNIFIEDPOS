@@ -27,7 +27,7 @@ export default function LegalPage() {
             onClick={() => navigate(-1)}
             className="flex items-center gap-1.5 text-sm text-ink-600 transition-colors hover:text-gold-600"
           >
-            <ArrowLeft size={16} /> Back
+            <ArrowLeft size={16} className="rtl:rotate-180" /> Back
           </button>
           <div className="flex-1" />
           <span className="font-display text-sm text-ink-900">{COMPANY}</span>

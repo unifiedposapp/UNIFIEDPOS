@@ -232,12 +232,12 @@ export default function AccountingPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Date</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Type</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Description</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium">Amount</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Status</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium">Actions</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Date</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Type</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Description</th>
+                  <th className="text-end px-4 py-3 text-sm font-medium">Amount</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Status</th>
+                  <th className="text-end px-4 py-3 text-sm font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -246,9 +246,9 @@ export default function AccountingPage() {
                     <td className="px-4 py-3 text-sm">{new Date(e.postedAt).toLocaleDateString()}</td>
                     <td className="px-4 py-3"><span className={`text-xs px-2 py-1 rounded ${TYPE_COLORS[e.type] || ''}`}>{e.type}</span></td>
                     <td className="px-4 py-3 text-sm">{e.description || '-'}</td>
-                    <td className="px-4 py-3 text-sm text-right font-mono">${Number(e.amount).toFixed(2)}</td>
+                    <td className="px-4 py-3 text-sm text-end font-mono">${Number(e.amount).toFixed(2)}</td>
                     <td className="px-4 py-3"><span className={`text-xs px-2 py-1 rounded ${STATUS_COLORS[e.status] || ''}`}>{e.status}</span></td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-end">
                       {e.status === 'POSTED' && (
                         <>
                           <button onClick={() => reconcile(e.id)} className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200 mr-1">Reconcile</button>
@@ -271,26 +271,26 @@ export default function AccountingPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="text-left px-4 py-3 text-sm font-medium">Date</th>
-                <th className="text-right px-4 py-3 text-sm font-medium">Sales</th>
-                <th className="text-right px-4 py-3 text-sm font-medium">Payments</th>
-                <th className="text-right px-4 py-3 text-sm font-medium">Refunds</th>
-                <th className="text-right px-4 py-3 text-sm font-medium">Expected</th>
-                <th className="text-right px-4 py-3 text-sm font-medium">Actual</th>
-                <th className="text-right px-4 py-3 text-sm font-medium">Variance</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">Status</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Date</th>
+                <th className="text-end px-4 py-3 text-sm font-medium">Sales</th>
+                <th className="text-end px-4 py-3 text-sm font-medium">Payments</th>
+                <th className="text-end px-4 py-3 text-sm font-medium">Refunds</th>
+                <th className="text-end px-4 py-3 text-sm font-medium">Expected</th>
+                <th className="text-end px-4 py-3 text-sm font-medium">Actual</th>
+                <th className="text-end px-4 py-3 text-sm font-medium">Variance</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Status</th>
               </tr>
             </thead>
             <tbody>
               {reconciliations.map(r => (
                 <tr key={r.id} className="border-b hover:bg-gray-50">
                   <td className="px-4 py-3 text-sm">{new Date(r.date).toLocaleDateString()}</td>
-                  <td className="px-4 py-3 text-sm text-right font-mono">${Number(r.totalSales).toFixed(2)}</td>
-                  <td className="px-4 py-3 text-sm text-right font-mono">${Number(r.totalPayments).toFixed(2)}</td>
-                  <td className="px-4 py-3 text-sm text-right font-mono">${Number(r.totalRefunds).toFixed(2)}</td>
-                  <td className="px-4 py-3 text-sm text-right font-mono">${Number(r.expectedBalance).toFixed(2)}</td>
-                  <td className="px-4 py-3 text-sm text-right font-mono">{r.actualBalance != null ? `$${Number(r.actualBalance).toFixed(2)}` : '-'}</td>
-                  <td className={`px-4 py-3 text-sm text-right font-mono ${r.variance && Math.abs(Number(r.variance)) > 0.01 ? 'text-red-600 font-semibold' : ''}`}>
+                  <td className="px-4 py-3 text-sm text-end font-mono">${Number(r.totalSales).toFixed(2)}</td>
+                  <td className="px-4 py-3 text-sm text-end font-mono">${Number(r.totalPayments).toFixed(2)}</td>
+                  <td className="px-4 py-3 text-sm text-end font-mono">${Number(r.totalRefunds).toFixed(2)}</td>
+                  <td className="px-4 py-3 text-sm text-end font-mono">${Number(r.expectedBalance).toFixed(2)}</td>
+                  <td className="px-4 py-3 text-sm text-end font-mono">{r.actualBalance != null ? `$${Number(r.actualBalance).toFixed(2)}` : '-'}</td>
+                  <td className={`px-4 py-3 text-sm text-end font-mono ${r.variance && Math.abs(Number(r.variance)) > 0.01 ? 'text-red-600 font-semibold' : ''}`}>
                     {r.variance != null ? `$${Number(r.variance).toFixed(2)}` : '-'}
                   </td>
                   <td className="px-4 py-3"><span className={`text-xs px-2 py-1 rounded ${STATUS_COLORS[r.status] || ''}`}>{r.status}</span></td>
@@ -348,23 +348,23 @@ export default function AccountingPage() {
               <table className="w-full">
                 <thead className="bg-gray-50 border-b">
                   <tr>
-                    <th className="text-left px-4 py-3 text-sm font-medium">Product</th>
-                    <th className="text-right px-4 py-3 text-sm font-medium">Qty</th>
-                    <th className="text-right px-4 py-3 text-sm font-medium">Revenue</th>
-                    <th className="text-right px-4 py-3 text-sm font-medium">Cost</th>
-                    <th className="text-right px-4 py-3 text-sm font-medium">Margin</th>
-                    <th className="text-right px-4 py-3 text-sm font-medium">Margin %</th>
+                    <th className="text-start px-4 py-3 text-sm font-medium">Product</th>
+                    <th className="text-end px-4 py-3 text-sm font-medium">Qty</th>
+                    <th className="text-end px-4 py-3 text-sm font-medium">Revenue</th>
+                    <th className="text-end px-4 py-3 text-sm font-medium">Cost</th>
+                    <th className="text-end px-4 py-3 text-sm font-medium">Margin</th>
+                    <th className="text-end px-4 py-3 text-sm font-medium">Margin %</th>
                   </tr>
                 </thead>
                 <tbody>
                   {cogsReport.productBreakdown.slice(0, 20).map((p: any) => (
                     <tr key={p.productId} className="border-b hover:bg-gray-50">
                       <td className="px-4 py-3 text-sm">{p.name}</td>
-                      <td className="px-4 py-3 text-sm text-right">{p.quantity}</td>
-                      <td className="px-4 py-3 text-sm text-right font-mono">${p.revenue.toFixed(2)}</td>
-                      <td className="px-4 py-3 text-sm text-right font-mono">${p.cost.toFixed(2)}</td>
-                      <td className="px-4 py-3 text-sm text-right font-mono">${p.margin.toFixed(2)}</td>
-                      <td className={`px-4 py-3 text-sm text-right font-mono ${p.marginPercent < 20 ? 'text-red-600' : ''}`}>{p.marginPercent.toFixed(1)}%</td>
+                      <td className="px-4 py-3 text-sm text-end">{p.quantity}</td>
+                      <td className="px-4 py-3 text-sm text-end font-mono">${p.revenue.toFixed(2)}</td>
+                      <td className="px-4 py-3 text-sm text-end font-mono">${p.cost.toFixed(2)}</td>
+                      <td className="px-4 py-3 text-sm text-end font-mono">${p.margin.toFixed(2)}</td>
+                      <td className={`px-4 py-3 text-sm text-end font-mono ${p.marginPercent < 20 ? 'text-red-600' : ''}`}>{p.marginPercent.toFixed(1)}%</td>
                     </tr>
                   ))}
                 </tbody>
@@ -388,11 +388,11 @@ export default function AccountingPage() {
               <table className="w-full">
                 <thead className="bg-gray-50 border-b">
                   <tr>
-                    <th className="text-left px-4 py-3 text-sm font-medium">Date</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium">Category</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium">Vendor</th>
-                    <th className="text-right px-4 py-3 text-sm font-medium">Amount</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium">Status</th>
+                    <th className="text-start px-4 py-3 text-sm font-medium">Date</th>
+                    <th className="text-start px-4 py-3 text-sm font-medium">Category</th>
+                    <th className="text-start px-4 py-3 text-sm font-medium">Vendor</th>
+                    <th className="text-end px-4 py-3 text-sm font-medium">Amount</th>
+                    <th className="text-start px-4 py-3 text-sm font-medium">Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -401,7 +401,7 @@ export default function AccountingPage() {
                       <td className="px-4 py-3 text-sm">{new Date(e.incurredAt).toLocaleDateString()}</td>
                       <td className="px-4 py-3 text-sm">{e.category}</td>
                       <td className="px-4 py-3 text-sm">{e.vendor || '-'}</td>
-                      <td className="px-4 py-3 text-sm text-right font-mono">${Number(e.amount).toFixed(2)}</td>
+                      <td className="px-4 py-3 text-sm text-end font-mono">${Number(e.amount).toFixed(2)}</td>
                       <td className="px-4 py-3"><span className={`text-xs px-2 py-1 rounded ${STATUS_COLORS[e.status] || ''}`}>{e.status}</span></td>
                     </tr>
                   ))}
@@ -418,12 +418,12 @@ export default function AccountingPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="text-left px-4 py-3 text-sm font-medium">Invoice #</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">Customer</th>
-                <th className="text-right px-4 py-3 text-sm font-medium">Amount</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">Due Date</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">Status</th>
-                <th className="text-right px-4 py-3 text-sm font-medium">Days Overdue</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Invoice #</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Customer</th>
+                <th className="text-end px-4 py-3 text-sm font-medium">Amount</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Due Date</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Status</th>
+                <th className="text-end px-4 py-3 text-sm font-medium">Days Overdue</th>
               </tr>
             </thead>
             <tbody>
@@ -431,10 +431,10 @@ export default function AccountingPage() {
                 <tr key={inv.id} className="border-b hover:bg-gray-50">
                   <td className="px-4 py-3 text-sm font-mono">{inv.invoiceNumber}</td>
                   <td className="px-4 py-3 text-sm">{inv.customer?.name || '-'}</td>
-                  <td className="px-4 py-3 text-sm text-right font-mono">${Number(inv.totalAmount).toFixed(2)}</td>
+                  <td className="px-4 py-3 text-sm text-end font-mono">${Number(inv.totalAmount).toFixed(2)}</td>
                   <td className="px-4 py-3 text-sm">{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString() : '-'}</td>
                   <td className="px-4 py-3"><span className={`text-xs px-2 py-1 rounded ${STATUS_COLORS[inv.status] || ''}`}>{inv.status}</span></td>
-                  <td className={`px-4 py-3 text-sm text-right ${inv.daysOverdue > 0 ? 'text-red-600 font-semibold' : ''}`}>
+                  <td className={`px-4 py-3 text-sm text-end ${inv.daysOverdue > 0 ? 'text-red-600 font-semibold' : ''}`}>
                     {inv.daysOverdue > 0 ? `${inv.daysOverdue}d` : '-'}
                   </td>
                 </tr>

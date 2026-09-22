@@ -110,13 +110,13 @@ export default function DevicesPage() {
         <table className="w-full">
           <thead className="bg-gray-50 border-b">
             <tr>
-              <th className="text-left px-4 py-3 text-sm font-medium">Device</th>
-              <th className="text-left px-4 py-3 text-sm font-medium">Type</th>
-              <th className="text-left px-4 py-3 text-sm font-medium">Status</th>
-              <th className="text-left px-4 py-3 text-sm font-medium">Location</th>
-              <th className="text-left px-4 py-3 text-sm font-medium">Last Heartbeat</th>
-              <th className="text-left px-4 py-3 text-sm font-medium">Config Ver</th>
-              <th className="text-right px-4 py-3 text-sm font-medium">Actions</th>
+              <th className="text-start px-4 py-3 text-sm font-medium">Device</th>
+              <th className="text-start px-4 py-3 text-sm font-medium">Type</th>
+              <th className="text-start px-4 py-3 text-sm font-medium">Status</th>
+              <th className="text-start px-4 py-3 text-sm font-medium">Location</th>
+              <th className="text-start px-4 py-3 text-sm font-medium">Last Heartbeat</th>
+              <th className="text-start px-4 py-3 text-sm font-medium">Config Ver</th>
+              <th className="text-end px-4 py-3 text-sm font-medium">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -142,7 +142,7 @@ export default function DevicesPage() {
                   {d.lastHeartbeatAt ? new Date(d.lastHeartbeatAt).toLocaleString() : 'Never'}
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-500">{d.configVersion || '-'}</td>
-                <td className="px-4 py-3 text-right">
+                <td className="px-4 py-3 text-end">
                   <div className="flex items-center gap-1 justify-end">
                     {d.status !== 'ONLINE' && d.status !== 'RETIRED' && (
                       <button onClick={() => updateStatus(d.id, 'ONLINE')} className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200" title="Set Online">

@@ -535,7 +535,19 @@ export async function consolidatedPnlFor(organizationId: string, from: Date, to:
     entity.labour = round2(wages.cost * share);
     entity.labourHoursTracked = round2(wages.hours * share);
   }
-  return { entities, consolidated: consolidatePnl(entities) };
+  // Consolidate in the organization's reporting currency. A single-currency
+  // network is unaffected (every entity already matches); a mixed one is
+  // translated with the tenant's stored FX table, and any currency we cannot
+  // price is reported as a warning rather than crashing the P&L page.
+  const org = await prisma.organization.findUnique({ where: { id: organizationId }, select: { currency: true } });
+  const consolidationCurrency = (org?.currency || 'USD').toUpperCase();
+  for (const entity of entities) entity.currency = entity.currency || consolidationCurrency;
+  const rateRows = await prisma.currencyRate.findMany({ where: { organizationId }, orderBy: { effectiveDate: 'desc' }, take: 2000 });
+  const fxRates = rateRows.map((r) => ({ from: r.from, to: r.to, rate: Number(r.rate), source: r.source, effectiveDate: r.effectiveDate, fetchedAt: r.fetchedAt }));
+  return {
+    entities,
+    consolidated: consolidatePnl(entities, { consolidationCurrency, fxRates, allowCurrencyMismatch: true }),
+  };
 }
 
 /** A location's P&L row plus the hours behind its apportioned wage figure. */

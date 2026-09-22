@@ -117,10 +117,10 @@ export default function EmployeesPage() {
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b">
                     <tr>
-                      <th className="text-left px-4 py-2 text-sm">Clock In</th>
-                      <th className="text-left px-4 py-2 text-sm">Break</th>
-                      <th className="text-left px-4 py-2 text-sm">Clock Out</th>
-                      <th className="text-right px-4 py-2 text-sm">Duration</th>
+                      <th className="text-start px-4 py-2 text-sm">Clock In</th>
+                      <th className="text-start px-4 py-2 text-sm">Break</th>
+                      <th className="text-start px-4 py-2 text-sm">Clock Out</th>
+                      <th className="text-end px-4 py-2 text-sm">Duration</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -136,7 +136,7 @@ export default function EmployeesPage() {
                             {entry.breakEnd ? ` - ${new Date(entry.breakEnd).toLocaleTimeString()}` : ''}
                           </td>
                           <td className="px-4 py-2 text-sm">{entry.clockOut ? new Date(entry.clockOut).toLocaleString() : '-'}</td>
-                          <td className="px-4 py-2 text-sm text-right">{duration}</td>
+                          <td className="px-4 py-2 text-sm text-end">{duration}</td>
                         </tr>
                       );
                     })}

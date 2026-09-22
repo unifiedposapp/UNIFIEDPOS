@@ -479,7 +479,7 @@ export default function POSPage() {
                   name: product.name,
                   price: Number(product.price),
                 })}
-                className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4 text-left"
+                className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4 text-start"
               >
                 <h3 className="font-semibold text-sm mb-1">{product.name}</h3>
                 <p className="text-xs text-gray-500 mb-2">{product.sku}</p>
@@ -635,7 +635,7 @@ export default function POSPage() {
               <button
                 key={order.id}
                 onClick={() => handleRecallOrder(order.id)}
-                className="bg-white border border-yellow-300 rounded-lg p-3 hover:bg-yellow-100 min-w-[200px] text-left"
+                className="bg-white border border-yellow-300 rounded-lg p-3 hover:bg-yellow-100 min-w-[200px] text-start"
               >
                 <p className="font-semibold">{order.orderNumber}</p>
                 <p className="text-sm text-gray-600">{order.items.length} items</p>

@@ -207,14 +207,14 @@ export default function CommercePage() {
             <div className="px-4 py-3 border-b font-medium">Revenue by Channel</div>
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
-                <tr><th className="text-left px-4 py-3 text-sm">Channel</th><th className="text-right px-4 py-3 text-sm">Orders</th><th className="text-right px-4 py-3 text-sm">Revenue</th></tr>
+                <tr><th className="text-start px-4 py-3 text-sm">Channel</th><th className="text-end px-4 py-3 text-sm">Orders</th><th className="text-end px-4 py-3 text-sm">Revenue</th></tr>
               </thead>
               <tbody>
                 {(overview.revenueByChannel || []).map((r: any) => (
                   <tr key={r.channel} className="border-b hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm font-medium">{r.channel}</td>
-                    <td className="px-4 py-3 text-sm text-right">{r.orders}</td>
-                    <td className="px-4 py-3 text-sm text-right font-mono">{money(r.revenue)}</td>
+                    <td className="px-4 py-3 text-sm text-end">{r.orders}</td>
+                    <td className="px-4 py-3 text-sm text-end font-mono">{money(r.revenue)}</td>
                   </tr>
                 ))}
                 {(!overview.revenueByChannel || overview.revenueByChannel.length === 0) && (
@@ -248,7 +248,7 @@ export default function CommercePage() {
           <div className="bg-white rounded-lg border">
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
-                <tr><th className="text-left px-4 py-3 text-sm">Key</th><th className="text-left px-4 py-3 text-sm">Name</th><th className="text-left px-4 py-3 text-sm">Type</th><th className="text-left px-4 py-3 text-sm">Platform</th><th className="text-left px-4 py-3 text-sm">Status</th><th className="text-right px-4 py-3 text-sm">Actions</th></tr>
+                <tr><th className="text-start px-4 py-3 text-sm">Key</th><th className="text-start px-4 py-3 text-sm">Name</th><th className="text-start px-4 py-3 text-sm">Type</th><th className="text-start px-4 py-3 text-sm">Platform</th><th className="text-start px-4 py-3 text-sm">Status</th><th className="text-end px-4 py-3 text-sm">Actions</th></tr>
               </thead>
               <tbody>
                 {channels.map((c) => (
@@ -258,7 +258,7 @@ export default function CommercePage() {
                     <td className="px-4 py-3 text-sm">{c.channelType}</td>
                     <td className="px-4 py-3 text-sm text-gray-500">{c.platform || '-'}</td>
                     <td className="px-4 py-3">{badge(c.isActive ? 'ACTIVE' : 'INACTIVE')}</td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-end">
                       <button onClick={() => toggleChannel(c)} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded hover:bg-gray-200 mr-1">{c.isActive ? 'Disable' : 'Enable'}</button>
                       <button onClick={() => removeChannel(c.id)} className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200">Delete</button>
                     </td>
@@ -326,7 +326,7 @@ export default function CommercePage() {
           <div className="bg-white rounded-lg border overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
-                <tr><th className="text-left px-4 py-3 text-sm">Order #</th><th className="text-left px-4 py-3 text-sm">Channel</th><th className="text-left px-4 py-3 text-sm">Fulfillment</th><th className="text-left px-4 py-3 text-sm">Customer</th><th className="text-right px-4 py-3 text-sm">Total</th><th className="text-left px-4 py-3 text-sm">Status</th><th className="text-right px-4 py-3 text-sm">Actions</th></tr>
+                <tr><th className="text-start px-4 py-3 text-sm">Order #</th><th className="text-start px-4 py-3 text-sm">Channel</th><th className="text-start px-4 py-3 text-sm">Fulfillment</th><th className="text-start px-4 py-3 text-sm">Customer</th><th className="text-end px-4 py-3 text-sm">Total</th><th className="text-start px-4 py-3 text-sm">Status</th><th className="text-end px-4 py-3 text-sm">Actions</th></tr>
               </thead>
               <tbody>
                 {orders.map((o) => (
@@ -335,9 +335,9 @@ export default function CommercePage() {
                     <td className="px-4 py-3 text-sm">{o.channel}</td>
                     <td className="px-4 py-3 text-sm">{o.fulfillmentType}</td>
                     <td className="px-4 py-3 text-sm">{o.customer?.name || '-'}</td>
-                    <td className="px-4 py-3 text-sm text-right font-mono">{money(o.totalAmount)}</td>
+                    <td className="px-4 py-3 text-sm text-end font-mono">{money(o.totalAmount)}</td>
                     <td className="px-4 py-3">{badge(o.status)}</td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-end">
                       {o.status !== 'CANCELLED' && <button onClick={() => cancelOrder(o.id)} className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200">Cancel</button>}
                     </td>
                   </tr>
@@ -354,7 +354,7 @@ export default function CommercePage() {
         <div className="bg-white rounded-lg border overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
-              <tr><th className="text-left px-4 py-3 text-sm">Order</th><th className="text-left px-4 py-3 text-sm">Type</th><th className="text-left px-4 py-3 text-sm">Status</th><th className="text-left px-4 py-3 text-sm">Scheduled</th><th className="text-left px-4 py-3 text-sm">Tracking</th><th className="text-right px-4 py-3 text-sm">Advance</th></tr>
+              <tr><th className="text-start px-4 py-3 text-sm">Order</th><th className="text-start px-4 py-3 text-sm">Type</th><th className="text-start px-4 py-3 text-sm">Status</th><th className="text-start px-4 py-3 text-sm">Scheduled</th><th className="text-start px-4 py-3 text-sm">Tracking</th><th className="text-end px-4 py-3 text-sm">Advance</th></tr>
             </thead>
             <tbody>
               {fulfillments.map((f) => (
@@ -364,7 +364,7 @@ export default function CommercePage() {
                   <td className="px-4 py-3">{badge(f.status)}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">{f.scheduledAt ? new Date(f.scheduledAt).toLocaleString() : '-'}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">{f.trackingNumber || f.courier || '-'}</td>
-                  <td className="px-4 py-3 text-right space-x-1">
+                  <td className="px-4 py-3 text-end space-x-1">
                     {['PREPARING', 'READY', 'SHIPPED', 'COMPLETED'].filter((s) => s !== f.status).slice(0, 3).map((s) => (
                       <button key={s} onClick={() => advance(f.id, s)} className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200">{s}</button>
                     ))}
@@ -382,7 +382,7 @@ export default function CommercePage() {
         <div className="bg-white rounded-lg border overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
-              <tr><th className="text-left px-4 py-3 text-sm">Order</th><th className="text-left px-4 py-3 text-sm">Type</th><th className="text-left px-4 py-3 text-sm">Customer</th><th className="text-left px-4 py-3 text-sm">Status</th><th className="text-left px-4 py-3 text-sm">Ready At</th><th className="text-right px-4 py-3 text-sm">Actions</th></tr>
+              <tr><th className="text-start px-4 py-3 text-sm">Order</th><th className="text-start px-4 py-3 text-sm">Type</th><th className="text-start px-4 py-3 text-sm">Customer</th><th className="text-start px-4 py-3 text-sm">Status</th><th className="text-start px-4 py-3 text-sm">Ready At</th><th className="text-end px-4 py-3 text-sm">Actions</th></tr>
             </thead>
             <tbody>
               {pickups.map((f) => (
@@ -392,7 +392,7 @@ export default function CommercePage() {
                   <td className="px-4 py-3 text-sm">{f.order?.customer?.name || '-'}</td>
                   <td className="px-4 py-3">{badge(f.status)}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">{f.readyAt ? new Date(f.readyAt).toLocaleTimeString() : '-'}</td>
-                  <td className="px-4 py-3 text-right space-x-1">
+                  <td className="px-4 py-3 text-end space-x-1">
                     {f.status !== 'READY' && f.status !== 'COMPLETED' && <button onClick={() => pickupReady(f.id)} className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200">Mark Ready</button>}
                     {f.status === 'READY' && <button onClick={() => pickupComplete(f.id)} className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200"><CheckCircle2 size={12} className="inline" /> Picked Up</button>}
                   </td>
@@ -414,7 +414,7 @@ export default function CommercePage() {
             <div className="bg-white rounded-lg border overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50 border-b">
-                  <tr><th className="text-left px-4 py-3 text-sm">Order</th><th className="text-left px-4 py-3 text-sm">Recipient</th><th className="text-left px-4 py-3 text-sm">Address</th><th className="text-left px-4 py-3 text-sm">Courier</th><th className="text-right px-4 py-3 text-sm">Fee</th><th className="text-left px-4 py-3 text-sm">Status</th><th className="text-right px-4 py-3 text-sm">Actions</th></tr>
+                  <tr><th className="text-start px-4 py-3 text-sm">Order</th><th className="text-start px-4 py-3 text-sm">Recipient</th><th className="text-start px-4 py-3 text-sm">Address</th><th className="text-start px-4 py-3 text-sm">Courier</th><th className="text-end px-4 py-3 text-sm">Fee</th><th className="text-start px-4 py-3 text-sm">Status</th><th className="text-end px-4 py-3 text-sm">Actions</th></tr>
                 </thead>
                 <tbody>
                   {deliveries.map((d) => (
@@ -423,9 +423,9 @@ export default function CommercePage() {
                       <td className="px-4 py-3 text-sm">{d.recipientName || d.order?.customer?.name || '-'}</td>
                       <td className="px-4 py-3 text-sm text-gray-500">{[d.addressLine1, d.city, d.postalCode].filter(Boolean).join(', ') || '-'}</td>
                       <td className="px-4 py-3 text-sm">{d.courier || '-'}</td>
-                      <td className="px-4 py-3 text-sm text-right font-mono">{money(d.deliveryFee)}</td>
+                      <td className="px-4 py-3 text-sm text-end font-mono">{money(d.deliveryFee)}</td>
                       <td className="px-4 py-3">{badge(d.status)}</td>
-                      <td className="px-4 py-3 text-right space-x-1">
+                      <td className="px-4 py-3 text-end space-x-1">
                         {d.status !== 'OUT_FOR_DELIVERY' && d.status !== 'DELIVERED' && <button onClick={() => dispatch(d.id)} className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded hover:bg-indigo-200"><Play size={12} className="inline" /> Dispatch</button>}
                         {d.status === 'OUT_FOR_DELIVERY' && <button onClick={() => delivered(d.id)} className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200">Delivered</button>}
                       </td>
@@ -456,18 +456,18 @@ export default function CommercePage() {
             <div className="bg-white rounded-lg border overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50 border-b">
-                  <tr><th className="text-left px-4 py-3 text-sm">Zone</th><th className="text-left px-4 py-3 text-sm">Location</th><th className="text-right px-4 py-3 text-sm">Radius</th><th className="text-right px-4 py-3 text-sm">Base Fee</th><th className="text-right px-4 py-3 text-sm">Per Mile</th><th className="text-right px-4 py-3 text-sm">Min Order</th><th className="text-right px-4 py-3 text-sm">Actions</th></tr>
+                  <tr><th className="text-start px-4 py-3 text-sm">Zone</th><th className="text-start px-4 py-3 text-sm">Location</th><th className="text-end px-4 py-3 text-sm">Radius</th><th className="text-end px-4 py-3 text-sm">Base Fee</th><th className="text-end px-4 py-3 text-sm">Per Mile</th><th className="text-end px-4 py-3 text-sm">Min Order</th><th className="text-end px-4 py-3 text-sm">Actions</th></tr>
                 </thead>
                 <tbody>
                   {zones.map((z) => (
                     <tr key={z.id} className="border-b hover:bg-gray-50">
                       <td className="px-4 py-3 text-sm font-medium">{z.name}</td>
                       <td className="px-4 py-3 text-sm">{z.location?.name || 'All'}</td>
-                      <td className="px-4 py-3 text-sm text-right">{Number(z.radiusMiles)} mi</td>
-                      <td className="px-4 py-3 text-sm text-right font-mono">{money(z.baseFee)}</td>
-                      <td className="px-4 py-3 text-sm text-right font-mono">{money(z.perMileFee)}</td>
-                      <td className="px-4 py-3 text-sm text-right font-mono">{money(z.minOrder)}</td>
-                      <td className="px-4 py-3 text-right"><button onClick={() => removeZone(z.id)} className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200">Delete</button></td>
+                      <td className="px-4 py-3 text-sm text-end">{Number(z.radiusMiles)} mi</td>
+                      <td className="px-4 py-3 text-sm text-end font-mono">{money(z.baseFee)}</td>
+                      <td className="px-4 py-3 text-sm text-end font-mono">{money(z.perMileFee)}</td>
+                      <td className="px-4 py-3 text-sm text-end font-mono">{money(z.minOrder)}</td>
+                      <td className="px-4 py-3 text-end"><button onClick={() => removeZone(z.id)} className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200">Delete</button></td>
                     </tr>
                   ))}
                   {zones.length === 0 && <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">No delivery zones</td></tr>}
@@ -499,7 +499,7 @@ export default function CommercePage() {
           <div className="bg-white rounded-lg border overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
-                <tr><th className="text-left px-4 py-3 text-sm">Name</th><th className="text-left px-4 py-3 text-sm">Provider</th><th className="text-left px-4 py-3 text-sm">Type</th><th className="text-left px-4 py-3 text-sm">Status</th><th className="text-left px-4 py-3 text-sm">Last Sync</th><th className="text-right px-4 py-3 text-sm">Actions</th></tr>
+                <tr><th className="text-start px-4 py-3 text-sm">Name</th><th className="text-start px-4 py-3 text-sm">Provider</th><th className="text-start px-4 py-3 text-sm">Type</th><th className="text-start px-4 py-3 text-sm">Status</th><th className="text-start px-4 py-3 text-sm">Last Sync</th><th className="text-end px-4 py-3 text-sm">Actions</th></tr>
               </thead>
               <tbody>
                 {integrations.map((i) => (
@@ -509,7 +509,7 @@ export default function CommercePage() {
                     <td className="px-4 py-3 text-sm">{i.type}</td>
                     <td className="px-4 py-3">{badge(i.status)}</td>
                     <td className="px-4 py-3 text-sm text-gray-500">{i.lastSyncAt ? new Date(i.lastSyncAt).toLocaleString() : 'Never'}</td>
-                    <td className="px-4 py-3 text-right space-x-1">
+                    <td className="px-4 py-3 text-end space-x-1">
                       <button onClick={() => syncIntegration(i.id)} className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200"><RefreshCw size={12} className="inline" /> Sync</button>
                       <button onClick={() => disconnect(i.id)} className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200">Disconnect</button>
                     </td>
@@ -527,16 +527,16 @@ export default function CommercePage() {
         <div className="bg-white rounded-lg border overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
-              <tr><th className="text-left px-4 py-3 text-sm">Product</th><th className="text-left px-4 py-3 text-sm">SKU</th><th className="text-right px-4 py-3 text-sm">On Hand</th><th className="text-right px-4 py-3 text-sm">Reserved</th><th className="text-right px-4 py-3 text-sm">Available (ATP)</th><th className="text-left px-4 py-3 text-sm">Locations</th><th className="text-left px-4 py-3 text-sm">Status</th></tr>
+              <tr><th className="text-start px-4 py-3 text-sm">Product</th><th className="text-start px-4 py-3 text-sm">SKU</th><th className="text-end px-4 py-3 text-sm">On Hand</th><th className="text-end px-4 py-3 text-sm">Reserved</th><th className="text-end px-4 py-3 text-sm">Available (ATP)</th><th className="text-start px-4 py-3 text-sm">Locations</th><th className="text-start px-4 py-3 text-sm">Status</th></tr>
             </thead>
             <tbody>
               {inventory.map((p) => (
                 <tr key={p.productId} className="border-b hover:bg-gray-50">
                   <td className="px-4 py-3 text-sm font-medium">{p.name}</td>
                   <td className="px-4 py-3 text-sm font-mono text-gray-500">{p.sku || '-'}</td>
-                  <td className="px-4 py-3 text-sm text-right">{p.totalOnHand}</td>
-                  <td className="px-4 py-3 text-sm text-right">{p.totalReserved}</td>
-                  <td className="px-4 py-3 text-sm text-right font-bold">{p.availableToPromise}</td>
+                  <td className="px-4 py-3 text-sm text-end">{p.totalOnHand}</td>
+                  <td className="px-4 py-3 text-sm text-end">{p.totalReserved}</td>
+                  <td className="px-4 py-3 text-sm text-end font-bold">{p.availableToPromise}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">{p.locations.map((l: any) => `${l.locationName || '—'}: ${l.available}`).join(' · ')}</td>
                   <td className="px-4 py-3">{p.lowStock ? <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">LOW STOCK</span> : <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-800">IN STOCK</span>}</td>
                 </tr>

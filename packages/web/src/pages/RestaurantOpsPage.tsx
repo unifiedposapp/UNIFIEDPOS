@@ -208,11 +208,11 @@ function FoodCostTab() {
           </div>
           <div className="bg-white rounded-lg border overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-left text-gray-500">
+              <thead className="bg-gray-50 text-start text-gray-500">
                 <tr>
                   <th className="p-3">Item</th><th className="p-3">Category</th>
-                  <th className="p-3 text-right">Sell</th><th className="p-3 text-right">Cost</th>
-                  <th className="p-3 text-right">Food-cost %</th><th className="p-3 text-right">Margin %</th>
+                  <th className="p-3 text-end">Sell</th><th className="p-3 text-end">Cost</th>
+                  <th className="p-3 text-end">Food-cost %</th><th className="p-3 text-end">Margin %</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -220,10 +220,10 @@ function FoodCostTab() {
                   <tr key={r.productId} className={clsx(r.aboveTarget && 'bg-rose-50')}>
                     <td className="p-3 font-medium">{r.name}</td>
                     <td className="p-3 text-gray-500">{r.category || '—'}</td>
-                    <td className="p-3 text-right">{r.sellPrice.toFixed(2)}</td>
-                    <td className="p-3 text-right">{r.costPrice.toFixed(2)}</td>
-                    <td className={clsx('p-3 text-right font-medium', r.aboveTarget ? 'text-rose-600' : 'text-emerald-600')}>{r.foodCostPct}%</td>
-                    <td className="p-3 text-right">{r.marginPct}%</td>
+                    <td className="p-3 text-end">{r.sellPrice.toFixed(2)}</td>
+                    <td className="p-3 text-end">{r.costPrice.toFixed(2)}</td>
+                    <td className={clsx('p-3 text-end font-medium', r.aboveTarget ? 'text-rose-600' : 'text-emerald-600')}>{r.foodCostPct}%</td>
+                    <td className="p-3 text-end">{r.marginPct}%</td>
                   </tr>
                 ))}
                 {data.items.length === 0 && <tr><td colSpan={6} className="p-8 text-center text-gray-500">No menu items or products</td></tr>}

@@ -397,13 +397,13 @@ export default function RetailPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Card Number</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Customer</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium">Balance</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium">Original</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Status</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Expires</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium">Actions</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Card Number</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Customer</th>
+                  <th className="text-end px-4 py-3 text-sm font-medium">Balance</th>
+                  <th className="text-end px-4 py-3 text-sm font-medium">Original</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Status</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Expires</th>
+                  <th className="text-end px-4 py-3 text-sm font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -411,11 +411,11 @@ export default function RetailPage() {
                   <tr key={gc.id} className="border-b hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm font-mono">{gc.cardNumber}</td>
                     <td className="px-4 py-3 text-sm">{gc.customer?.name || '-'}</td>
-                    <td className="px-4 py-3 text-sm text-right font-mono">${Number(gc.balance).toFixed(2)}</td>
-                    <td className="px-4 py-3 text-sm text-right font-mono">${Number(gc.originalAmount).toFixed(2)}</td>
+                    <td className="px-4 py-3 text-sm text-end font-mono">${Number(gc.balance).toFixed(2)}</td>
+                    <td className="px-4 py-3 text-sm text-end font-mono">${Number(gc.originalAmount).toFixed(2)}</td>
                     <td className="px-4 py-3"><span className={`text-xs px-2 py-1 rounded ${STATUS_COLORS[gc.status] || ''}`}>{gc.status}</span></td>
                     <td className="px-4 py-3 text-sm text-gray-500">{gc.expiresAt ? new Date(gc.expiresAt).toLocaleDateString() : '-'}</td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-end">
                       <button onClick={() => redeemGiftCard(gc.id, gc.balance)} disabled={gc.status !== 'ACTIVE' || Number(gc.balance) <= 0} className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200 disabled:opacity-40">Redeem</button>
                     </td>
                   </tr>
@@ -449,25 +449,25 @@ export default function RetailPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Customer</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium">Balance</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium">Original</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Reason</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Status</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Expires</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium">Actions</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Customer</th>
+                  <th className="text-end px-4 py-3 text-sm font-medium">Balance</th>
+                  <th className="text-end px-4 py-3 text-sm font-medium">Original</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Reason</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Status</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Expires</th>
+                  <th className="text-end px-4 py-3 text-sm font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {storeCredits.map(sc => (
                   <tr key={sc.id} className="border-b hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm">{sc.customer?.name || '-'}</td>
-                    <td className="px-4 py-3 text-sm text-right font-mono">${Number(sc.balance).toFixed(2)}</td>
-                    <td className="px-4 py-3 text-sm text-right font-mono">${Number(sc.originalAmount).toFixed(2)}</td>
+                    <td className="px-4 py-3 text-sm text-end font-mono">${Number(sc.balance).toFixed(2)}</td>
+                    <td className="px-4 py-3 text-sm text-end font-mono">${Number(sc.originalAmount).toFixed(2)}</td>
                     <td className="px-4 py-3 text-sm">{sc.reason || '-'}</td>
                     <td className="px-4 py-3"><span className={`text-xs px-2 py-1 rounded ${STATUS_COLORS[sc.status] || ''}`}>{sc.status}</span></td>
                     <td className="px-4 py-3 text-sm text-gray-500">{sc.expiresAt ? new Date(sc.expiresAt).toLocaleDateString() : '-'}</td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-end">
                       <button onClick={() => redeemStoreCredit(sc.id, sc.balance)} disabled={sc.status !== 'ACTIVE' || Number(sc.balance) <= 0} className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded hover:bg-purple-200 disabled:opacity-40">Redeem</button>
                     </td>
                   </tr>
@@ -503,14 +503,14 @@ export default function RetailPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Order #</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Customer</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium">Total</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium">Paid</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium">Remaining</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Status</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Due Date</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium">Actions</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Order #</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Customer</th>
+                  <th className="text-end px-4 py-3 text-sm font-medium">Total</th>
+                  <th className="text-end px-4 py-3 text-sm font-medium">Paid</th>
+                  <th className="text-end px-4 py-3 text-sm font-medium">Remaining</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Status</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Due Date</th>
+                  <th className="text-end px-4 py-3 text-sm font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -518,12 +518,12 @@ export default function RetailPage() {
                   <tr key={lw.id} className="border-b hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm font-mono">{lw.orderNumber}</td>
                     <td className="px-4 py-3 text-sm">{lw.customer?.name || '-'}</td>
-                    <td className="px-4 py-3 text-sm text-right font-mono">${Number(lw.totalAmount).toFixed(2)}</td>
-                    <td className="px-4 py-3 text-sm text-right font-mono">${Number(lw.paidAmount).toFixed(2)}</td>
-                    <td className="px-4 py-3 text-sm text-right font-mono">${(Number(lw.totalAmount) - Number(lw.paidAmount)).toFixed(2)}</td>
+                    <td className="px-4 py-3 text-sm text-end font-mono">${Number(lw.totalAmount).toFixed(2)}</td>
+                    <td className="px-4 py-3 text-sm text-end font-mono">${Number(lw.paidAmount).toFixed(2)}</td>
+                    <td className="px-4 py-3 text-sm text-end font-mono">${(Number(lw.totalAmount) - Number(lw.paidAmount)).toFixed(2)}</td>
                     <td className="px-4 py-3"><span className={`text-xs px-2 py-1 rounded ${STATUS_COLORS[lw.status] || ''}`}>{lw.status}</span></td>
                     <td className="px-4 py-3 text-sm">{lw.dueDate ? new Date(lw.dueDate).toLocaleDateString() : '-'}</td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-end">
                       {lw.status === 'ACTIVE' && (
                         <div className="flex items-center gap-1 justify-end">
                           <input placeholder="$" type="number" value={payAmount} onChange={e => setPayAmount(e.target.value)} className="border rounded px-2 py-1 w-20 text-sm" />
@@ -549,12 +549,12 @@ export default function RetailPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="text-left px-4 py-3 text-sm font-medium">Reference</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">Employee</th>
-                <th className="text-right px-4 py-3 text-sm font-medium">Total</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">Notes</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">Created</th>
-                <th className="text-right px-4 py-3 text-sm font-medium">Actions</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Reference</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Employee</th>
+                <th className="text-end px-4 py-3 text-sm font-medium">Total</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Notes</th>
+                <th className="text-start px-4 py-3 text-sm font-medium">Created</th>
+                <th className="text-end px-4 py-3 text-sm font-medium">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -562,10 +562,10 @@ export default function RetailPage() {
                 <tr key={sc.id} className="border-b hover:bg-gray-50">
                   <td className="px-4 py-3 text-sm font-medium">{sc.reference || '-'}</td>
                   <td className="px-4 py-3 text-sm">{sc.employee?.name || '-'}</td>
-                  <td className="px-4 py-3 text-sm text-right font-mono">${Number(sc.totalAmount).toFixed(2)}</td>
+                  <td className="px-4 py-3 text-sm text-end font-mono">${Number(sc.totalAmount).toFixed(2)}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">{sc.notes || '-'}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">{new Date(sc.createdAt).toLocaleString()}</td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3 text-end">
                     <button onClick={() => resumeCart(sc.id)} className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 mr-1">Resume</button>
                     <button onClick={() => deleteCart(sc.id)} className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200">Delete</button>
                   </td>
@@ -639,13 +639,13 @@ export default function RetailPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Product</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">SKU</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Type</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Category</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium">Price</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium">Stock</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium">Actions</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Product</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">SKU</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Type</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Category</th>
+                  <th className="text-end px-4 py-3 text-sm font-medium">Price</th>
+                  <th className="text-end px-4 py-3 text-sm font-medium">Stock</th>
+                  <th className="text-end px-4 py-3 text-sm font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -655,9 +655,9 @@ export default function RetailPage() {
                     <td className="px-4 py-3 text-sm text-gray-500">{p.sku}</td>
                     <td className="px-4 py-3 text-sm text-gray-500">{productTypeLabel(p.type)}</td>
                     <td className="px-4 py-3 text-sm text-gray-500">{p.category?.name || '-'}</td>
-                    <td className="px-4 py-3 text-sm text-right font-mono">${Number(p.price).toFixed(2)}</td>
-                    <td className="px-4 py-3 text-sm text-right">{isStockTracked(p.type) ? (p.stock ?? 0) : '—'}</td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-sm text-end font-mono">${Number(p.price).toFixed(2)}</td>
+                    <td className="px-4 py-3 text-sm text-end">{isStockTracked(p.type) ? (p.stock ?? 0) : '—'}</td>
+                    <td className="px-4 py-3 text-end">
                       <button onClick={() => editProduct(p)} className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 mr-1">Edit</button>
                       <button onClick={() => deleteProduct(p.id)} className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200">Delete</button>
                     </td>

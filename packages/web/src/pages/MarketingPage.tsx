@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import {
   Tag, Ticket, Megaphone, Users, Plus, X, RefreshCw, Trash2, Edit2, Send, Play,
   Eye, Ban, Target, TrendingUp, FlaskConical, MousePointerClick,
@@ -41,12 +41,39 @@ function Field({ label, children, hint }: { label: string; children: React.React
 }
 
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+  const panel = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    panel.current?.focus();
+    // WCAG 2.1.2: Escape always closes; Tab is trapped inside the dialog.
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { onClose(); return; }
+      if (e.key !== 'Tab' || !panel.current) return;
+      const focusables = panel.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-4 overflow-auto" onClick={onClose}>
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl my-8" onClick={(e) => e.stopPropagation()}>
+      <div
+        ref={panel}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        className="bg-white rounded-xl shadow-xl w-full max-w-2xl my-8 focus:outline-none"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between px-5 py-3 border-b">
           <h3 className="font-semibold">{title}</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-700"><X size={18} /></button>
+          <button onClick={onClose} aria-label="Close dialog" className="text-gray-500 hover:text-gray-700"><X size={18} /></button>
         </div>
         <div className="p-5">{children}</div>
       </div>
@@ -265,12 +292,12 @@ export default function MarketingPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b text-sm font-medium text-gray-600">
                 <tr>
-                  <th className="text-left px-4 py-3">Name</th>
-                  <th className="text-left px-4 py-3">Type</th>
-                  <th className="text-left px-4 py-3">Value</th>
-                  <th className="text-left px-4 py-3">Min purchase</th>
-                  <th className="text-left px-4 py-3">Window</th>
-                  <th className="text-left px-4 py-3">Status</th>
+                  <th className="text-start px-4 py-3">Name</th>
+                  <th className="text-start px-4 py-3">Type</th>
+                  <th className="text-start px-4 py-3">Value</th>
+                  <th className="text-start px-4 py-3">Min purchase</th>
+                  <th className="text-start px-4 py-3">Window</th>
+                  <th className="text-start px-4 py-3">Status</th>
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>
@@ -321,12 +348,12 @@ export default function MarketingPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b text-sm font-medium text-gray-600">
                 <tr>
-                  <th className="text-left px-4 py-3">Code</th>
-                  <th className="text-left px-4 py-3">Type</th>
-                  <th className="text-left px-4 py-3">Value</th>
-                  <th className="text-left px-4 py-3">Min</th>
-                  <th className="text-left px-4 py-3">Usage</th>
-                  <th className="text-left px-4 py-3">Status</th>
+                  <th className="text-start px-4 py-3">Code</th>
+                  <th className="text-start px-4 py-3">Type</th>
+                  <th className="text-start px-4 py-3">Value</th>
+                  <th className="text-start px-4 py-3">Min</th>
+                  <th className="text-start px-4 py-3">Usage</th>
+                  <th className="text-start px-4 py-3">Status</th>
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>

@@ -51,7 +51,7 @@ export default function LanguageSwitcher() {
         <div
           role="listbox"
           aria-label={t('lang.switcher')}
-          className="absolute right-0 z-40 mt-2 w-44 overflow-hidden rounded-xl border border-ink-100 bg-white py-1 shadow-luxe"
+          className="absolute end-0 z-40 mt-2 w-44 overflow-hidden rounded-xl border border-ink-100 bg-white py-1 shadow-luxe"
         >
           {SUPPORTED_LOCALES.map((l) => {
             const active = l.code === locale;
@@ -66,7 +66,7 @@ export default function LanguageSwitcher() {
                   setOpen(false);
                 }}
                 className={clsx(
-                  'flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors hover:bg-gold-50',
+                  'flex w-full items-center gap-2 px-3 py-2 text-start text-sm transition-colors hover:bg-gold-50',
                   active ? 'font-medium text-gold-700' : 'text-ink-600',
                 )}
               >

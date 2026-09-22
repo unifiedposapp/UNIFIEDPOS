@@ -271,7 +271,7 @@ export default function AppsPage() {
               <Td className="text-xs text-gray-600">{a.scopes.length} declared{a.handlesPersonalData ? ' · personal data' : ''}</Td>
               <Td><Badge tone={a.risk?.risk === 'HIGH' ? 'bad' : a.risk?.risk === 'MEDIUM' ? 'warn' : 'good'}>{a.risk?.risk || 'LOW'}</Badge></Td>
               <Td>{a.installed ? <Badge>{a.installed.status}</Badge> : a.availableInMarket ? <span className="text-xs text-gray-400">not installed</span> : <Badge tone="warn">other markets</Badge>}</Td>
-              <Td className="text-right"><button className={ghostButton} onClick={() => openManifest(a.code)}>Manifest</button></Td>
+              <Td className="text-end"><button className={ghostButton} onClick={() => openManifest(a.code)}>Manifest</button></Td>
             </tr>
           ))}
           {shown.length === 0 && <tr><Td colSpan={8}><Empty>Nothing matches that filter.</Empty></Td></tr>}
@@ -327,7 +327,7 @@ export default function AppsPage() {
               <Td className="text-xs text-gray-600 max-w-sm">{(i.scopes || []).join(', ')}</Td>
               <Td><Badge tone={i.risk?.risk === 'HIGH' ? 'bad' : i.risk?.risk === 'MEDIUM' ? 'warn' : 'good'}>{i.risk?.risk || 'LOW'}</Badge></Td>
               <Td className="text-xs text-gray-500">{i.installedAt ? new Date(i.installedAt).toLocaleDateString() : '—'}</Td>
-              <Td className="text-right whitespace-nowrap">
+              <Td className="text-end whitespace-nowrap">
                 <button className={ghostButton} onClick={() => editGrant(i)}>Edit grant</button>{' '}
                 <button className={ghostButton} onClick={() => rotate(i.appCode)}><KeyRound size={14} /> Rotate</button>{' '}
                 <button className={dangerButton} onClick={() => uninstall(i.appCode)}>Uninstall</button>
@@ -388,7 +388,7 @@ export default function AppsPage() {
                 <Td className="text-xs">{f.entity}</Td>
                 <Td>{f.required ? 'yes' : 'no'}</Td>
                 <Td><Badge tone={f.active ? 'good' : 'neutral'}>{f.active ? 'ACTIVE' : 'OFF'}</Badge></Td>
-                <Td className="text-right">{f.active && <button className={ghostButton} onClick={() => deactivateField(f.id)}>Deactivate</button>}</Td>
+                <Td className="text-end">{f.active && <button className={ghostButton} onClick={() => deactivateField(f.id)}>Deactivate</button>}</Td>
               </tr>
             ))}
             {definitions.length === 0 && <tr><Td colSpan={7}><Empty>No custom fields — every document uses only the standard columns.</Empty></Td></tr>}

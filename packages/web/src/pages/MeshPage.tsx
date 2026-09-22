@@ -149,7 +149,7 @@ export default function MeshPage() {
                 </Td>
                 <Td className="tabular-nums text-xs">e{l.fence?.epoch} / s{l.fence?.committedSequence}</Td>
                 <Td><Badge>{l.status?.health}</Badge></Td>
-                <Td className="text-right"><button className={ghostButton} onClick={() => openLocation(l.locationId)}>Manage</button></Td>
+                <Td className="text-end"><button className={ghostButton} onClick={() => openLocation(l.locationId)}>Manage</button></Td>
               </tr>
             );
           })}

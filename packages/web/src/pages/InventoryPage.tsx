@@ -199,13 +199,13 @@ export default function InventoryPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SKU</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Product</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">SKU</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Category</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Type</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Price</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Stock</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -252,10 +252,10 @@ export default function InventoryPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Current Stock</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reorder Point</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Product</th>
+                <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Current Stock</th>
+                <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Reorder Point</th>
+                <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -290,12 +290,12 @@ export default function InventoryPage() {
               <table className="w-full">
                 <thead className="bg-gray-50 border-b">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Batch #</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qty / Remaining</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Expiration</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Product</th>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Batch #</th>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Qty / Remaining</th>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Expiration</th>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -349,9 +349,9 @@ export default function InventoryPage() {
               <table className="w-full">
                 <thead className="bg-gray-50 border-b">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Serial</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Product</th>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Serial</th>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">

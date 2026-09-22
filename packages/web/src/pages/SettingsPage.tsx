@@ -7,7 +7,7 @@ import { COPYRIGHT } from '../data/legal';
 import PhoneInput from '../components/PhoneInput';
 import {
   Save, Upload, Image as ImageIcon, Trash2, Palette, MapPin, Store as StoreIcon,
-  Globe2, X, FileText, ShieldCheck, Receipt, Bell,
+  Globe2, X, FileText, ShieldCheck, Receipt, Bell, KeyRound,
 } from 'lucide-react';
 
 const MAX_BYTES = 5 * 1024 * 1024; // 5 MB per image (matches server limit)
@@ -376,6 +376,9 @@ export default function SettingsPage() {
             </label>
           </div>
 
+          {/* ── Single Sign-On (OIDC / SAML) ── */}
+          <SsoPanel />
+
           {/* ── Legal ── */}
           <div className="bg-white rounded-xl border p-6">
             <h2 className="text-lg font-bold mb-3 flex items-center gap-2"><ShieldCheck size={20} className="text-primary-600" /> Legal</h2>
@@ -423,6 +426,136 @@ function ImageUpload({ label, value, onChange, onClear, hint }: {
         </div>
         {hint && <span className="text-[10px] text-gray-400">{hint}</span>}
       </div>
+    </div>
+  );
+}
+
+// ─── Enterprise SSO panel ────────────────────────────────────────────────
+// Manages OIDC/SAML federation connections: Okta, Entra ID, Google Workspace…
+// Secrets are write-only (the server never returns them), and sign-in routing is
+// driven by the domain whitelist so staff just type their work email.
+function SsoPanel() {
+  const [connections, setConnections] = useState<any[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [form, setForm] = useState({
+    providerType: 'OIDC', label: '', clientId: '', clientSecret: '',
+    issuer: '', metadataUrl: '', domains: '', enabled: true,
+  });
+
+  const load = async () => {
+    try {
+      const res = await api.getSsoConnections();
+      setConnections(Array.isArray(res.data) ? res.data : []);
+    } catch { /* panel is non-critical on load */ }
+  };
+  useEffect(() => { load(); }, []);
+
+  const save = async () => {
+    setBusy(true);
+    try {
+      await api.saveSsoConnection({
+        providerType: form.providerType,
+        label: form.label || undefined,
+        clientId: form.clientId || undefined,
+        clientSecret: form.clientSecret || undefined, // omitted = keep stored secret
+        issuer: form.issuer || undefined,
+        metadataUrl: form.metadataUrl || undefined,
+        domainWhitelist: form.domains ? form.domains.split(/[,\s]+/).filter(Boolean) : undefined,
+        enabled: form.enabled,
+      });
+      setForm((f) => ({ ...f, clientSecret: '' }));
+      load();
+    } catch (err: any) {
+      alert(err?.message || 'Failed to save SSO connection');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const remove = async (id: string) => {
+    if (!confirm('Remove this SSO connection? Staff will fall back to password sign-in.')) return;
+    try { await api.deleteSsoConnection(id); load(); } catch { alert('Delete failed'); }
+  };
+
+  return (
+    <div className="bg-white rounded-xl border p-6">
+      <h2 className="text-lg font-bold mb-1 flex items-center gap-2"><KeyRound size={20} className="text-primary-600" /> Single Sign-On</h2>
+      <p className="text-xs text-gray-500 mb-4">Federate sign-in with your company directory (OIDC or SAML 2.0). Accounts are provisioned automatically on first login and stay inside your organization.</p>
+
+      {connections.length > 0 && (
+        <div className="mb-5 border rounded-lg divide-y">
+          {connections.map((c) => (
+            <div key={c.id} className="flex items-center justify-between gap-3 px-3 py-2.5 text-sm">
+              <div className="min-w-0">
+                <span className="font-medium">{c.label || c.providerType}</span>
+                <span className="ml-2 text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-700">{c.providerType}</span>
+                {!c.enabled && <span className="ml-1 text-xs text-amber-700">disabled</span>}
+                <div className="text-xs text-gray-500 truncate">{c.issuer || c.metadataUrl || '—'} · domains: {c.domainWhitelist?.length ? c.domainWhitelist.join(', ') : 'any'}</div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                {c.hasSecret && <span className="text-[10px] text-gray-500">secret stored</span>}
+                <button type="button" onClick={() => remove(c.id)} className="text-red-500 hover:text-red-700" aria-label={`Delete SSO connection ${c.label || c.providerType}`}><Trash2 size={15} /></button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label className="block text-sm font-medium mb-1">Provider type</label>
+          <select className={input} value={form.providerType} onChange={(e) => setForm({ ...form, providerType: e.target.value })}>
+            <option>OIDC</option>
+            <option>SAML</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Label <span className="text-gray-400 font-normal">(optional — distinguishes multiple connections)</span></label>
+          <input className={input} value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} placeholder="Okta" />
+        </div>
+        {form.providerType === 'OIDC' ? (
+          <>
+            <div>
+              <label className="block text-sm font-medium mb-1">Issuer URL (discovered via /.well-known)</label>
+              <input className={input} value={form.issuer} onChange={(e) => setForm({ ...form, issuer: e.target.value })} placeholder="https://acme.okta.com/oauth2/default" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Client ID</label>
+              <input className={input} value={form.clientId} onChange={(e) => setForm({ ...form, clientId: e.target.value })} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Client Secret <span className="text-gray-400 font-normal">(write-only — leave blank to keep)</span></label>
+              <input type="password" autoComplete="new-password" className={input} value={form.clientSecret} onChange={(e) => setForm({ ...form, clientSecret: e.target.value })} placeholder="••••••••" />
+            </div>
+          </>
+        ) : (
+          <>
+            <div>
+              <label className="block text-sm font-medium mb-1">IdP entity ID (issuer)</label>
+              <input className={input} value={form.issuer} onChange={(e) => setForm({ ...form, issuer: e.target.value })} placeholder="http://www.okta.com/exk..." />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">IdP SSO redirect URL (metadataUrl)</label>
+              <input className={input} value={form.metadataUrl} onChange={(e) => setForm({ ...form, metadataUrl: e.target.value })} placeholder="https://acme.okta.com/app/.../sso/saml" />
+            </div>
+          </>
+        )}
+        <div className="sm:col-span-2">
+          <label className="block text-sm font-medium mb-1">Email domains routed to this IdP (comma-separated)</label>
+          <input className={input} value={form.domains} onChange={(e) => setForm({ ...form, domains: e.target.value })} placeholder="corp.acme.com, acme.com" />
+        </div>
+      </div>
+      <div className="flex items-center gap-4 mt-4">
+        <label className="flex items-center gap-2 cursor-pointer text-sm">
+          <input type="checkbox" checked={form.enabled} onChange={(e) => setForm({ ...form, enabled: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
+          Enabled
+        </label>
+        <button type="button" onClick={save} disabled={busy || (form.providerType === 'OIDC' ? !(form.issuer && form.clientId) : !(form.issuer && form.metadataUrl))}
+          className="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 disabled:opacity-50">
+          {busy ? 'Saving…' : 'Save connection'}
+        </button>
+      </div>
+      <p className="mt-3 text-[11px] text-gray-500">Callback URLs to register at the IdP — OIDC redirect: <code>/api/sso/callback</code> · SAML ACS: <code>POST /api/sso/callback</code>. SAML assertions must be signed; unsigned assertions are refused.</p>
     </div>
   );
 }

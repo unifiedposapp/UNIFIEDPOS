@@ -30,7 +30,7 @@ function KV({ k, v }: { k: string; v: React.ReactNode }) {
   return (
     <div className="flex justify-between text-sm py-1 border-b last:border-0">
       <span className="text-gray-500">{k}</span>
-      <span className="font-medium text-gray-800 text-right">{v}</span>
+      <span className="font-medium text-gray-800 text-end">{v}</span>
     </div>
   );
 }

@@ -127,7 +127,7 @@ export default function BenchmarkPage() {
                 <Td className="tabular-nums text-gray-600">{fmt(r.p75, r.unit)}</Td>
                 <Td className="tabular-nums">{r.percentile != null ? `${Math.round(r.percentile)}th` : '—'}</Td>
                 <Td>{r.publishable ? <Badge tone={ahead ? 'good' : 'warn'}>{ahead ? 'AHEAD' : 'BEHIND'}</Badge> : <span className="text-xs text-gray-400">cohort &lt; k</span>}</Td>
-                <Td className="text-right"><button className={ghostButton} onClick={() => openMetric(r.metricKey)}>Inspect</button></Td>
+                <Td className="text-end"><button className={ghostButton} onClick={() => openMetric(r.metricKey)}>Inspect</button></Td>
               </tr>
             );
           })}

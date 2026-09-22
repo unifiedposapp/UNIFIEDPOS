@@ -202,15 +202,15 @@ export default function AIInsightsPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="text-left px-4 py-3 text-sm font-medium">Product</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium">Units Sold</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium">Product</th>
+                  <th className="text-end px-4 py-3 text-sm font-medium">Units Sold</th>
                 </tr>
               </thead>
               <tbody>
                 {data.topProducts.map((p: any, idx: number) => (
                   <tr key={idx} className="border-b">
                     <td className="px-4 py-3">{p.name}</td>
-                    <td className="px-4 py-3 text-right font-mono">{p.quantity}</td>
+                    <td className="px-4 py-3 text-end font-mono">{p.quantity}</td>
                   </tr>
                 ))}
               </tbody>

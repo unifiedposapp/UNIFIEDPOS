@@ -134,7 +134,7 @@ export default function AgentOpsPage() {
                 <Td className="tabular-nums">{i.quantity}</Td>
                 <Td className="tabular-nums">{i.reorderPoint}</Td>
                 <Td className="tabular-nums">{i.daysOfCover == null ? '—' : `${i.daysOfCover} d`}</Td>
-                <Td className="text-right"><button className={ghostButton} onClick={() => showForecast(i.productId)}>Forecast</button></Td>
+                <Td className="text-end"><button className={ghostButton} onClick={() => showForecast(i.productId)}>Forecast</button></Td>
               </tr>
             ))}
             {(lowStock?.items || []).length === 0 && <tr><Td colSpan={6}><Empty>Nothing below its reorder point.</Empty></Td></tr>}
@@ -244,7 +244,7 @@ export default function AgentOpsPage() {
               <Td className="tabular-nums">{r.supplierCount}</Td>
               <Td><Money value={r.estimatedCost} /></Td>
               <Td><Badge>{r.status}</Badge></Td>
-              <Td className="text-right whitespace-nowrap">
+              <Td className="text-end whitespace-nowrap">
                 <button className={ghostButton} onClick={() => inspect(r.id)}>Inspect</button>
                 {r.status === 'DRAFT' && (
                   <>

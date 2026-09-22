@@ -2504,3 +2504,118 @@ model BenchmarkSnapshot {
   @@index([organizationId, metricKey])
   @@map("benchmark_snapshots")
 }
+
+// ═══ GLOBAL HARDENING WAVE (FX, recurring billing, enterprise SSO) ═══
+// These models are relation-free by design (like the global-expansion wave) so
+// the additive migration applies cleanly to a live database without back-refs.
+
+// ── FX / exchange-rate layer ──
+// A rate is a point observation: how many units of `to` one unit of `from` buys
+// on `effectiveDate`, tagged with where it came from so a consolidation can be
+// audited back to a source. `source` is 'MANUAL', a provider name, or 'SYSTEM'.
+model CurrencyRate {
+  id             String   @id @default(uuid())
+  organizationId String
+  from           String   @default("USD") // ISO 4217 base
+  to             String   @default("USD") // ISO 4217 quote
+  rate           Decimal  @db.Decimal(24, 10)
+  source         String   @default("MANUAL")
+  fetchedAt      DateTime @default(now())
+  effectiveDate  DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([organizationId, from, to, effectiveDate])
+  @@index([organizationId, from, to])
+  @@map("currency_rates")
+}
+
+// ── Recurring subscription billing ──
+model SubscriptionPlan {
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  code           String   @default("") // optional stable external key
+  interval       String   @default("MONTH") // DAY, WEEK, MONTH, QUARTER, YEAR
+  intervalCount  Int      @default(1)
+  amount         Decimal  @db.Decimal(14, 2)
+  currency       String   @default("USD")
+  trialDays      Int      @default(0)
+  features       Json?   // free-form entitlement list
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([organizationId, name])
+  @@index([organizationId, active])
+  @@map("subscription_plans")
+}
+
+model Subscription {
+  id                 String    @id @default(uuid())
+  organizationId     String
+  customerId         String
+  planId             String
+  status             String    @default("ACTIVE") // TRIALING, ACTIVE, PAST_DUE, CANCELLED, EXPIRED
+  currentPeriodStart DateTime  @default(now())
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd  Boolean   @default(false)
+  cancelAt           DateTime?
+  canceledAt         DateTime?
+  trialEnd           DateTime?
+  externalId         String?  // PSP subscription id (Stripe, etc.)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([organizationId, status])
+  @@index([organizationId, customerId])
+  @@index([planId])
+  @@map("subscriptions")
+}
+
+model SubscriptionInvoice {
+  id             String    @id @default(uuid())
+  organizationId String
+  subscriptionId String
+  number         String?  // human invoice reference
+  amount         Decimal   @db.Decimal(14, 2)
+  currency       String    @default("USD")
+  periodStart    DateTime
+  periodEnd      DateTime
+  dueDate        DateTime
+  paidAt         DateTime?
+  status         String    @default("OPEN") // OPEN, PAID, UNPAID, DUNNING, VOID
+  attemptCount   Int       @default(0)
+  nextRetryAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([subscriptionId, status])
+  @@index([organizationId, status])
+  @@map("subscription_invoices")
+}
+
+// ── Enterprise SSO (SAML 2.0 / OIDC) + SCIM provisioning ──
+// clientSecret / signing material are stored AES-256-GCM encrypted at rest via
+// services/crypto.ts. domainWhitelist gates which email domains may use the
+// connection. `config` carries provider-discovered endpoints (OIDC) or the IdP
+// SSO/slo URLs and certificate (SAML).
+model SsoConnection {
+  id              String   @id @default(uuid())
+  organizationId  String
+  providerType    String   @default("OIDC") // OIDC, SAML
+  label           String   @default("")
+  clientId        String?
+  clientSecret    String?  // encrypted at rest (v1: AES-GCM)
+  issuer          String?
+  metadataUrl     String?
+  domainWhitelist Json?   // ["acme.com", ...]
+  config          Json?   // discovered endpoints / IdP cert / ACS path
+  enabled         Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([organizationId, providerType, label])
+  @@index([organizationId, enabled])
+  @@map("sso_connections")
+}

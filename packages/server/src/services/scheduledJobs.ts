@@ -7,6 +7,7 @@
 // "nothing fires it" is now driven from here.
 
 import { prisma } from '../db/client.js';
+import { runSubscriptionCycle } from './subscriptionBilling.js';
 import { registerJob, type JobResult } from './scheduler.js';
 import { emitEvent } from './eventBus.js';
 import { sendEmail, isEmailConfigured } from './email.js';
@@ -373,6 +374,15 @@ async function retentionPurge(): Promise<JobResult> {
   return { recordsProcessed: processed };
 }
 
+// ─── Recurring subscription billing cycle ──────────────────────────────────
+// Trial endings, period rollovers, invoice collection and the dunning ladder
+// in one idempotent tick (see services/subscriptionBilling.ts).
+async function subscriptionCycleJob(): Promise<JobResult> {
+  const r = await runSubscriptionCycle();
+  const touched = r.trialsActivated + r.periodsAdvanced + r.invoicesCharged + r.dunned + r.cancelled;
+  return { recordsProcessed: touched, ...r };
+}
+
 /** Register every scheduled job. Idempotent (registerJob replaces by name). */
 export function registerAllJobs(): void {
   registerJob({ name: 'webhooks.retry-failed', intervalMs: 30 * SEC, runOnStart: true, handler: retryFailedWebhooks });
@@ -384,6 +394,7 @@ export function registerAllJobs(): void {
   registerJob({ name: 'retail.expire-stored-value', intervalMs: HOUR, handler: expireStoredValue });
   registerJob({ name: 'loyalty.expire-points', intervalMs: 6 * HOUR, handler: expireLoyaltyPoints });
   registerJob({ name: 'compliance.retention-purge', intervalMs: DAY, handler: retentionPurge });
+  registerJob({ name: 'billing.subscription-cycle', intervalMs: 15 * MIN, runOnStart: true, handler: subscriptionCycleJob });
   // Global-expansion jobs (fiscal chain, sweeps, replenishment drafts, royalty
   // close, benchmark cells, mesh leases) live in their own registry module.
   registerGlobalJobs();

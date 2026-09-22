@@ -53,6 +53,8 @@ import {
   Building,
   Puzzle,
   Scale,
+  Repeat,
+  CandlestickChart,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
@@ -141,6 +143,8 @@ const navGroups: { labelKey: TranslationKey; items: { to: string; labelKey: Tran
       { to: '/franchise', labelKey: 'nav.franchise', icon: Building },
       { to: '/apps', labelKey: 'nav.apps', icon: Puzzle },
       { to: '/benchmark', labelKey: 'nav.benchmark', icon: Scale },
+      { to: '/fx', labelKey: 'nav.fx', icon: CandlestickChart },
+      { to: '/subscriptions', labelKey: 'nav.subscriptions', icon: Repeat },
     ],
   },
   {
@@ -190,6 +194,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen">
+      {/* WCAG 2.4.1 bypass block — visually hidden until keyboard-focused. */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:shadow-lg focus:ring-2 focus:ring-gold-500"
+      >
+        {t('a11y.skip')}
+      </a>
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -201,8 +212,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* ── Luxury sidebar ── */}
       <aside
         className={clsx(
-          'fixed inset-y-0 left-0 z-30 w-72 transform border-r border-white/10 bg-gradient-to-b from-ink-950 via-ink-900 to-ink-950 shadow-[8px_0_40px_-20px_rgba(10,13,24,0.9)] transition-transform lg:static lg:flex lg:translate-x-0',
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          'fixed inset-y-0 start-0 z-30 w-72 transform border-e border-white/10 bg-gradient-to-b from-ink-950 via-ink-900 to-ink-950 shadow-[8px_0_40px_-20px_rgba(10,13,24,0.9)] rtl:shadow-[-8px_0_40px_-20px_rgba(10,13,24,0.9)] transition-transform lg:static lg:flex lg:translate-x-0',
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full rtl:translate-x-full'
         )}
       >
         <div className="flex h-full flex-col">
@@ -219,13 +230,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </div>
               <div className="text-[10px] uppercase tracking-luxe text-ink-300/70">{t('app.tagline')}</div>
             </div>
-            <button className="ml-auto text-ink-200 hover:text-white lg:hidden" onClick={() => setSidebarOpen(false)}>
+            <button className="ms-auto text-ink-200 hover:text-white lg:hidden" onClick={() => setSidebarOpen(false)} aria-label="Close menu">
               <X size={22} />
             </button>
           </div>
 
           {/* Nav */}
-          <nav className="flex-1 overflow-y-auto py-3">
+          <nav className="flex-1 overflow-y-auto py-3" aria-label={t('a11y.mainNav')}>
             {navGroups.map((group) => (
               <div key={group.labelKey} className="mb-1">
                 <p className="px-6 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-luxe text-ink-400/50">
@@ -250,7 +261,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                       <>
                         <span
                           className={clsx(
-                            'absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-gold-400 transition-opacity',
+                            'absolute start-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-gold-400 transition-opacity',
                             isActive ? 'opacity-100' : 'opacity-0'
                           )}
                         />
@@ -260,7 +271,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         />
                         <span className="truncate">{t(item.labelKey)}</span>
                         {item.to === '/notifications' && unreadCount > 0 && (
-                          <span className="ml-auto flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-gold-500 px-1 text-[10px] font-bold text-ink-950">
+                          <span className="ms-auto flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-gold-500 px-1 text-[10px] font-bold text-ink-950">
                             {unreadCount > 99 ? '99+' : unreadCount}
                           </span>
                         )}
@@ -301,7 +312,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top bar */}
         <header className="flex h-16 items-center border-b border-ink-100/70 bg-white/70 px-4 shadow-luxe-sm backdrop-blur-md lg:px-6">
-          <button className="mr-4 text-ink-700 lg:hidden" onClick={() => setSidebarOpen(true)}>
+          <button className="me-4 text-ink-700 lg:hidden" onClick={() => setSidebarOpen(true)}>
             <Menu size={22} />
           </button>
           <div className="hidden items-center gap-2 text-xs text-ink-400 sm:flex">
@@ -328,7 +339,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             >
               <Bell size={20} />
               {unreadCount > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
+                <span className="absolute -end-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
@@ -337,7 +348,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        <main id="main-content" className="flex-1 overflow-y-auto">{children}</main>
       </div>
 
       {/* First-visit cookie / consent notice */}

@@ -7,7 +7,7 @@
  * so partial translations ship safely.
  */
 
-export type Locale = 'en' | 'es' | 'fr' | 'de' | 'pt';
+export type Locale = 'en' | 'es' | 'fr' | 'de' | 'pt' | 'ar' | 'zh' | 'hi';
 
 export interface LocaleMeta {
   /** Internal code used by the store + dictionaries. */
@@ -20,7 +20,7 @@ export interface LocaleMeta {
   englishLabel: string;
   /** Flag emoji — a compact, dependency-free visual cue. */
   flag: string;
-  /** Text direction; kept for future RTL locales (ar/he). */
+  /** Text direction — `rtl` drives the mirrored shell (Arabic). */
   dir: 'ltr' | 'rtl';
 }
 
@@ -32,6 +32,9 @@ export const SUPPORTED_LOCALES: LocaleMeta[] = [
   { code: 'fr', htmlLang: 'fr-FR', nativeLabel: 'Français', englishLabel: 'French', flag: '🇫🇷', dir: 'ltr' },
   { code: 'de', htmlLang: 'de-DE', nativeLabel: 'Deutsch', englishLabel: 'German', flag: '🇩🇪', dir: 'ltr' },
   { code: 'pt', htmlLang: 'pt-BR', nativeLabel: 'Português', englishLabel: 'Portuguese', flag: '🇧🇷', dir: 'ltr' },
+  { code: 'ar', htmlLang: 'ar-SA', nativeLabel: 'العربية', englishLabel: 'Arabic', flag: '🇸🇦', dir: 'rtl' },
+  { code: 'zh', htmlLang: 'zh-CN', nativeLabel: '简体中文', englishLabel: 'Chinese (Simplified)', flag: '🇨🇳', dir: 'ltr' },
+  { code: 'hi', htmlLang: 'hi-IN', nativeLabel: 'हिन्दी', englishLabel: 'Hindi', flag: '🇮🇳', dir: 'ltr' },
 ];
 
 export function getLocaleMeta(code: Locale): LocaleMeta {

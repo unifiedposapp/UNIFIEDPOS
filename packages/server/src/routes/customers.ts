@@ -48,8 +48,8 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 // GET /api/customers/:id
 router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const customer = await prisma.customer.findUnique({
-      where: { id: String(req.params.id) },
+    const customer = await prisma.customer.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
       include: {
         orders: { orderBy: { createdAt: 'desc' }, take: 20, include: { items: true, payments: true } },
         loyaltyTransactions: { orderBy: { createdAt: 'desc' }, take: 20 },

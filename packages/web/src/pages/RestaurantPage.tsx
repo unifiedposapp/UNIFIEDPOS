@@ -231,11 +231,11 @@ export default function RestaurantPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Customer</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Party</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Date</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Status</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Customer</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Party</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Date</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Status</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -280,12 +280,12 @@ export default function RestaurantPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Name</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Party</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Phone</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Wait Time</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Status</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Name</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Party</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Phone</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Wait Time</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Status</th>
+                  <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y">

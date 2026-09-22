@@ -20,6 +20,11 @@ export function csrfProtection(req: AuthRequest, res: Response, next: NextFuncti
     return next();
   }
 
+  // SAML/OIDC IdP callbacks are cross-site POSTs by design — no CSRF token can
+  // exist there. The flow is protected instead by the signed RelayState/state
+  // nonce and fail-closed assertion verification (see services/sso.ts).
+  if (req.path === '/api/sso/callback' || req.path === '/api/v1/sso/callback') return next();
+
   const cookies = (req as any).cookies || {};
   // No session cookie => nothing to protect here; authMiddleware will 401 later.
   if (!cookies[SESSION_COOKIE]) return next();

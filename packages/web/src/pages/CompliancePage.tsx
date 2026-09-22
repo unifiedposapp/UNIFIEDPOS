@@ -574,10 +574,10 @@ export default function CompliancePage() {
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50 border-b">
                     <tr>
-                      <th className="text-left px-3 py-2 font-medium">Criterion</th>
-                      <th className="text-left px-3 py-2 font-medium">Requirement</th>
-                      <th className="text-left px-3 py-2 font-medium">How UnifiedPOS addresses it</th>
-                      <th className="text-left px-3 py-2 font-medium">Status</th>
+                      <th className="text-start px-3 py-2 font-medium">Criterion</th>
+                      <th className="text-start px-3 py-2 font-medium">Requirement</th>
+                      <th className="text-start px-3 py-2 font-medium">How UnifiedPOS addresses it</th>
+                      <th className="text-start px-3 py-2 font-medium">Status</th>
                     </tr>
                   </thead>
                   <tbody>

@@ -14,7 +14,7 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
     <div className="flex items-start justify-between gap-4 flex-wrap">
       <div>
         <h1 className="text-2xl font-bold">{title}</h1>
-        {subtitle && <p className="text-gray-500 mt-1 max-w-3xl">{subtitle}</p>}
+        {subtitle && <p className="text-gray-600 mt-1 max-w-3xl">{subtitle}</p>}
       </div>
       {actions && <div className="flex items-center gap-2 flex-wrap">{actions}</div>}
     </div>
@@ -41,10 +41,10 @@ export function Card({ title, icon, actions, children, className }: { title?: st
 export function Stat({ label, value, hint, tone = 'default' }: { label: string; value: ReactNode; hint?: ReactNode; tone?: 'default' | 'good' | 'warn' | 'bad' }) {
   const tones = { default: 'text-gray-900', good: 'text-emerald-600', warn: 'text-amber-600', bad: 'text-rose-600' };
   return (
-    <div className="bg-white rounded-lg border p-4 min-w-0">
-      <div className="text-sm text-gray-500 truncate">{label}</div>
+    <div className="bg-white rounded-lg border p-4 min-w-0" role="group" aria-label={`${label}: ${String(value)}`}>
+      <div className="text-sm text-gray-600 truncate">{label}</div>
       <div className={clsx('text-2xl font-bold break-words', tones[tone])}>{value}</div>
-      {hint && <div className="text-xs text-gray-400 mt-1">{hint}</div>}
+      {hint && <div className="text-xs text-gray-500 mt-1">{hint}</div>}
     </div>
   );
 }
@@ -80,17 +80,17 @@ export function Money({ value, currency }: { value: unknown; currency?: string }
   return (
     <span className="tabular-nums">
       {n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-      {currency ? <span className="text-gray-400 text-xs ml-1">{currency}</span> : null}
+      {currency ? <span className="text-gray-500 text-xs ms-1">{currency}</span> : null}
     </span>
   );
 }
 
 export function Empty({ children }: { children: ReactNode }) {
-  return <div className="text-center text-gray-500 py-8">{children}</div>;
+  return <div className="text-center text-gray-600 py-8">{children}</div>;
 }
 
 export function Th({ children, className }: { children?: ReactNode; className?: string }) {
-  return <th className={clsx('text-left text-xs uppercase tracking-wide text-gray-500 font-medium px-3 py-2', className)}>{children}</th>;
+  return <th className={clsx('text-start text-xs uppercase tracking-wide text-gray-600 font-medium px-3 py-2', className)}>{children}</th>;
 }
 
 export function Td({ children, className, colSpan }: { children?: ReactNode; className?: string; colSpan?: number }) {
@@ -108,18 +108,18 @@ export function Table({ head, children }: { head: ReactNode; children: ReactNode
   );
 }
 
-export const inputClass = 'border rounded px-3 py-2 text-sm bg-white';
-export const primaryButton = 'bg-blue-600 text-white text-sm px-3 py-2 rounded hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1';
-export const ghostButton = 'border text-sm px-3 py-2 rounded hover:bg-gray-50 disabled:opacity-50 flex items-center gap-1';
-export const dangerButton = 'border border-rose-200 text-rose-700 text-sm px-3 py-2 rounded hover:bg-rose-50 disabled:opacity-50 flex items-center gap-1';
+export const inputClass = 'border rounded px-3 py-2 text-sm bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500';
+export const primaryButton = 'bg-blue-600 text-white text-sm px-3 py-2 rounded hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1';
+export const ghostButton = 'border text-sm px-3 py-2 rounded hover:bg-gray-50 disabled:opacity-50 flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400';
+export const dangerButton = 'border border-rose-200 text-rose-700 text-sm px-3 py-2 rounded hover:bg-rose-50 disabled:opacity-50 flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400';
 
 /** Field wrapper so the ten forms look like one product. */
 export function Field({ label, children, hint }: { label: string; children: ReactNode; hint?: string }) {
   return (
     <label className="flex flex-col gap-1 text-sm">
-      <span className="text-gray-600">{label}</span>
+      <span className="text-gray-700">{label}</span>
       {children}
-      {hint && <span className="text-xs text-gray-400">{hint}</span>}
+      {hint && <span className="text-xs text-gray-500">{hint}</span>}
     </label>
   );
 }
@@ -136,7 +136,7 @@ export function JsonBox({ value }: { value: unknown }) {
 /** Renders the error a request threw, or nothing. Keeps every page honest. */
 export function ErrorNote({ message }: { message: string | null }) {
   if (!message) return null;
-  return <div className="text-sm bg-rose-50 border border-rose-200 text-rose-700 rounded px-3 py-2">{message}</div>;
+  return <div role="alert" className="text-sm bg-rose-50 border border-rose-200 text-rose-700 rounded px-3 py-2">{message}</div>;
 }
 
 /**

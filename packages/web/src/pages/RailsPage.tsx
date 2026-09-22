@@ -206,7 +206,7 @@ export default function RailsPage() {
                 {a.validationNote && <div className="text-xs text-gray-500 mt-0.5">{a.validationNote}</div>}
               </Td>
               <Td>{a.isPrimary ? '✓' : ''}</Td>
-              <Td className="text-right whitespace-nowrap">
+              <Td className="text-end whitespace-nowrap">
                 {!a.isPrimary && (
                   <button className={ghostButton} onClick={async () => { await call(() => api.setPrimaryRailAccount(a.id), setError); load(); }}>
                     Make primary
@@ -271,7 +271,7 @@ export default function RailsPage() {
                 <Td className={Math.abs(Number(b.variance)) > 0.01 ? 'text-rose-600 tabular-nums' : 'tabular-nums'}><Money value={b.variance} /></Td>
                 <Td className="tabular-nums">{b.matchedCount}/{b.lineCount}</Td>
                 <Td><Badge>{b.status}</Badge></Td>
-                <Td className="text-right"><button className={ghostButton} onClick={() => openBatch(b.id)}>Open</button></Td>
+                <Td className="text-end"><button className={ghostButton} onClick={() => openBatch(b.id)}>Open</button></Td>
               </tr>
             ))}
             {batches.length === 0 && <tr><Td colSpan={7}><Empty>No statements imported yet.</Empty></Td></tr>}

@@ -106,12 +106,12 @@ export default function PaymentsPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Order</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Method</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Amount</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Status</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Date</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Order</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Method</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Amount</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Status</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Date</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -141,11 +141,11 @@ export default function PaymentsPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Order</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Amount</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Reason</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Status</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Date</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Order</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Amount</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Reason</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Status</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Date</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -168,12 +168,12 @@ export default function PaymentsPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Payment</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Amount</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Reason</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Status</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Filed</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Payment</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Amount</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Reason</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Status</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Filed</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -204,12 +204,12 @@ export default function PaymentsPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Payment</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Amount</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Reason</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Status</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Filed</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Payment</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Amount</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Reason</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Status</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Filed</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -240,11 +240,11 @@ export default function PaymentsPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Amount</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Currency</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Status</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Created</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Amount</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Currency</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Status</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Created</th>
+                <th className="text-start px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y">

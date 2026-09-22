@@ -84,15 +84,15 @@ function ForecastTab() {
       </div>
       <div className="bg-white rounded-lg border overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-gray-500">
-            <tr><th className="p-3">Date</th><th className="p-3 text-right">Predicted</th><th className="p-3 text-right">80% range</th></tr>
+          <thead className="bg-gray-50 text-start text-gray-500">
+            <tr><th className="p-3">Date</th><th className="p-3 text-end">Predicted</th><th className="p-3 text-end">80% range</th></tr>
           </thead>
           <tbody className="divide-y">
             {data.forecast.map((f: any) => (
               <tr key={f.date}>
                 <td className="p-3">{f.date}</td>
-                <td className="p-3 text-right font-medium">{f.predicted}</td>
-                <td className="p-3 text-right text-gray-400">{f.lower} – {f.upper}</td>
+                <td className="p-3 text-end font-medium">{f.predicted}</td>
+                <td className="p-3 text-end text-gray-400">{f.lower} – {f.upper}</td>
               </tr>
             ))}
           </tbody>
@@ -165,16 +165,16 @@ function SegmentsTab() {
       </div>
       <div className="bg-white rounded-lg border overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-gray-500">
-            <tr><th className="p-3">Customer</th><th className="p-3">Segment</th><th className="p-3 text-right">R</th><th className="p-3 text-right">F</th><th className="p-3 text-right">M</th><th className="p-3 text-right">Spend</th></tr>
+          <thead className="bg-gray-50 text-start text-gray-500">
+            <tr><th className="p-3">Customer</th><th className="p-3">Segment</th><th className="p-3 text-end">R</th><th className="p-3 text-end">F</th><th className="p-3 text-end">M</th><th className="p-3 text-end">Spend</th></tr>
           </thead>
           <tbody className="divide-y">
             {data.customers.slice(0, 100).map((c: any) => (
               <tr key={c.customerId}>
                 <td className="p-3 font-medium">{c.name || '—'}</td>
                 <td className="p-3"><span className={clsx('text-xs px-2 py-0.5 rounded', SEGMENT_TONE[c.segment] || 'bg-gray-100 text-gray-600')}>{c.segment.replace(/_/g, ' ')}</span></td>
-                <td className="p-3 text-right">{c.r}</td><td className="p-3 text-right">{c.f}</td><td className="p-3 text-right">{c.m}</td>
-                <td className="p-3 text-right">{c.monetary.toFixed(2)}</td>
+                <td className="p-3 text-end">{c.r}</td><td className="p-3 text-end">{c.f}</td><td className="p-3 text-end">{c.m}</td>
+                <td className="p-3 text-end">{c.monetary.toFixed(2)}</td>
               </tr>
             ))}
           </tbody>

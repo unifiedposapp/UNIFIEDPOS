@@ -142,7 +142,7 @@ export default function FiscalizationPage() {
                   <Td>{d.profileCode}</Td>
                   <Td><Badge>{d.status}</Badge></Td>
                   <Td className="tabular-nums">{d.lastSequence}</Td>
-                  <Td className="text-right">
+                  <Td className="text-end">
                     <button
                       className={dangerButton}
                       onClick={async () => {
@@ -223,7 +223,7 @@ export default function FiscalizationPage() {
               <Td className="tabular-nums">{d.sequenceNumber}</Td>
               <Td><Badge>{d.status}</Badge></Td>
               <Td className="text-gray-500 whitespace-nowrap">{new Date(d.sealedAt).toLocaleString()}</Td>
-              <Td className="text-right">
+              <Td className="text-end">
                 <button className={ghostButton} onClick={() => openDocument(d.id)}>Inspect</button>
               </Td>
             </tr>

@@ -5,6 +5,8 @@ name: CI
 #                   packages, the unit + coverage gate, and a production image build.
 #   • db-validate — applies the committed Prisma migration to a throwaway Postgres
 #                   and asserts the schema has not drifted from the migration.
+#   • integration — DB-gated suites (money path + tenant isolation) run over the
+#                   real express app against a freshly migrated Postgres.
 on:
   push:
     branches: [main]
@@ -115,3 +117,50 @@ jobs:
           --from-url "${{ env.DATABASE_URL }}"
           --to-schema-datamodel ${{ env.PRISMA_SCHEMA }}
           --exit-code
+
+  integration:
+    name: DB-gated integration suites
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: pos
+          POSTGRES_PASSWORD: pos
+          POSTGRES_DB: unified_pos_it
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pos"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      # session_replication_role in the isolation-suite teardown needs a superuser;
+      # the service container's postgres user is one.
+      DATABASE_URL: postgresql://pos:pos@localhost:5432/unified_pos_it?schema=public
+      ENCRYPTION_KEY: ${{ secrets.CI_ENCRYPTION_KEY || '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef' }}
+      RUN_DB_TESTS: '1'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate --schema=${{ env.PRISMA_SCHEMA }}
+
+      - name: Migrate database
+        run: npx prisma migrate deploy --schema=${{ env.PRISMA_SCHEMA }}
+
+      # moneyPath (service-level) + tenantIsolation (HTTP-level, supertest against
+      # the express app) — both skipped unless RUN_DB_TESTS=1, which this job sets.
+      - name: Integration tests
+        run: npx vitest run integration --reporter=pretty
