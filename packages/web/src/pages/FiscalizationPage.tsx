@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../api/client';
-import { Receipt, Link2, Send, ShieldCheck, Usb, Trash2 } from 'lucide-react';
+import { Receipt, Link2, Send, ShieldCheck, Usb, Trash2, Percent, Globe2 } from 'lucide-react';
 import {
   Badge,
   Card,
@@ -27,6 +27,8 @@ import {
  */
 export default function FiscalizationPage() {
   const [profiles, setProfiles] = useState<any>(null);
+  const [tax, setTax] = useState<any>(null);
+  const [taxQuery, setTaxQuery] = useState('');
   const [status, setStatus] = useState<any>(null);
   const [documents, setDocuments] = useState<any[]>([]);
   const [chain, setChain] = useState<any>(null);
@@ -36,14 +38,16 @@ export default function FiscalizationPage() {
   const [form, setForm] = useState({ serialNumber: '', profileCode: '', activationCode: '', locationId: '' });
 
   const load = useCallback(async () => {
-    const [p, s, d] = await Promise.all([
+    const [p, s, d, tx] = await Promise.all([
       call(() => api.getFiscalProfiles(), setError),
       call(() => api.getFiscalStatus(), setError),
       call(() => api.getFiscalDocuments({ limit: '25' }), setError),
+      call(() => api.getTaxProfiles(), setError),
     ]);
     setProfiles(p);
     setStatus(s);
     setDocuments(d?.documents || []);
+    setTax(tx);
   }, []);
 
   useEffect(() => {
@@ -200,6 +204,49 @@ export default function FiscalizationPage() {
           {profiles?.algorithm && <p className="text-xs text-gray-400 mt-1">Seal algorithm: {profiles.algorithm}</p>}
         </Card>
       </div>
+
+      <Card
+        title="Default consumption tax by country"
+        icon={<Percent size={18} />}
+        actions={
+          <input
+            className={inputClass + ' max-w-xs'}
+            placeholder="Search country…"
+            value={taxQuery}
+            onChange={(e) => setTaxQuery(e.target.value)}
+          />
+        }
+      >
+        {tax && (
+          <>
+            <div className="flex items-center gap-2 flex-wrap mb-3 text-sm">
+              <Badge tone="good">
+                {tax.active?.profile?.country || tax.active?.countryCode || 'No market set'} · {tax.active?.suggestedRate ?? 0}%
+              </Badge>
+              <span className="text-gray-500">
+                <Globe2 size={13} className="inline -mt-0.5" /> {tax.coverage?.countries ?? 0} markets · {tax.coverage?.vatSystems ?? 0} VAT · {tax.coverage?.gstSystems ?? 0} GST · highest {tax.coverage?.highestRate?.rate ?? 0}% ({tax.coverage?.highestRate?.country})
+              </span>
+              {tax.active?.countryCode && <span className="text-gray-400">Use this to pre-fill the organisation tax rate.</span>}
+            </div>
+            <div className="max-h-80 overflow-y-auto -mx-4">
+              <Table head={<tr><Th>Country</Th><Th>Regime</Th><Th>Type</Th><Th className="text-end">Standard</Th><Th>Reduced</Th><Th>CCY</Th></tr>}>
+                {(tax.profiles || [])
+                  .filter((p: any) => !taxQuery || `${p.country} ${p.localName} ${p.countryCode}`.toLowerCase().includes(taxQuery.toLowerCase()))
+                  .map((p: any) => (
+                    <tr key={p.countryCode} className={p.countryCode === tax.active?.countryCode ? 'bg-blue-50' : undefined}>
+                      <Td className="font-medium whitespace-nowrap">{p.country}</Td>
+                      <Td className="text-gray-500">{p.localName}</Td>
+                      <Td><Badge>{p.type}</Badge></Td>
+                      <Td className="text-end tabular-nums">{p.standardRate}%</Td>
+                      <Td className="text-gray-500">{p.reducedRates?.length ? p.reducedRates.join(' / ') + '%' : '—'}</Td>
+                      <Td className="text-gray-500">{p.currency}</Td>
+                    </tr>
+                  ))}
+              </Table>
+            </div>
+          </>
+        )}
+      </Card>
 
       <Card
         title="Fiscal chain — newest documents"

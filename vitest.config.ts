@@ -40,6 +40,7 @@ export default defineConfig({
         'packages/server/src/services/barcodes.ts',
         'packages/server/src/services/tradingPatterns.ts',
         'packages/server/src/services/deliveryChannels.ts',
+        'packages/server/src/data/taxProfiles.ts',
       ],
       thresholds: {
         statements: 70,

@@ -946,6 +946,7 @@ export const api = {
 
   // ── Fiscalization: country regimes, hash-chain seals, verification ──
   getFiscalProfiles: () => request<any>('/fiscal/profiles'),
+  getTaxProfiles: () => request<any>('/fiscal/tax-profiles'),
   getFiscalStatus: () => request<any>('/fiscal/status'),
   getFiscalDevices: (params?: Record<string, string>) => {
     const query = params ? '?' + new URLSearchParams(params).toString() : '';

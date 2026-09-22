@@ -20,6 +20,7 @@ import {
   fiscalCoverage,
   isKnownFiscalCountry,
 } from '../data/fiscalProfiles.js';
+import { TAX_PROFILES, taxProfileFor, taxProfilesByRegion, taxCoverage, suggestedTaxRateFor } from '../data/taxProfiles.js';
 import {
   SEAL_ALGORITHM,
   MAX_TRANSMIT_ATTEMPTS,
@@ -58,6 +59,24 @@ router.get('/profiles', authMiddleware, async (req: AuthRequest, res: Response) 
         defaultProfile: DEFAULT_FISCAL_PROFILE,
         algorithm: SEAL_ALGORITHM,
         bridgeConfigured: isFiscalBridgeConfigured(),
+      },
+    });
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
+// GET /api/fiscal/tax-profiles - country consumption-tax rate reference + this tenant's default
+router.get('/tax-profiles', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const { countryCode } = await orgContext(req.user!.organizationId!);
+    res.json({
+      success: true,
+      data: {
+        active: { countryCode, profile: taxProfileFor(countryCode), suggestedRate: suggestedTaxRateFor(countryCode) },
+        coverage: taxCoverage(),
+        byRegion: taxProfilesByRegion(),
+        profiles: TAX_PROFILES,
       },
     });
   } catch (error) {

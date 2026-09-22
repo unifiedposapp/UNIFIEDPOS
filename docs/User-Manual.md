@@ -49,7 +49,7 @@ Unified POS is a complete Business Operating System for retail, restaurant and o
 
 ### Choosing your language and region
 
-Use the language selector in the top bar to switch the interface language. Eight languages ship today: English, Spanish, French, German, Portuguese, Arabic, Simplified Chinese and Hindi. Arabic flips the entire shell to right-to-left reading - sidebar, tables, forms and navigation all mirror automatically - and dates and numbers are formatted for each language's own conventions. Set your business country, address, tax rate and currency in Settings. Unified POS supports businesses in every nation and every ISO 4217 currency.
+Use the language selector in the top bar to switch the interface language. Seventeen languages ship today: English, Spanish, French, German, Portuguese, Arabic, Simplified Chinese, Hindi, Turkish, Japanese, Korean, Vietnamese, Indonesian, Thai, Swahili, Hebrew and Persian. Arabic, Hebrew and Persian flip the entire shell to right-to-left reading - sidebar, tables, forms and navigation all mirror automatically - and dates and numbers are formatted for each language's own conventions. Set your business country, address, tax rate and currency in Settings. Unified POS supports businesses in every nation and every ISO 4217 currency.
 
 ### The demo environment
 
@@ -560,7 +560,7 @@ Thirteen modules exist for one reason: a business that crosses a border - a seco
 
 **Where: Fiscal.**
 
-Unified POS ships 26 country regimes - TSE in Germany, SdI in Italy, ZATCA Phase 2 in Saudi Arabia, eTIMS in Kenya, NFC-e in Brazil, CFDI in Mexico, GST e-invoicing in India, KSeF in Poland and more - plus a no-fiscalisation profile for markets such as the US and UK.
+Unified POS ships 38 country regimes - TSE in Germany, SdI in Italy, ZATCA Phase 2 in Saudi Arabia, eTIMS in Kenya, NFC-e in Brazil, CFDI in Mexico, GST e-invoicing in India, KSeF in Poland, Egypt's ETA, Japan's Qualified Invoice System, Vietnam, the Philippines, South Korea, Türkiye, Pakistan, Bangladesh, Ghana, Morocco, Uganda and Rwanda - plus a no-fiscalisation profile for markets such as the US and UK.
 
 - Every sealed document carries a sequence number, a digest of its content and a link to the previous document, so editing an old receipt breaks the chain and says so.
 - **Verify chain** re-walks the documents and reports the first break, which is what an auditor asks for.
@@ -678,6 +678,16 @@ Recurring revenue runs through exactly the same money path as a one-off sale.
 - Client secrets are write-only: stored encrypted, never returned to the browser afterwards.
 - Directory sync (SCIM 2.0) lets your identity provider create, update and deactivate staff accounts as roles change, always scoped to your organization. Deactivating is never destructive, and the last active owner of an organization cannot be removed by directory sync.
 - Trust is fail-closed: unsigned SAML assertions, mismatched issuers, wrong audience, expired tokens and replayed nonces are all refused.
+
+### 32.14 Country tax defaults and payment-gateway breadth
+
+**Where: Fiscal (Default consumption tax panel), Settings, Integrations.**
+
+So that opening a store in a new country is a selection rather than a research project, the platform keeps two world maps of configuration.
+
+- **Country tax profiles.** Beyond *how* a receipt is sealed (§32.1), the Fiscal page answers *what the default rate is*. It carries the standard VAT/GST/sales-tax rate and the common reduced slabs for 100+ markets - Nigeria 7.5%, Kenya 16%, South Africa 15%, Germany 19%, Saudi Arabia 15%, the UAE 5%, India's 5/12/18/28% GST slabs, Japan's 10% with an 8% reduced food rate, and so on (rates reflect the mid-2026 global survey and are sensible defaults, not legal advice). Your selected country is highlighted with a **suggested rate** you can use to pre-fill the organisation tax rate; tax-free and unknown markets return 0 rather than a wrong non-zero guess. Actual return filing is delegated to a TAX_COMPLIANCE integration (Avalara, TaxJar, Stripe Tax, Sovos).
+- **Payment-gateway breadth.** The Integrations catalog now lists the major regional processors on every continent alongside the global names: Interswitch, Yoco, PayFast, DPO and PesaPal (Africa); Cashfree, Paytm, PhonePe, SafePay and SSLCommerz (South Asia); Xendit, 2C2P, iPay88 and VNPay (Southeast Asia); Telr, PayTabs, Moyasar, HyperPay, Amazon Payment Services, Tap and iyzico (MENA and Türkiye); Toss Payments, KG Inicis, Multi Payment, UnionPay (East Asia); Mollie, Worldline, Nuvei, SumUp, Adyen, and more. Each is a bring-your-own-credentials connection - the platform stores the API keys and webhook secrets encrypted and never fabricates a partner endpoint.
+- **Language breadth.** The interface now ships in seventeen languages (§ Choosing your language and region), including three right-to-left scripts, so the register speaks the customer's language in most of the world's major markets.
 
 ## 33. Storefront, Delivery, Labels and Trading Insights
 

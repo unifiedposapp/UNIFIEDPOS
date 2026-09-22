@@ -7,7 +7,9 @@
  * so partial translations ship safely.
  */
 
-export type Locale = 'en' | 'es' | 'fr' | 'de' | 'pt' | 'ar' | 'zh' | 'hi';
+export type Locale =
+  | 'en' | 'es' | 'fr' | 'de' | 'pt' | 'ar' | 'zh' | 'hi'
+  | 'tr' | 'ja' | 'ko' | 'vi' | 'id' | 'th' | 'sw' | 'he' | 'fa';
 
 export interface LocaleMeta {
   /** Internal code used by the store + dictionaries. */
@@ -35,6 +37,15 @@ export const SUPPORTED_LOCALES: LocaleMeta[] = [
   { code: 'ar', htmlLang: 'ar-SA', nativeLabel: 'العربية', englishLabel: 'Arabic', flag: '🇸🇦', dir: 'rtl' },
   { code: 'zh', htmlLang: 'zh-CN', nativeLabel: '简体中文', englishLabel: 'Chinese (Simplified)', flag: '🇨🇳', dir: 'ltr' },
   { code: 'hi', htmlLang: 'hi-IN', nativeLabel: 'हिन्दी', englishLabel: 'Hindi', flag: '🇮🇳', dir: 'ltr' },
+  { code: 'tr', htmlLang: 'tr-TR', nativeLabel: 'Türkçe', englishLabel: 'Turkish', flag: '🇹🇷', dir: 'ltr' },
+  { code: 'ja', htmlLang: 'ja-JP', nativeLabel: '日本語', englishLabel: 'Japanese', flag: '🇯🇵', dir: 'ltr' },
+  { code: 'ko', htmlLang: 'ko-KR', nativeLabel: '한국어', englishLabel: 'Korean', flag: '🇰🇷', dir: 'ltr' },
+  { code: 'vi', htmlLang: 'vi-VN', nativeLabel: 'Tiếng Việt', englishLabel: 'Vietnamese', flag: '🇻🇳', dir: 'ltr' },
+  { code: 'id', htmlLang: 'id-ID', nativeLabel: 'Bahasa Indonesia', englishLabel: 'Indonesian', flag: '🇮🇩', dir: 'ltr' },
+  { code: 'th', htmlLang: 'th-TH', nativeLabel: 'ไทย', englishLabel: 'Thai', flag: '🇹🇭', dir: 'ltr' },
+  { code: 'sw', htmlLang: 'sw-KE', nativeLabel: 'Kiswahili', englishLabel: 'Swahili', flag: '🇰🇪', dir: 'ltr' },
+  { code: 'he', htmlLang: 'he-IL', nativeLabel: 'עברית', englishLabel: 'Hebrew', flag: '🇮🇱', dir: 'rtl' },
+  { code: 'fa', htmlLang: 'fa-IR', nativeLabel: 'فارسی', englishLabel: 'Persian', flag: '🇮🇷', dir: 'rtl' },
 ];
 
 export function getLocaleMeta(code: Locale): LocaleMeta {

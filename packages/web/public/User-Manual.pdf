@@ -4,7 +4,7 @@
 << /Type /Catalog /Pages 2 0 R >>
 endobj
 2 0 obj
-<< /Type /Pages /Count 48 /Kids [7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R 23 0 R 25 0 R 27 0 R 29 0 R 31 0 R 33 0 R 35 0 R 37 0 R 39 0 R 41 0 R 43 0 R 45 0 R 47 0 R 49 0 R 51 0 R 53 0 R 55 0 R 57 0 R 59 0 R 61 0 R 63 0 R 65 0 R 67 0 R 69 0 R 71 0 R 73 0 R 75 0 R 77 0 R 79 0 R 81 0 R 83 0 R 85 0 R 87 0 R 89 0 R 91 0 R 93 0 R 95 0 R 97 0 R 99 0 R 101 0 R] >>
+<< /Type /Pages /Count 49 /Kids [7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R 23 0 R 25 0 R 27 0 R 29 0 R 31 0 R 33 0 R 35 0 R 37 0 R 39 0 R 41 0 R 43 0 R 45 0 R 47 0 R 49 0 R 51 0 R 53 0 R 55 0 R 57 0 R 59 0 R 61 0 R 63 0 R 65 0 R 67 0 R 69 0 R 71 0 R 73 0 R 75 0 R 77 0 R 79 0 R 81 0 R 83 0 R 85 0 R 87 0 R 89 0 R 91 0 R 93 0 R 95 0 R 97 0 R 99 0 R 101 0 R 103 0 R] >>
 endobj
 3 0 obj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
@@ -236,12 +236,12 @@ BT /F2 11.5 Tf 1 0 0 1 535.21 614.00 Tm (41) Tj ET
 0.08 0.08 0.09 rg
 BT /F1 11.5 Tf 1 0 0 1 68.00 595.00 Tm (33. Storefront, Delivery, Labels and Trading Insights) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 11.5 Tf 1 0 0 1 535.21 595.00 Tm (46) Tj ET
+BT /F2 11.5 Tf 1 0 0 1 535.21 595.00 Tm (47) Tj ET
 0.80 0.82 0.86 RG 0.4 w 68.00 590.00 m 548.00 590.00 l S
 0.08 0.08 0.09 rg
 BT /F1 11.5 Tf 1 0 0 1 68.00 576.00 Tm (34. Getting Help) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 11.5 Tf 1 0 0 1 535.21 576.00 Tm (48) Tj ET
+BT /F2 11.5 Tf 1 0 0 1 535.21 576.00 Tm (49) Tj ET
 0.80 0.82 0.86 RG 0.4 w 68.00 571.00 m 548.00 571.00 l S
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
@@ -455,7 +455,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 18 0 R >>
 endobj
 18 0 obj
-<< /Length 2457 >>
+<< /Length 2626 >>
 stream
 0.70 0.53 0.14 rg
 BT /F1 11 Tf 1 0 0 1 68.00 692.00 Tm (•) Tj ET
@@ -474,25 +474,27 @@ BT /F1 11 Tf 1 0 0 1 84.00 643.00 Tm (download.) Tj ET
 0.11 0.19 0.44 rg
 BT /F2 13 Tf 1 0 0 1 64.00 620.00 Tm (Choosing your language and region) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 602.00 Tm (Use the language selector in the top bar to switch the interface language. Eight languages ship) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 602.00 Tm (Use the language selector in the top bar to switch the interface language. Seventeen languages) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 587.00 Tm (today: English, Spanish, French, German, Portuguese, Arabic, Simplified Chinese and Hindi.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 587.00 Tm (ship today: English, Spanish, French, German, Portuguese, Arabic, Simplified Chinese, Hindi,) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 572.00 Tm (Arabic flips the entire shell to right-to-left reading - sidebar, tables, forms and navigation all mirror) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 572.00 Tm (Turkish, Japanese, Korean, Vietnamese, Indonesian, Thai, Swahili, Hebrew and Persian. Arabic,) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 557.00 Tm (automatically - and dates and numbers are formatted for each language's own conventions. Set) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 557.00 Tm (Hebrew and Persian flip the entire shell to right-to-left reading - sidebar, tables, forms and) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 542.00 Tm (your business country, address, tax rate and currency in Settings. Unified POS supports) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 542.00 Tm (navigation all mirror automatically - and dates and numbers are formatted for each language's own) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 527.00 Tm (businesses in every nation and every ISO 4217 currency.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 527.00 Tm (conventions. Set your business country, address, tax rate and currency in Settings. Unified POS) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 512.00 Tm (supports businesses in every nation and every ISO 4217 currency.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 501.00 Tm (The demo environment) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 486.00 Tm (The demo environment) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 483.00 Tm (A fresh installation seeds a demo business with sample products, an owner, a manager and a) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 468.00 Tm (A fresh installation seeds a demo business with sample products, an owner, a manager and a) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 468.00 Tm (cashier so you can explore safely. Replace or remove demo data before going live, and change the) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 453.00 Tm (cashier so you can explore safely. Replace or remove demo data before going live, and change the) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 453.00 Tm (seeded passwords immediately.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 438.00 Tm (seeded passwords immediately.) Tj ET
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
 BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
@@ -5604,7 +5606,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 88 0 R >>
 endobj
 88 0 obj
-<< /Length 5472 >>
+<< /Length 5253 >>
 stream
 0.11 0.19 0.44 rg
 0.11 0.19 0.44 rg
@@ -5621,79 +5623,75 @@ BT /F2 13 Tf 1 0 0 1 64.00 606.00 Tm (32.1 Fiscalisation and e-invoicing) Tj ET
 0.08 0.08 0.09 rg
 BT /F1 11 Tf 1 0 0 1 64.00 588.00 Tm (Where: Fiscal.) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 568.00 Tm (Unified POS ships 26 country regimes - TSE in Germany, SdI in Italy, ZATCA Phase 2 in Saudi) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 568.00 Tm (Unified POS ships 38 country regimes - TSE in Germany, SdI in Italy, ZATCA Phase 2 in Saudi) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 553.00 Tm (Arabia, eTIMS in Kenya, NFC-e in Brazil, CFDI in Mexico, GST e-invoicing in India, KSeF in Poland) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 553.00 Tm (Arabia, eTIMS in Kenya, NFC-e in Brazil, CFDI in Mexico, GST e-invoicing in India, KSeF in) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 538.00 Tm (and more - plus a no-fiscalisation profile for markets such as the US and UK.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 538.00 Tm (Poland, Egypt's ETA, Japan's Qualified Invoice System, Vietnam, the Philippines, South Korea,) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 523.00 Tm (Trkiye, Pakistan, Bangladesh, Ghana, Morocco, Uganda and Rwanda - plus a no-fiscalisation) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 508.00 Tm (profile for markets such as the US and UK.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 518.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 488.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 518.00 Tm (Every sealed document carries a sequence number, a digest of its content and a link to the) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 488.00 Tm (Every sealed document carries a sequence number, a digest of its content and a link to the) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 503.00 Tm (previous document, so editing an old receipt breaks the chain and says so.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 473.00 Tm (previous document, so editing an old receipt breaks the chain and says so.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 486.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 456.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 486.00 Tm (Verify chain re-walks the documents and reports the first break, which is what an auditor asks) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 456.00 Tm (Verify chain re-walks the documents and reports the first break, which is what an auditor asks) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 471.00 Tm (for.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 441.00 Tm (for.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 454.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 424.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 454.00 Tm (Missing receipt numbers are listed rather than silently accepted; each regime keeps its own) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 424.00 Tm (Missing receipt numbers are listed rather than silently accepted; each regime keeps its own) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 439.00 Tm (document numbering prefix and retention period.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 409.00 Tm (document numbering prefix and retention period.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 422.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 392.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 422.00 Tm (Where the regime requires a QR or TLV block \(ZATCA, eTIMS, SAT, FATOORA\), it is) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 392.00 Tm (Where the regime requires a QR or TLV block \(ZATCA, eTIMS, SAT, FATOORA\), it is) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 407.00 Tm (generated on the receipt.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 377.00 Tm (generated on the receipt.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 390.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 360.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 390.00 Tm (Reporting is queued, retried with back-off and shown with its last outcome. When a country) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 360.00 Tm (Reporting is queued, retried with back-off and shown with its last outcome. When a country) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 375.00 Tm (needs a hardware or partner bridge, the Fiscal page tells you which single setting is missing) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 345.00 Tm (needs a hardware or partner bridge, the Fiscal page tells you which single setting is missing) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 360.00 Tm (instead of failing at the register.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 330.00 Tm (instead of failing at the register.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 337.00 Tm (32.2 Local payment rails and settlement) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 307.00 Tm (32.2 Local payment rails and settlement) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 319.00 Tm (Where: Rails.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 289.00 Tm (Where: Rails.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 299.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 269.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 299.00 Tm (Validates the identifier the local rail actually demands: IBAN check digits, US routing numbers,) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 269.00 Tm (Validates the identifier the local rail actually demands: IBAN check digits, US routing numbers,) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 284.00 Tm (UK sort codes, Mexican CLABE, Brazilian CPF/CNPJ, Indian IFSC and UPI addresses,) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 254.00 Tm (UK sort codes, Mexican CLABE, Brazilian CPF/CNPJ, Indian IFSC and UPI addresses,) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 269.00 Tm (Nigerian NUBAN, Australian BSB, South African till numbers and international MSISDNs. A) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 239.00 Tm (Nigerian NUBAN, Australian BSB, South African till numbers and international MSISDNs. A) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 254.00 Tm (mistyped digit is caught before money moves, with the reason.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 224.00 Tm (mistyped digit is caught before money moves, with the reason.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 237.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 207.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 237.00 Tm (Chooses the cheapest workable rail for a payout \(instant, standard or wire\) using each) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 207.00 Tm (Chooses the cheapest workable rail for a payout \(instant, standard or wire\) using each) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 222.00 Tm (network's ceiling and fee, and shows what the choice costs.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 192.00 Tm (network's ceiling and fee, and shows what the choice costs.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 205.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 175.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 205.00 Tm (Settlement reconciliation compares the acquirer's statement against your own captured sales) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 175.00 Tm (Settlement reconciliation compares the acquirer's statement against your own captured sales) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 190.00 Tm (line by line, classifying every difference as amount, fee, timing or unmatched, and publishes a) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 160.00 Tm (line by line, classifying every difference as amount, fee, timing or unmatched, and publishes a) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 175.00 Tm (batch health score so a slow day is visible immediately.) Tj ET
-0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 152.00 Tm (32.3 Agentic back-office) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 134.00 Tm (Where: Agent Ops.) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 114.00 Tm (The planner forecasts demand per item, then works out the reorder point from lead time, review) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 99.00 Tm (period and a chosen service level, with safety stock, pack sizes and supplier minimums respected.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 145.00 Tm (batch health score so a slow day is visible immediately.) Tj ET
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
 BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
@@ -5707,94 +5705,94 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 90 0 R >>
 endobj
 90 0 obj
-<< /Length 5291 >>
+<< /Length 5382 >>
 stream
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 692.00 Tm (•) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 692.00 Tm (Guardrails are yours: a maximum spend, a maximum number of lines, and suppliers you have) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 677.00 Tm (blocked. The plan trims the least urgent lines to fit and tells you what was deferred.) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 660.00 Tm (•) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 660.00 Tm (Urgency is scored, so the line that runs dry first is at the top of the list.) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 643.00 Tm (•) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 643.00 Tm (Approved lines become draft purchase orders. Nothing is sent to a supplier until a human) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 628.00 Tm (approves it - the agent drafts, you decide.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 605.00 Tm (32.4 Vertical solutions) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 686.00 Tm (32.3 Agentic back-office) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 587.00 Tm (Where: Verticals.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 668.00 Tm (Where: Agent Ops.) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 567.00 Tm (Fourteen trade packs - grocery, pharmacy, fashion, hardware, auto repair, salon, quick service,) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 648.00 Tm (The planner forecasts demand per item, then works out the reorder point from lead time, review) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 552.00 Tm (liquor, electronics, bakery, wholesale, rental, pet care and clinic - each add the fields, menu entries) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 633.00 Tm (period and a chosen service level, with safety stock, pack sizes and supplier minimums respected.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 613.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 537.00 Tm (and register behaviour that trade needs. Enabling a pack applies it to your location; disabling it) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 613.00 Tm (Guardrails are yours: a maximum spend, a maximum number of lines, and suppliers you have) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 522.00 Tm (removes what it added without touching your sales history.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 598.00 Tm (blocked. The plan trims the least urgent lines to fit and tells you what was deferred.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 581.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 581.00 Tm (Urgency is scored, so the line that runs dry first is at the top of the list.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 564.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 564.00 Tm (Approved lines become draft purchase orders. Nothing is sent to a supplier until a human) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 549.00 Tm (approves it - the agent drafts, you decide.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 496.00 Tm (32.5 Embedded finance) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 526.00 Tm (32.4 Vertical solutions) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 478.00 Tm (Where: Finance.) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 458.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 508.00 Tm (Where: Verticals.) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 458.00 Tm (Underwriting reads only your own trading history - months trading, sales stability, refund and) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 488.00 Tm (Fourteen trade packs - grocery, pharmacy, fashion, hardware, auto repair, salon, quick service,) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 443.00 Tm (chargeback rates, dormant days and settlement freshness - and returns a score, a risk band, a) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 473.00 Tm (liquor, electronics, bakery, wholesale, rental, pet care and clinic - each add the fields, menu entries) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 428.00 Tm (suggested limit, the reasons for any decline and a term sheet per available duration.) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 411.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 458.00 Tm (and register behaviour that trade needs. Enabling a pack applies it to your location; disabling it) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 411.00 Tm (Each facility has a real amortisation schedule and a daily sweep that takes a fixed percentage) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 443.00 Tm (removes what it added without touching your sales history.) Tj ET
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 417.00 Tm (32.5 Embedded finance) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 396.00 Tm (of net sales, capped, oldest instalment first. Any leftover is reported rather than applied twice.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 399.00 Tm (Where: Finance.) Tj ET
 0.70 0.53 0.14 rg
 BT /F1 11 Tf 1 0 0 1 68.00 379.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 379.00 Tm (This is a ledger of a credit facility with its repayment maths; funds move only through the) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 379.00 Tm (Underwriting reads only your own trading history - months trading, sales stability, refund and) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 364.00 Tm (payment rails you have already configured.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 364.00 Tm (chargeback rates, dormant days and settlement freshness - and returns a score, a risk band, a) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 349.00 Tm (suggested limit, the reasons for any decline and a term sheet per available duration.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 332.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 332.00 Tm (Each facility has a real amortisation schedule and a daily sweep that takes a fixed percentage) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 317.00 Tm (of net sales, capped, oldest instalment first. Any leftover is reported rather than applied twice.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 300.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 300.00 Tm (This is a ledger of a credit facility with its repayment maths; funds move only through the) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 285.00 Tm (payment rails you have already configured.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 341.00 Tm (32.6 Agentic commerce) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 262.00 Tm (32.6 Agentic commerce) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 323.00 Tm (Where: Agent Storefront.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 244.00 Tm (Where: Agent Storefront.) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 303.00 Tm (Buying agents can already read your shop; now they can pay for it safely.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 224.00 Tm (Buying agents can already read your shop; now they can pay for it safely.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 283.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 204.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 283.00 Tm (The catalogue is published as JSON-LD \(schema.org Product and Offer\) so an agent can price) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 204.00 Tm (The catalogue is published as JSON-LD \(schema.org Product and Offer\) so an agent can price) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 268.00 Tm (and stock-check without scraping.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 189.00 Tm (and stock-check without scraping.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 251.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 172.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 251.00 Tm (/.well-known/unifiedpos and /.well-known/unifiedpos/{merchantId} declare your endpoints,) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 172.00 Tm (/.well-known/unifiedpos and /.well-known/unifiedpos/{merchantId} declare your endpoints,) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 236.00 Tm (mandate rules and accepted payment methods before an agent authenticates.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 157.00 Tm (mandate rules and accepted payment methods before an agent authenticates.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 219.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 140.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 219.00 Tm (A mandate is a signed authorisation with a ceiling amount, a lifetime, per-line price guards and) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 140.00 Tm (A mandate is a signed authorisation with a ceiling amount, a lifetime, per-line price guards and) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 204.00 Tm (a nonce. Checkout verifies the signature, the window, the currency, stock, the agent-sellable) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 125.00 Tm (a nonce. Checkout verifies the signature, the window, the currency, stock, the agent-sellable) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 189.00 Tm (flag and the ceiling, and refuses with a specific code so the agent can correct one line instead) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 174.00 Tm (of losing the sale.) Tj ET
-0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 151.00 Tm (32.7 Store mesh) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 133.00 Tm (Where: Mesh.) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 113.00 Tm (A store is a terminal, a tablet, a kitchen display and a kiosk writing to the same stock count.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 110.00 Tm (flag and the ceiling, and refuses with a specific code so the agent can correct one line instead) Tj ET
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
 BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
@@ -5808,100 +5806,100 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 92 0 R >>
 endobj
 92 0 obj
-<< /Length 5657 >>
+<< /Length 5566 >>
 stream
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 692.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 692.00 Tm (The leader is elected deterministically from live devices \(role, then operator priority, then most) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 677.00 Tm (recent heartbeat, then id\), so every device reaches the same answer.) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 660.00 Tm (•) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 660.00 Tm (The leader holds a lease. Every write carries its epoch and sequence, which is what fences off) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 645.00 Tm (the classic failure: a partitioned ex-leader coming back and overwriting committed state. A write) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 630.00 Tm (claiming an epoch the store never granted is refused for the same reason.) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 613.00 Tm (•) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 613.00 Tm (Concurrent stock edits are merged as deltas rather than overwriting each other; absolute) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 598.00 Tm (values fall back to last-writer-wins with a deterministic tie-break.) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 581.00 Tm (•) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 581.00 Tm (The page shows health as healthy, degraded or isolated, with the lease countdown and which) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 566.00 Tm (devices are unreachable.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 692.00 Tm (of losing the sale.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 543.00 Tm (32.8 Franchise and multi-entity) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 669.00 Tm (32.7 Store mesh) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 525.00 Tm (Where: Franchise.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 651.00 Tm (Where: Mesh.) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 631.00 Tm (A store is a terminal, a tablet, a kitchen display and a kiosk writing to the same stock count.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 505.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 611.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 505.00 Tm (Royalty agreements support flat percentage, banded, per-unit and fixed models, agreed) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 611.00 Tm (The leader is elected deterministically from live devices \(role, then operator priority, then most) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 490.00 Tm (exclusions \(VAT, tips, gift-card redemption\) and a monthly minimum. Each calculation is printed) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 475.00 Tm (as the steps that produced it, so a franchisee can audit a statement without asking you for a) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 460.00 Tm (spreadsheet.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 596.00 Tm (recent heartbeat, then id\), so every device reaches the same answer.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 443.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 579.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 443.00 Tm (Stock moved between entities is priced cost-plus-markup with freight, so the sending entity) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 579.00 Tm (The leader holds a lease. Every write carries its epoch and sequence, which is what fences off) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 428.00 Tm (recognises its margin and the receiving one carries a real cost.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 564.00 Tm (the classic failure: a partitioned ex-leader coming back and overwriting committed state. A write) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 549.00 Tm (claiming an epoch the store never granted is refused for the same reason.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 411.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 532.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 411.00 Tm (The consolidated P&L converts every entity's results into the consolidation currency using your) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 532.00 Tm (Concurrent stock edits are merged as deltas rather than overwriting each other; absolute) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 396.00 Tm (stored exchange rates before summing \(see 32.11\), then eliminates intercompany sales and) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 517.00 Tm (values fall back to last-writer-wins with a deterministic tie-break.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 500.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 381.00 Tm (their matching cost, showing the unrealised profit still sitting in a franchisee's stock. An entity) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 500.00 Tm (The page shows health as healthy, degraded or isolated, with the lease countdown and which) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 366.00 Tm (whose rate is missing or stale is flagged rather than silently mis-summed. Unpaid royalties are) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 351.00 Tm (aged.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 485.00 Tm (devices are unreachable.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 328.00 Tm (32.9 Ecosystem: apps and custom fields) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 462.00 Tm (32.8 Franchise and multi-entity) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 310.00 Tm (Where: Apps.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 444.00 Tm (Where: Franchise.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 290.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 424.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 290.00 Tm (Eleven partner and first-party apps are listed with exactly the scopes they need. Installing) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 424.00 Tm (Royalty agreements support flat percentage, banded, per-unit and fixed models, agreed) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 275.00 Tm (shows the riskiest thing the grant can do; a high-risk grant needs an explicit acknowledgement) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 409.00 Tm (exclusions \(VAT, tips, gift-card redemption\) and a monthly minimum. Each calculation is printed) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 260.00 Tm (before it is issued.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 394.00 Tm (as the steps that produced it, so a franchisee can audit a statement without asking you for a) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 379.00 Tm (spreadsheet.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 243.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 362.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 243.00 Tm (The API token is shown once. It can be rotated or revoked per installation, verified, and its) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 362.00 Tm (Stock moved between entities is priced cost-plus-markup with freight, so the sending entity) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 228.00 Tm (scopes narrowed later without reinstalling.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 347.00 Tm (recognises its margin and the receiving one carries a real cost.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 211.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 330.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 211.00 Tm (Custom fields add the columns your trade needs - cut length, batch number, stylist note - to) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 330.00 Tm (The consolidated P&L converts every entity's results into the consolidation currency using your) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 196.00 Tm (orders, customers or products. Values are typed and validated at the edge, so a number field) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 315.00 Tm (stored exchange rates before summing \(see 32.11\), then eliminates intercompany sales and) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 181.00 Tm (never quietly accepts "yes".) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 300.00 Tm (their matching cost, showing the unrealised profit still sitting in a franchisee's stock. An entity) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 285.00 Tm (whose rate is missing or stale is flagged rather than silently mis-summed. Unpaid royalties are) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 270.00 Tm (aged.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 158.00 Tm (32.10 Peer benchmarking) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 247.00 Tm (32.9 Ecosystem: apps and custom fields) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 140.00 Tm (Where: Benchmark.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 229.00 Tm (Where: Apps.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 209.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 120.00 Tm (Ten metrics - average basket, gross margin, labour cost, shrink, discounting, attachment rate,) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 209.00 Tm (Eleven partner and first-party apps are listed with exactly the scopes they need. Installing) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 105.00 Tm (repeat customers, digital share, inventory turns and daily sales - compared against stores in your) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 194.00 Tm (shows the riskiest thing the grant can do; a high-risk grant needs an explicit acknowledgement) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 179.00 Tm (before it is issued.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 162.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 162.00 Tm (The API token is shown once. It can be rotated or revoked per installation, verified, and its) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 147.00 Tm (scopes narrowed later without reinstalling.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 130.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 130.00 Tm (Custom fields add the columns your trade needs - cut length, batch number, stylist note - to) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 115.00 Tm (orders, customers or products. Values are typed and validated at the edge, so a number field) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 100.00 Tm (never quietly accepts "yes".) Tj ET
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
 BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
@@ -5915,102 +5913,100 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 94 0 R >>
 endobj
 94 0 obj
-<< /Length 5723 >>
+<< /Length 5629 >>
 stream
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 692.00 Tm (country, trade and size band.) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 672.00 Tm (•) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 672.00 Tm (A cohort smaller than the k threshold never publishes, not even a median. Outliers are clipped) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 657.00 Tm (into the 5th-95th percentile range and a calibrated noise figure is added to what is shown.) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 640.00 Tm (•) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 640.00 Tm (The page publishes the privacy ledger with every figure: cohort size, k, noise applied,) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 625.00 Tm (participation rate. A suppressed cell is the model working, not a missing feature.) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 608.00 Tm (•) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 608.00 Tm (Contributing your own numbers is what makes the comparison exist at all; the participation rate) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 593.00 Tm (is shown alongside every metric.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 570.00 Tm (32.11 Exchange rates and multi-currency consolidation) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 686.00 Tm (32.10 Peer benchmarking) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 552.00 Tm (Where: Exchange Rates.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 668.00 Tm (Where: Benchmark.) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 532.00 Tm (A group that trades in more than one currency needs one honest number at the end of the month.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 648.00 Tm (Ten metrics - average basket, gross margin, labour cost, shrink, discounting, attachment rate,) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 633.00 Tm (repeat customers, digital share, inventory turns and daily sales - compared against stores in your) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 618.00 Tm (country, trade and size band.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 512.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 598.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 512.00 Tm (Store rates per pair and effective date - imported in bulk, or fetched from a configured provider) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 598.00 Tm (A cohort smaller than the k threshold never publishes, not even a median. Outliers are clipped) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 497.00 Tm (- each tagged with its source and timestamp.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 583.00 Tm (into the 5th-95th percentile range and a calibrated noise figure is added to what is shown.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 480.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 566.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 480.00 Tm (The built-in converter answers any pair directly, by inverse, or by triangulating through a) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 566.00 Tm (The page publishes the privacy ledger with every figure: cohort size, k, noise applied,) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 465.00 Tm (common base, and it always shows which method and which stored rate it used, with a) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 450.00 Tm (staleness warning when the rate is older than your tolerance.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 551.00 Tm (participation rate. A suppressed cell is the model working, not a missing feature.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 433.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 534.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 433.00 Tm (Franchise consolidation \(32.8\), subscription revenue and any cross-currency report draw on) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 534.00 Tm (Contributing your own numbers is what makes the comparison exist at all; the participation rate) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 418.00 Tm (this single rate table, so the same rate is never quietly different in two places.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 519.00 Tm (is shown alongside every metric.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 395.00 Tm (32.12 Subscriptions and recurring billing) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 496.00 Tm (32.11 Exchange rates and multi-currency consolidation) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 377.00 Tm (Where: Subscriptions.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 478.00 Tm (Where: Exchange Rates.) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 357.00 Tm (Recurring revenue runs through exactly the same money path as a one-off sale.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 458.00 Tm (A group that trades in more than one currency needs one honest number at the end of the month.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 337.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 438.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 337.00 Tm (Plans cover daily, weekly, monthly, quarterly and yearly intervals, optional trial days, and) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 438.00 Tm (Store rates per pair and effective date - imported in bulk, or fetched from a configured provider) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 322.00 Tm (feature lists; prices are kept in the plan's own currency.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 423.00 Tm (- each tagged with its source and timestamp.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 305.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 406.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 305.00 Tm (Each billing cycle runs automatically: invoices open, payment is attempted through your) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 406.00 Tm (The built-in converter answers any pair directly, by inverse, or by triangulating through a) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 290.00 Tm (configured provider, and failures walk a dunning ladder \(retry at 1, 3, 7, 14 and 21 days\) before) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 391.00 Tm (common base, and it always shows which method and which stored rate it used, with a) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 275.00 Tm (the subscription expires - no silent churn.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 376.00 Tm (staleness warning when the rate is older than your tolerance.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 258.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 359.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 258.00 Tm (Cancel immediately or at period end, reinstate later, and prorate when a customer changes) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 359.00 Tm (Franchise consolidation \(32.8\), subscription revenue and any cross-currency report draw on) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 243.00 Tm (plan mid-cycle.) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 226.00 Tm (•) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 226.00 Tm (The dashboard shows live MRR, status mix, open invoices and twelve months of collected) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 211.00 Tm (revenue; every invoice keeps its attempt history for audit.) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 194.00 Tm (•) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 194.00 Tm (A webhook endpoint lets a payment provider push success or failure straight back, so status) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 179.00 Tm (updates are instant rather than waiting for the next cycle tick.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 344.00 Tm (this single rate table, so the same rate is never quietly different in two places.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 156.00 Tm (32.13 Enterprise single sign-on and directory sync) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 321.00 Tm (32.12 Subscriptions and recurring billing) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 138.00 Tm (Where: Settings, Single Sign-On panel.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 303.00 Tm (Where: Subscriptions.) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 283.00 Tm (Recurring revenue runs through exactly the same money path as a one-off sale.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 118.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 263.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 118.00 Tm (Two federation protocols: OIDC \(authorization-code, with provider discovery and) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 263.00 Tm (Plans cover daily, weekly, monthly, quarterly and yearly intervals, optional trial days, and) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 103.00 Tm (signature-verified ID tokens\) and SAML 2.0. Add as many connections as you have directories,) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 248.00 Tm (feature lists; prices are kept in the plan's own currency.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 231.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 231.00 Tm (Each billing cycle runs automatically: invoices open, payment is attempted through your) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 216.00 Tm (configured provider, and failures walk a dunning ladder \(retry at 1, 3, 7, 14 and 21 days\) before) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 201.00 Tm (the subscription expires - no silent churn.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 184.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 184.00 Tm (Cancel immediately or at period end, reinstate later, and prorate when a customer changes) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 169.00 Tm (plan mid-cycle.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 152.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 152.00 Tm (The dashboard shows live MRR, status mix, open invoices and twelve months of collected) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 137.00 Tm (revenue; every invoice keeps its attempt history for audit.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 120.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 120.00 Tm (A webhook endpoint lets a payment provider push success or failure straight back, so status) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 105.00 Tm (updates are instant rather than waiting for the next cycle tick.) Tj ET
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
 BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
@@ -6024,38 +6020,98 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 96 0 R >>
 endobj
 96 0 obj
-<< /Length 2099 >>
+<< /Length 6042 >>
 stream
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 686.00 Tm (32.13 Enterprise single sign-on and directory sync) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 692.00 Tm (each with its own label.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 668.00 Tm (Where: Settings, Single Sign-On panel.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 675.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 648.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 675.00 Tm (Staff simply type their work email: the domain whitelist decides whether they sign in with a) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 648.00 Tm (Two federation protocols: OIDC \(authorization-code, with provider discovery and) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 660.00 Tm (password or are redirected to your identity provider, and their account - with a staff role - is) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 633.00 Tm (signature-verified ID tokens\) and SAML 2.0. Add as many connections as you have directories,) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 645.00 Tm (provisioned automatically inside your organization on first login. Automatic provisioning can) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 630.00 Tm (never claim or merge an existing owner account.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 618.00 Tm (each with its own label.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 613.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 601.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 613.00 Tm (Client secrets are write-only: stored encrypted, never returned to the browser afterwards.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 601.00 Tm (Staff simply type their work email: the domain whitelist decides whether they sign in with a) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 586.00 Tm (password or are redirected to your identity provider, and their account - with a staff role - is) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 571.00 Tm (provisioned automatically inside your organization on first login. Automatic provisioning can) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 556.00 Tm (never claim or merge an existing owner account.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 596.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 539.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 596.00 Tm (Directory sync \(SCIM 2.0\) lets your identity provider create, update and deactivate staff) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 581.00 Tm (accounts as roles change, always scoped to your organization. Deactivating is never) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 566.00 Tm (destructive, and the last active owner of an organization cannot be removed by directory sync.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 539.00 Tm (Client secrets are write-only: stored encrypted, never returned to the browser afterwards.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 549.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 522.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 549.00 Tm (Trust is fail-closed: unsigned SAML assertions, mismatched issuers, wrong audience, expired) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 522.00 Tm (Directory sync \(SCIM 2.0\) lets your identity provider create, update and deactivate staff) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 534.00 Tm (tokens and replayed nonces are all refused.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 507.00 Tm (accounts as roles change, always scoped to your organization. Deactivating is never) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 492.00 Tm (destructive, and the last active owner of an organization cannot be removed by directory sync.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 475.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 475.00 Tm (Trust is fail-closed: unsigned SAML assertions, mismatched issuers, wrong audience, expired) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 460.00 Tm (tokens and replayed nonces are all refused.) Tj ET
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 437.00 Tm (32.14 Country tax defaults and payment-gateway breadth) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 419.00 Tm (Where: Fiscal \(Default consumption tax panel\), Settings, Integrations.) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 399.00 Tm (So that opening a store in a new country is a selection rather than a research project, the platform) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 384.00 Tm (keeps two world maps of configuration.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 364.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 364.00 Tm (Country tax profiles. Beyond how a receipt is sealed \(32.1\), the Fiscal page answers what the) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 349.00 Tm (default rate is. It carries the standard VAT/GST/sales-tax rate and the common reduced slabs) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 334.00 Tm (for 100+ markets - Nigeria 7.5%, Kenya 16%, South Africa 15%, Germany 19%, Saudi Arabia) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 319.00 Tm (15%, the UAE 5%, India's 5/12/18/28% GST slabs, Japan's 10% with an 8% reduced food rate,) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 304.00 Tm (and so on \(rates reflect the mid-2026 global survey and are sensible defaults, not legal advice\).) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 289.00 Tm (Your selected country is highlighted with a suggested rate you can use to pre-fill the) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 274.00 Tm (organisation tax rate; tax-free and unknown markets return 0 rather than a wrong non-zero) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 259.00 Tm (guess. Actual return filing is delegated to a TAX_COMPLIANCE integration \(Avalara, TaxJar,) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 244.00 Tm (Stripe Tax, Sovos\).) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 227.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 227.00 Tm (Payment-gateway breadth. The Integrations catalog now lists the major regional processors on) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 212.00 Tm (every continent alongside the global names: Interswitch, Yoco, PayFast, DPO and PesaPal) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 197.00 Tm (\(Africa\); Cashfree, Paytm, PhonePe, SafePay and SSLCommerz \(South Asia\); Xendit, 2C2P,) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 182.00 Tm (iPay88 and VNPay \(Southeast Asia\); Telr, PayTabs, Moyasar, HyperPay, Amazon Payment) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 167.00 Tm (Services, Tap and iyzico \(MENA and Trkiye\); Toss Payments, KG Inicis, Multi Payment,) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 152.00 Tm (UnionPay \(East Asia\); Mollie, Worldline, Nuvei, SumUp, Adyen, and more. Each is a) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 137.00 Tm (bring-your-own-credentials connection - the platform stores the API keys and webhook secrets) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 122.00 Tm (encrypted and never fabricates a partner endpoint.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 105.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 105.00 Tm (Language breadth. The interface now ships in seventeen languages \( Choosing your) Tj ET
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
 BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
@@ -6069,6 +6125,25 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 98 0 R >>
 endobj
 98 0 obj
+<< /Length 564 >>
+stream
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 692.00 Tm (language and region\), including three right-to-left scripts, so the register speaks the customer's) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 677.00 Tm (language in most of the world's major markets.) Tj ET
+0.35 0.38 0.43 rg
+0.35 0.38 0.43 rg
+BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
+0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
+0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
+0.35 0.38 0.43 rg
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 46) Tj ET
+endstream
+endobj
+99 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 100 0 R >>
+endobj
+100 0 obj
 << /Length 5871 >>
 stream
 0.11 0.19 0.44 rg
@@ -6171,13 +6246,13 @@ BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
 0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
 0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
 0.35 0.38 0.43 rg
-BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 46) Tj ET
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 47) Tj ET
 endstream
 endobj
-99 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 100 0 R >>
+101 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 102 0 R >>
 endobj
-100 0 obj
+102 0 obj
 << /Length 4364 >>
 stream
 0.11 0.19 0.44 rg
@@ -6252,13 +6327,13 @@ BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
 0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
 0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
 0.35 0.38 0.43 rg
-BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 47) Tj ET
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 48) Tj ET
 endstream
 endobj
-101 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 102 0 R >>
+103 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 104 0 R >>
 endobj
-102 0 obj
+104 0 obj
 << /Length 1412 >>
 stream
 0.11 0.19 0.44 rg
@@ -6290,116 +6365,118 @@ BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
 0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
 0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
 0.35 0.38 0.43 rg
-BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 48) Tj ET
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 49) Tj ET
 endstream
 endobj
 xref
-0 103
+0 105
 0000000000 65535 f
 0000000015 00000 n
 0000000064 00000 n
-0000000451 00000 n
-0000000548 00000 n
-0000000650 00000 n
-0000000755 00000 n
-0000001009 00000 n
-0000001155 00000 n
-0000002633 00000 n
-0000002780 00000 n
-0000009519 00000 n
-0000009667 00000 n
-0000011100 00000 n
-0000011248 00000 n
-0000015563 00000 n
-0000015711 00000 n
-0000021002 00000 n
-0000021150 00000 n
-0000023660 00000 n
-0000023808 00000 n
-0000031921 00000 n
-0000032069 00000 n
-0000045568 00000 n
-0000045716 00000 n
-0000051112 00000 n
-0000051260 00000 n
-0000054817 00000 n
-0000054965 00000 n
-0000063307 00000 n
-0000063455 00000 n
-0000073673 00000 n
-0000073821 00000 n
-0000074617 00000 n
-0000074765 00000 n
-0000083629 00000 n
-0000083777 00000 n
-0000084574 00000 n
-0000084722 00000 n
-0000092474 00000 n
-0000092622 00000 n
-0000100335 00000 n
-0000100483 00000 n
-0000108610 00000 n
-0000108758 00000 n
-0000117774 00000 n
-0000117922 00000 n
-0000126539 00000 n
-0000126687 00000 n
-0000128281 00000 n
-0000128429 00000 n
-0000136618 00000 n
-0000136766 00000 n
-0000144243 00000 n
-0000144391 00000 n
-0000152945 00000 n
-0000153093 00000 n
-0000163054 00000 n
-0000163202 00000 n
-0000166684 00000 n
-0000166832 00000 n
-0000174461 00000 n
-0000174609 00000 n
-0000183019 00000 n
-0000183167 00000 n
-0000191127 00000 n
-0000191275 00000 n
-0000192572 00000 n
-0000192720 00000 n
-0000200073 00000 n
-0000200221 00000 n
-0000208722 00000 n
-0000208870 00000 n
-0000216508 00000 n
-0000216656 00000 n
-0000224720 00000 n
-0000224868 00000 n
-0000233804 00000 n
-0000233952 00000 n
-0000235939 00000 n
-0000236087 00000 n
-0000239562 00000 n
-0000239710 00000 n
-0000241082 00000 n
-0000241230 00000 n
-0000242928 00000 n
-0000243076 00000 n
-0000249629 00000 n
-0000249777 00000 n
-0000255302 00000 n
-0000255450 00000 n
-0000260794 00000 n
-0000260942 00000 n
-0000266652 00000 n
-0000266800 00000 n
-0000272576 00000 n
-0000272724 00000 n
-0000274876 00000 n
-0000275024 00000 n
-0000280948 00000 n
-0000281097 00000 n
-0000285515 00000 n
-0000285665 00000 n
+0000000459 00000 n
+0000000556 00000 n
+0000000658 00000 n
+0000000763 00000 n
+0000001017 00000 n
+0000001163 00000 n
+0000002641 00000 n
+0000002788 00000 n
+0000009527 00000 n
+0000009675 00000 n
+0000011108 00000 n
+0000011256 00000 n
+0000015571 00000 n
+0000015719 00000 n
+0000021010 00000 n
+0000021158 00000 n
+0000023837 00000 n
+0000023985 00000 n
+0000032098 00000 n
+0000032246 00000 n
+0000045745 00000 n
+0000045893 00000 n
+0000051289 00000 n
+0000051437 00000 n
+0000054994 00000 n
+0000055142 00000 n
+0000063484 00000 n
+0000063632 00000 n
+0000073850 00000 n
+0000073998 00000 n
+0000074794 00000 n
+0000074942 00000 n
+0000083806 00000 n
+0000083954 00000 n
+0000084751 00000 n
+0000084899 00000 n
+0000092651 00000 n
+0000092799 00000 n
+0000100512 00000 n
+0000100660 00000 n
+0000108787 00000 n
+0000108935 00000 n
+0000117951 00000 n
+0000118099 00000 n
+0000126716 00000 n
+0000126864 00000 n
+0000128458 00000 n
+0000128606 00000 n
+0000136795 00000 n
+0000136943 00000 n
+0000144420 00000 n
+0000144568 00000 n
+0000153122 00000 n
+0000153270 00000 n
+0000163231 00000 n
+0000163379 00000 n
+0000166861 00000 n
+0000167009 00000 n
+0000174638 00000 n
+0000174786 00000 n
+0000183196 00000 n
+0000183344 00000 n
+0000191304 00000 n
+0000191452 00000 n
+0000192749 00000 n
+0000192897 00000 n
+0000200250 00000 n
+0000200398 00000 n
+0000208899 00000 n
+0000209047 00000 n
+0000216685 00000 n
+0000216833 00000 n
+0000224897 00000 n
+0000225045 00000 n
+0000233981 00000 n
+0000234129 00000 n
+0000236116 00000 n
+0000236264 00000 n
+0000239739 00000 n
+0000239887 00000 n
+0000241259 00000 n
+0000241407 00000 n
+0000243105 00000 n
+0000243253 00000 n
+0000249806 00000 n
+0000249954 00000 n
+0000255260 00000 n
+0000255408 00000 n
+0000260843 00000 n
+0000260991 00000 n
+0000266610 00000 n
+0000266758 00000 n
+0000272440 00000 n
+0000272588 00000 n
+0000278683 00000 n
+0000278831 00000 n
+0000279447 00000 n
+0000279596 00000 n
+0000285521 00000 n
+0000285671 00000 n
+0000290089 00000 n
+0000290239 00000 n
 trailer
-<< /Size 103 /Root 1 0 R /Info 6 0 R >>
+<< /Size 105 /Root 1 0 R /Info 6 0 R >>
 startxref
-287131
+291705
 %%EOF
