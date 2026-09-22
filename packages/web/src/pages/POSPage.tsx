@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { useCartStore } from '../stores/cartStore';
 import { useAuthStore } from '../stores/authStore';
 import { attachBarcodeScanner } from '../services/hardware';
+import RegisterLockScreen from '../components/RegisterLockScreen';
+import { useRegisterLock } from '../hooks/useRegisterLock';
 import { 
   Search, Plus, Minus, Trash2, CreditCard, Banknote, Smartphone, 
   User, Pause, ShoppingCart, Percent, MoreHorizontal, Clock,
-  MapPin, Monitor, UserCircle, CheckCircle,
+  MapPin, Monitor, UserCircle, CheckCircle, Lock, KeyRound,
   Wallet, Zap, QrCode, Landmark, BadgeDollarSign, Bitcoin, Gift,
   Receipt, FileText, ChevronDown, ChevronUp
 } from 'lucide-react';
@@ -62,7 +65,18 @@ export default function POSPage() {
   const [loadingCredit, setLoadingCredit] = useState(false);
 
   const { items, addItem, removeItem, updateQuantity, clearCart, getSubtotal, setCustomer, discount, discountType, setDiscount } = useCartStore();
-  const { user, organization } = useAuthStore();
+  const { user, organization, logout } = useAuthStore();
+  const navigate = useNavigate();
+
+  // Drawer ownership for this workstation (§7 / §37): which register is open, the
+  // cashier's individual-PIN state, and the idle auto-lock. The screen is covered
+  // by RegisterLockScreen while locked, and every sale on a locked drawer is
+  // refused server-side, so this is display + ergonomics, not the enforcement.
+  const registerLock = useRegisterLock();
+  const signOut = () => {
+    logout();
+    navigate('/');
+  };
 
   useEffect(() => {
     loadData();
@@ -160,6 +174,12 @@ export default function POSPage() {
       loadData();
     } catch (err: any) {
       console.error('Checkout failed:', err);
+      // A locked drawer is not an error to shout about: the overlay is the fix, so
+      // just re-read the session state and let it cover the screen.
+      if (err?.code === 'REGISTER_LOCKED' || err?.status === 423) {
+        await registerLock.refresh();
+        return;
+      }
       const msg = err?.message || 'Checkout failed. Please try again.';
       // Surface backend stored-value errors inside the redemption step when open.
       if (pendingMethod === 'GIFT_CARD') setGiftCardError(msg);
@@ -359,8 +379,10 @@ export default function POSPage() {
               <span className="font-medium">{organization?.name || 'Main Location'}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Monitor size={18} className="text-gray-500" />
-              <span className="font-medium">Register 01</span>
+              <Monitor size={18} className={registerLock.session ? 'text-gray-500' : 'text-red-400'} />
+              {/* The real register name, not a placeholder — cashiers must be able to
+                  tell at a glance whose drawer they are standing at. */}
+              <span className="font-medium">{registerLock.registerName || 'No register open'}</span>
             </div>
             <div className="flex items-center gap-2">
               <UserCircle size={18} className="text-gray-500" />
@@ -368,6 +390,32 @@ export default function POSPage() {
             </div>
           </div>
           <div className="flex items-center gap-4">
+            {/* Individual PIN (§37): without one the cashier cannot lock their own
+                drawer, so nudge them to the Registers page once per session. */}
+            {!registerLock.loading && !registerLock.pinConfigured && (
+              <button
+                onClick={() => navigate('/registers')}
+                className="flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-800 hover:bg-amber-100"
+              >
+                <KeyRound size={16} />
+                Set your register PIN
+              </button>
+            )}
+            {registerLock.pinConfigured && (
+              <button
+                onClick={() => void registerLock.lock('MANUAL')}
+                disabled={!registerLock.session || registerLock.locked}
+                title={
+                  registerLock.session
+                    ? `Locks this drawer · auto-locks after ${registerLock.idleLockMinutes} min idle`
+                    : 'Open a register to lock it'
+                }
+                className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <Lock size={16} />
+                Lock register
+              </button>
+            )}
             <div className="flex items-center gap-2 text-green-600">
               <CheckCircle size={18} />
               <span className="font-medium">Online</span>
@@ -789,6 +837,18 @@ export default function POSPage() {
           </div>
         </div>
       )}
+
+      {/* Full-screen PIN pad: covers the basket and blocks the till until the
+          cashier who owns this drawer enters their own code. */}
+      <RegisterLockScreen
+        open={registerLock.locked}
+        cashierName={user?.name}
+        registerName={registerLock.registerName}
+        lockReason={registerLock.session?.lockReason}
+        error={registerLock.unlockError}
+        onUnlock={registerLock.unlock}
+        onSignOut={signOut}
+      />
     </div>
   );
 }

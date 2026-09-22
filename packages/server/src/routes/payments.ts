@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '../db/client.js';
 import { AuthRequest, authMiddleware } from '../middleware/auth.js';
 import { validateRequest, handleError } from '../middleware/error.js';
+import { requireUnlockedRegister } from '../middleware/registerAccess.js';
 import { createAuditEvent } from '../utils/audit.js';
 import { emitEvent } from '../services/eventBus.js';
 import { isValidCurrency, normalizeCurrency } from '../data/currencies.js';
@@ -327,7 +328,7 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // POST /api/payments/process - Process a payment with idempotency
-router.post('/process', authMiddleware, validateRequest(processPaymentSchema), async (req: AuthRequest, res: Response) => {
+router.post('/process', authMiddleware, requireUnlockedRegister, validateRequest(processPaymentSchema), async (req: AuthRequest, res: Response) => {
   try {
     const { orderId, amount, idempotencyKey, provider, reference, paymentMethodId, capture } = req.body;
     // Fold aliases + upper-case to the canonical catalog id before storing.
@@ -472,7 +473,7 @@ router.post('/process', authMiddleware, validateRequest(processPaymentSchema), a
 });
 
 // POST /api/payments/:id/void - Void a payment
-router.post('/:id/void', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/:id/void', authMiddleware, requireUnlockedRegister, async (req: AuthRequest, res: Response) => {
   try {
     const orgId = req.user!.organizationId!;
     const payment = await prisma.payment.findUnique({ where: { id: String(req.params.id) } });
@@ -509,7 +510,7 @@ router.post('/:id/void', authMiddleware, async (req: AuthRequest, res: Response)
 });
 
 // POST /api/payments/refund - Process a refund
-router.post('/refund', authMiddleware, validateRequest(refundPaymentSchema), async (req: AuthRequest, res: Response) => {
+router.post('/refund', authMiddleware, requireUnlockedRegister, validateRequest(refundPaymentSchema), async (req: AuthRequest, res: Response) => {
   try {
     const { paymentId, amount, reason, method } = req.body;
     const orgId = req.user!.organizationId!;

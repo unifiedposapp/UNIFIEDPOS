@@ -112,6 +112,40 @@ The Register is the heart of the system, built for speed and accuracy.
 - The drawer kicks automatically on cash sales when auto-open is enabled.
 - Close the session at the end of the shift to record the expected versus counted cash and the variance.
 
+- Held and parked tickets belong to the cashier who parked them. Another cashier on
+  another register cannot recall your tickets; a manager can see all of them.
+
+### Your personal register PIN
+
+Every cashier has their own 4-8 digit register code, separate from the password used
+to sign in. It exists so that a drawer you are responsible for stays yours:
+
+1. Go to Registers and set your PIN in the "My Register PIN" card. Repeated codes
+   (1111) and straight runs (1234) are refused. A cashier without a PIN cannot open
+   a register - there would be nothing to lock it with.
+2. Change it whenever you like; you must enter the current PIN to replace it, so a
+   colleague standing at an unlocked screen cannot quietly take over your code.
+3. Forgotten it? A manager or owner can clear it, and you then choose a new one,
+   which also releases your locked drawer.
+
+### Locking the register when you step away
+
+- Tap "Lock register" in the POS header (or Lock Register on the Registers page).
+  The screen is replaced by a PIN pad, your basket stays exactly where it is, and
+  the drawer stays open.
+- Nobody else can get in: only your own PIN unlocks your own drawer, and while it is
+  locked the server refuses sales, discounts, holds, refunds, voids and cash moves
+  on that register.
+- You can also simply walk away. An unattended register locks itself after the
+  manager's auto-lock window (default 5 minutes) has passed with no typing,
+  tapping or scanning.
+- Five wrong PIN guesses freeze the PIN for five minutes as a brute-force guard.
+- End of shift is different from stepping away: unlock your drawer, then Close
+  Register to count the cash and record the variance.
+- Managers see every open drawer on the floor (who holds it, whether it is locked,
+  how often it has been locked) and can force unlock or force close one when a
+  cashier is genuinely unavailable. Both actions are written to the audit log.
+
 ### Guest orders and quotes
 
 - Create a guest order for walk-in or phone customers without a customer profile.
@@ -311,6 +345,15 @@ Staffing controls who can do what, and tracks time and labor cost.
 - Create registers for each physical or virtual point of sale.
 - Assign registers to locations and open or close sessions.
 - Monitor register status and activity.
+- Each register is held by exactly one cashier at a time. The list shows whether a
+  drawer is free, yours, or in use by a colleague, and a register already being
+  used cannot be opened a second time by anyone else.
+- Set your own register PIN here ("My Register PIN"), lock or unlock your drawer, and
+  choose how many minutes of inactivity trigger an automatic lock (managers only;
+  choose "Never (disabled)" to turn auto-lock off).
+- Managers see an "Open Drawers" console: who holds each register, whether it is
+  locked and how often it has been locked, with force unlock, force close and PIN
+  reset - every one of them recorded in the audit log.
 
 ### Device registry
 
@@ -427,6 +470,9 @@ Settings configure how the system looks and behaves for your business.
 - Multi-tenant isolation ensures your data is separated from every other business.
 - Passwords are hashed; sensitive credentials at rest are encrypted.
 - Role-based access control and rate limiting protect against abuse.
+- Each cashier's register drawer is protected by their own individual PIN: a locked
+  register accepts no sale, refund or cash movement until its owner unlocks it, and
+  repeated wrong guesses temporarily freeze the PIN.
 - Sessions use secure cookies; audit logging records sensitive actions.
 - You own your data. Export or request deletion at any time from the Compliance Center.
 

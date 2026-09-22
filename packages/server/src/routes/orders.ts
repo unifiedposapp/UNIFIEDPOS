@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '../db/client.js';
 import { AuthRequest, authMiddleware } from '../middleware/auth.js';
 import { validateRequest, handleError, HttpError } from '../middleware/error.js';
+import { RegisterRequest, requireUnlockedRegister } from '../middleware/registerAccess.js';
 import { createAuditEvent } from '../utils/audit.js';
 import { normalizePaymentMethod } from '../data/paymentMethods.js';
 import { computeOrderTotals, planGiftCardDeduction, planStoreCreditDeduction } from '../services/moneyMath.js';
@@ -38,6 +39,44 @@ const createOrderSchema = z.object({
   serviceCharge: z.number().optional(),
 });
 
+// Roles that may see (and pull back) tickets held on somebody else's drawer.
+const SUPERVISOR_ROLES = ['OWNER', 'ADMIN', 'MANAGER'];
+
+/**
+ * Load an order that the caller is entitled to change, answering 404/403 for them
+ * when they are not. Two rules, both part of "each cashier's register is their
+ * own": the ticket must live in the caller's business (a guessed uuid can never
+ * reach another tenant's order), and a sale sitting on a drawer another cashier
+ * still has OPEN belongs to that drawer — a colleague cannot cancel, hold, refund
+ * or re-status it out from under them. Once the shift is closed, normal
+ * reconciliation work is possible again, and supervisors are never blocked.
+ */
+async function loadMutableOrder(req: RegisterRequest, res: Response): Promise<any | null> {
+  const order = await prisma.order.findFirst({
+    where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+  });
+  if (!order) {
+    res.status(404).json({ success: false, message: 'Order not found' });
+    return null;
+  }
+  const isSupervisor = SUPERVISOR_ROLES.includes(String(req.user!.role));
+  if (!isSupervisor && order.sessionId && order.employeeId !== req.user!.employeeId) {
+    const session = await prisma.registerSession.findUnique({
+      where: { id: order.sessionId },
+      select: { status: true },
+    });
+    if (session?.status === 'OPEN') {
+      res.status(403).json({
+        success: false,
+        code: 'FOREIGN_REGISTER',
+        message: 'This order belongs to another cashier\'s open register',
+      });
+      return null;
+    }
+  }
+  return order;
+}
+
 // GET /api/orders
 router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
@@ -71,10 +110,18 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // GET /api/orders/held - List held orders (must precede /:id to avoid param capture)
+// A cashier only ever sees the tickets parked on THEIR OWN drawer; recalling a
+// colleague's held order would move that sale onto this cash drawer and corrupt
+// the other cashier's count, so held tickets are private unless you supervise.
 router.get('/held', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
+    const ownOnly = !SUPERVISOR_ROLES.includes(String(req.user!.role));
     const orders = await prisma.order.findMany({
-      where: { organizationId: req.user!.organizationId, status: 'HELD' },
+      where: {
+        organizationId: req.user!.organizationId,
+        status: 'HELD',
+        ...(ownOnly ? { employeeId: req.user!.employeeId } : {}),
+      },
       include: { items: true, customer: true },
       orderBy: { updatedAt: 'desc' },
     });
@@ -108,7 +155,10 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // POST /api/orders - Create order
-router.post('/', authMiddleware, validateRequest(createOrderSchema), async (req: AuthRequest, res: Response) => {
+// `requireUnlockedRegister` is what makes the lock screen real: while the
+// caller's drawer is locked, every sale on that session is refused with 423
+// (see middleware/registerAccess.ts).
+router.post('/', authMiddleware, requireUnlockedRegister, validateRequest(createOrderSchema), async (req: RegisterRequest, res: Response) => {
   try {
     const { items, customerId, paymentMethod, amountPaid, giftCardNumber, payments, notes, status, couponCode, channel, fulfillmentType, tipAmount, serviceCharge } = req.body;
     
@@ -118,6 +168,20 @@ router.post('/', authMiddleware, validateRequest(createOrderSchema), async (req:
     });
     
     if (!location) return res.status(400).json({ success: false, message: 'No location configured' });
+
+    // Bind the sale to the drawer it is rung on. The session was resolved by the
+    // lock middleware from the CALLER's token, so an order can never be parked on
+    // another cashier's session — and closing that session now counts every sale
+    // that belongs to it (§7 drawer reconciliation).
+    const session = req.registerSession ?? null;
+    let activeLocationId = location.id;
+    if (session?.registerId) {
+      const register = await prisma.register.findFirst({
+        where: { id: session.registerId, organizationId: req.user!.organizationId! },
+        select: { locationId: true },
+      });
+      if (register?.locationId) activeLocationId = register.locationId;
+    }
     
     // Build persisted line items; order-level totals are computed by the pure,
     // unit-tested moneyMath module below (§10/§34).
@@ -173,7 +237,9 @@ router.post('/', authMiddleware, validateRequest(createOrderSchema), async (req:
       data: {
         orderNumber,
         organizationId: req.user!.organizationId!,
-        locationId: location.id,
+        locationId: activeLocationId,
+        registerId: session?.registerId,
+        sessionId: session?.id,
         employeeId: req.user!.employeeId,
         customerId,
         subtotal,
@@ -342,7 +408,7 @@ router.post('/', authMiddleware, validateRequest(createOrderSchema), async (req:
           where: {
             productId_locationId: {
               productId: item.productId,
-              locationId: location.id,
+              locationId: activeLocationId,
             },
           },
         });
@@ -411,9 +477,10 @@ router.post('/', authMiddleware, validateRequest(createOrderSchema), async (req:
 });
 
 // PUT /api/orders/:id/status
-router.put('/:id/status', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.put('/:id/status', authMiddleware, requireUnlockedRegister, async (req: RegisterRequest, res: Response) => {
   try {
     const { status } = req.body;
+    if (!(await loadMutableOrder(req, res))) return;
     const order = await prisma.order.update({
       where: { id: String(req.params.id) },
       data: { status },
@@ -435,8 +502,9 @@ router.put('/:id/status', authMiddleware, async (req: AuthRequest, res: Response
 });
 
 // POST /api/orders/:id/cancel
-router.post('/:id/cancel', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/:id/cancel', authMiddleware, requireUnlockedRegister, async (req: RegisterRequest, res: Response) => {
   try {
+    if (!(await loadMutableOrder(req, res))) return;
     const order = await prisma.order.update({
       where: { id: String(req.params.id) },
       data: { status: 'CANCELLED' },
@@ -457,10 +525,11 @@ router.post('/:id/cancel', authMiddleware, async (req: AuthRequest, res: Respons
 });
 
 // POST /api/orders/:id/refund
-router.post('/:id/refund', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/:id/refund', authMiddleware, requireUnlockedRegister, async (req: RegisterRequest, res: Response) => {
   try {
     const { amount, reason } = req.body;
-    
+    if (!(await loadMutableOrder(req, res))) return;
+
     const order = await prisma.order.update({
       where: { id: String(req.params.id) },
       data: { 
@@ -484,8 +553,9 @@ router.post('/:id/refund', authMiddleware, async (req: AuthRequest, res: Respons
 });
 
 // PUT /api/orders/:id/hold - Hold/suspend order
-router.put('/:id/hold', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.put('/:id/hold', authMiddleware, requireUnlockedRegister, async (req: RegisterRequest, res: Response) => {
   try {
+    if (!(await loadMutableOrder(req, res))) return;
     const order = await prisma.order.update({
       where: { id: String(req.params.id) },
       data: { status: 'HELD' },
@@ -506,12 +576,19 @@ router.put('/:id/hold', authMiddleware, async (req: AuthRequest, res: Response) 
 });
 
 // PUT /api/orders/:id/recall - Recall held order
-router.put('/:id/recall', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.put('/:id/recall', authMiddleware, requireUnlockedRegister, async (req: RegisterRequest, res: Response) => {
   try {
-    const order = await prisma.order.findUnique({ where: { id: String(req.params.id) } });
-    if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+    const order = await loadMutableOrder(req, res);
+    if (!order) return;
     if (order.status !== 'HELD') {
       return res.status(400).json({ success: false, message: 'Order is not on hold' });
+    }
+
+    // Pulling a ticket back onto a register moves its cash there, so a cashier
+    // may only recall a ticket they parked themselves (supervisors may resolve
+    // a colleague's ticket at end of shift).
+    if (!SUPERVISOR_ROLES.includes(String(req.user!.role)) && order.employeeId !== req.user!.employeeId) {
+      return res.status(403).json({ success: false, message: 'This held order belongs to another cashier' });
     }
     
     const updated = await prisma.order.update({

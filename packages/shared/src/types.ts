@@ -27,6 +27,21 @@ export interface Register {
   locationId: string;
   name: string;
   status: RegisterStatus;
+  // Set by GET /registers: who (if anybody) currently holds this drawer. A
+  // cashier sees only that it is taken — the holding colleague's identity is
+  // supervisor-only.
+  available?: boolean;
+  occupied?: boolean;
+  openSession?: RegisterOccupancy | null;
+}
+
+export interface RegisterOccupancy {
+  sessionId: string;
+  locked: boolean;
+  mine: boolean;
+  openedAt: string;
+  cashier?: string;
+  employeeId?: string;
 }
 
 export type RegisterStatus = 'CLOSED' | 'OPENING' | 'OPEN' | 'SUSPENDED' | 'CLOSING';
@@ -43,6 +58,31 @@ export interface RegisterSession {
   openedAt: string;
   closedAt?: string;
   notes?: string;
+  // Drawer handover lock: while true, the owning cashier must enter their own
+  // PIN before the register accepts another sale.
+  locked?: boolean;
+  lockedAt?: string | null;
+  lockReason?: RegisterLockReason | null;
+  lockedCount?: number;
+  // Accompanying the session on GET /registers/session.
+  pinConfigured?: boolean;
+  idleLockMinutes?: number;
+  pinLock?: PinLockState;
+}
+
+export type RegisterLockReason = 'MANUAL' | 'IDLE';
+
+/** PIN brute-freeze state returned by GET /registers/pin. */
+export interface PinLockState {
+  locked: boolean;
+  remainingAttempts: number;
+  retryAfterSeconds: number;
+}
+
+export interface PinStatus {
+  pinConfigured: boolean;
+  pinUpdatedAt?: string | null;
+  lock: PinLockState;
 }
 
 export interface Device {
@@ -78,6 +118,8 @@ export interface Employee {
   hourlyRate?: number;
   isActive: boolean;
   user?: User;
+  // The PIN itself is never transmitted — only whether one exists.
+  pinConfigured?: boolean;
 }
 
 export interface LoginRequest {

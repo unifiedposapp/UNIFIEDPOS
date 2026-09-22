@@ -135,10 +135,18 @@ model RegisterSession {
   openedAt      DateTime  @default(now())
   closedAt      DateTime?
   notes         String?
+  // Drawer handover lock: while `locked` is true the session's cashier must
+  // re-authenticate with their own PIN before the register accepts any sale.
+  locked        Boolean   @default(false)
+  lockedAt      DateTime?
+  lockReason    String?   // MANUAL (cashier walked away) | IDLE (auto-lock)
+  lockedCount   Int       @default(0) // how many times this session was locked (ops signal)
 
   register Register @relation(fields: [registerId], references: [id])
   employee Employee @relation(fields: [employeeId], references: [id])
 
+  @@index([employeeId, status])
+  @@index([registerId, status])
   @@map("register_sessions")
 }
 
@@ -216,6 +224,13 @@ model Employee {
   hourlyRate      Decimal? @db.Decimal(10, 2)
   commissionRate  Decimal? @db.Decimal(5, 2)
   isActive        Boolean  @default(true)
+  // Individual register PIN (bcrypt hash — never stored or returned in plain
+  // text). Each cashier owns one, so a locked drawer can only be reopened by the
+  // cashier who locked it.
+  registerPin         String?
+  pinUpdatedAt        DateTime?
+  pinFailedAttempts   Int       @default(0)
+  pinLockedUntil      DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -750,6 +765,11 @@ model StoreSettings {
   // ── Data governance (§37 retention & legal hold) ──
   dataRetentionDays    Int?      // days to retain personal data; null = keep indefinitely
   legalHold            Boolean   @default(false)  // suspend purging while a litigation hold is active
+
+  // ── Register security policy (§37 / §7) ──
+  // Minutes of cashier inactivity before the POS locks the drawer; the cashier's
+  // own PIN is then required to resume. Owner/manager controlled.
+  registerIdleLockMinutes Int    @default(5)
 
   // ── Structured worldwide address ──
   streetAddress        String?

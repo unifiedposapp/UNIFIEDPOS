@@ -1,7 +1,7 @@
 # Unified POS System — Implementation Status
 
 > Last verified: full `npm run build` (shared + server + web) exits 0; server and
-> web `tsc --noEmit` exit 0; `vitest run` = **174 passed / 5 DB-gated skipped**;
+> web `tsc --noEmit` exit 0; `vitest run` = **227 passed / 5 DB-gated skipped**;
 > coverage gate clears (86% stmts, 72% branch, 92% funcs, 88% lines).
 
 ## Executive Summary
@@ -33,6 +33,11 @@ Only **§24 Hardware** (physical device drivers) and the spec-deferred
 ### Phase 1 — POS Foundation ✅
 - **§4 Tenant model** — Platform → Organization → Location → Register → Device.
 - **§6/§7 POS** — catalog, cart, variants/modifiers, discounts, taxes, tips, hold/recall, customer assignment; payment methods CASH, CARD, TAP, CHIP, APPLE_PAY, GOOGLE_PAY, GIFT_CARD, STORE_CREDIT, ACH, QR.
+- **§7/§37 Cashier drawer isolation** — one register = one cashier at a time, with an
+  **individual re-entry PIN** per cashier: occupancy is enforced at open time, held
+  tickets are private to their owner, and a locked drawer (manual or idle auto-lock)
+  refuses every sale, refund and cash move with `423 REGISTER_LOCKED` until the same
+  cashier re-authenticates. See *Register drawer locks* below.
 - **§8 Orders** — full lifecycle DRAFT → HELD → CONFIRMED → PAID → PROCESSING → FULFILLED → COMPLETED → CANCELLED → REFUNDED → PARTIALLY_REFUNDED.
 - **§9/§10 Payments** — PSP orchestration, AUTHORIZED → CAPTURED → SETTLED → RECONCILED, refunds/voids/disputes/chargebacks, payouts & settlements, **payment links** (shareable tokenised checkout).
 - **§11 Catalog** — products, categories, brands, variants, modifier groups, tax rules.
@@ -103,10 +108,34 @@ Navigation is grouped into luxury "collections" and fully i18n-localised (en mas
 - AES-256-GCM encryption at rest for sensitive fields; PCI-safe tokenised cards (SAQ-A scope — no raw PAN touches the server).
 - Immutable audit log; fraud risk scoring with an ops alert queue.
 
+## Register drawer locks (per-cashier isolation)
+
+- **Individual PIN** per employee (`Employee.registerPin`, bcrypt-hashed, never
+  returned): 4–8 digits, repeats (`1111`) and straight runs (`1234`) rejected;
+  rotation requires the current PIN, so an unattended screen cannot be hijacked.
+- **Handover lock** on `RegisterSession` (`locked`, `lockedAt`, `lockReason`,
+  `lockedCount`). `middleware/registerAccess.ts` gates 6 order routes + 3 payment
+  routes: a locked session cannot create, discount, hold, cancel, refund, void or
+  settle anything (HTTP 423). Closing a drawer also requires unlocking first.
+- **Occupancy**: `POST /registers/open` refuses a register holding another cashier's
+  session (`OCCUPIED` / `LOCKED_TO_OTHER`), scoped to the caller's organization; a
+  cashier may not even open a drawer they have no PIN to lock again.
+- **Idle auto-lock** — org policy `StoreSettings.registerIdleLockMinutes` (default 5,
+  supervisor-editable); the POS arms it and calls `POST /registers/lock`, so the
+  server, not the browser, decides. A cashier with no PIN is never trapped.
+- **Brute force** — 5 wrong PINs freezes the PIN for 5 minutes (`423 PIN_COOLDOWN`)
+  plus a shared DB rate limiter keyed by employee (12/min on both PIN endpoints).
+- **Supervisor escape hatches** (all audited): `GET /registers/sessions/active`,
+  force unlock, force close, PIN reset. Cashiers never see a colleague's identity —
+  only that a register is "in use".
+- **POS UI** — `useRegisterLock` + `RegisterLockScreen` (full-screen PIN pad), real
+  register name in the header, manual "Lock register", and RegistersPage with PIN
+  setup, lock/unlock, occupancy column and the supervisor drawer console.
+
 ## Testing
 
 - `vitest` suites in each package's `test/` folder (excluded from the production `tsc` build).
-- **Pure unit coverage**: moneyMath (FIFO gift-card/store-credit), currencies, crypto (AES-GCM), payment provider + Stripe webhook signature, email, payment methods, escpos, i18n parity, product types, **aiEngine** (regression/forecast/anomaly/RFM), **fraud** (`scoreFraud` verdicts + thresholds), **scheduler** (registry, overlap guard, success/failure capture).
+- **Pure unit coverage**: moneyMath (FIFO gift-card/store-credit), currencies, crypto (AES-GCM), payment provider + Stripe webhook signature, email, payment methods, escpos, i18n parity, product types, **aiEngine** (regression/forecast/anomaly/RFM), **fraud** (`scoreFraud` verdicts + thresholds), **scheduler** (registry, overlap guard, success/failure capture), **registerAccess** (PIN strength, hash/verify, freeze arithmetic, idle window, occupancy verdicts, sales gate).
 - **DB-gated integration**: `moneyPath.integration.test.ts` exercises the payment-link charge → PAID transition and gift-card deduction against a real DB. Skipped unless `RUN_DB_TESTS=1` with a disposable `DATABASE_URL`.
 - Coverage gate (opt-in via `npm run test:coverage`) scoped to money-critical pure modules; thresholds 70/60/70/70.
 

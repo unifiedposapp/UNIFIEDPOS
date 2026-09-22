@@ -70,10 +70,31 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
         window.location.assign('/login');
       }
     }
-    throw new Error(data.error || data.message || 'Request failed');
+    throw statusError(response.status, data);
   }
 
   return data;
+}
+
+/**
+ * Build the error thrown for a failed response. Beyond the human message we keep
+ * the HTTP `status` and the server's machine-readable `code` (e.g.
+ * 'REGISTER_LOCKED', 'PIN_INVALID') attached, so a caller can react to a locked
+ * drawer or a wrong PIN without parsing prose.
+ */
+function statusError(
+  status: number,
+  data: any,
+): Error & { status?: number; code?: string; data?: any } {
+  const error = new Error(data?.error || data?.message || 'Request failed') as Error & {
+    status?: number;
+    code?: string;
+    data?: any;
+  };
+  error.status = status;
+  error.code = data?.code;
+  error.data = data?.data;
+  return error;
 }
 
 export const api = {
@@ -175,6 +196,24 @@ export const api = {
     request<any>('/registers/open', { method: 'POST', body: JSON.stringify(data) }),
   closeRegister: (data: { closingCash: number; notes?: string }) =>
     request<any>('/registers/close', { method: 'POST', body: JSON.stringify(data) }),
+  // ── Individual cashier PIN + drawer handover lock (§37 / §7) ──
+  getRegisterPolicy: () => request<any>('/registers/policy'),
+  updateRegisterPolicy: (idleLockMinutes: number) =>
+    request<any>('/registers/policy', { method: 'PUT', body: JSON.stringify({ idleLockMinutes }) }),
+  getRegisterPinStatus: () => request<any>('/registers/pin'),
+  setRegisterPin: (pin: string, currentPin?: string) =>
+    request<any>('/registers/pin', { method: 'POST', body: JSON.stringify({ pin, currentPin }) }),
+  resetRegisterPin: (employeeId: string) =>
+    request<any>('/registers/pin/reset', { method: 'POST', body: JSON.stringify({ employeeId }) }),
+  lockRegister: (reason: 'MANUAL' | 'IDLE' = 'MANUAL') =>
+    request<any>('/registers/lock', { method: 'POST', body: JSON.stringify({ reason }) }),
+  unlockRegister: (pin: string) =>
+    request<any>('/registers/unlock', { method: 'POST', body: JSON.stringify({ pin }) }),
+  getActiveRegisterSessions: () => request<any>('/registers/sessions/active'),
+  forceUnlockRegisterSession: (sessionId: string) =>
+    request<any>(`/registers/sessions/${sessionId}/unlock`, { method: 'POST' }),
+  forceCloseRegisterSession: (sessionId: string, data?: { closingCash?: number; notes?: string }) =>
+    request<any>(`/registers/sessions/${sessionId}/close`, { method: 'POST', body: JSON.stringify(data || {}) }),
 
   // Locations
   getLocations: () => request<any>('/locations'),
