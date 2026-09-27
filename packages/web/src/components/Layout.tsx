@@ -363,8 +363,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <main id="main-content" className="flex-1 overflow-y-auto">{children}</main>
       </div>
 
-      {/* First-visit cookie / consent notice */}
-      <CookieConsent />
+      {/* First-visit cookie / consent notice. Skipped for SUPER_ADMIN: a
+          platform operator has no tenant organization to bind consent to, and
+          the backend would reject the write. The banner is a merchant-facing
+          GDPR/ePrivacy affordance, not an operator one. */}
+      {user?.role !== 'SUPER_ADMIN' && <CookieConsent />}
     </div>
   );
 }

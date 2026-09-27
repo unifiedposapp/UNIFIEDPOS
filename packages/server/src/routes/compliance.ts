@@ -74,7 +74,13 @@ router.get('/checklist', authMiddleware, async (_req: AuthRequest, res: Response
 // GET /api/compliance/consent — latest stored consent for this organization.
 router.get('/consent', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const orgId = req.user!.organizationId!;
+    // SUPER_ADMIN tokens carry no organizationId (platform operators sit above
+    // tenants). Consent is a per-tenant GDPR artefact, so we return defaults
+    // instead of throwing on a null FK.
+    const orgId = req.user?.organizationId;
+    if (!orgId) {
+      return res.json({ success: true, data: { consent: DEFAULT_CONSENT, hasConsent: false, updatedAt: null } });
+    }
     const rec = await prisma.complianceRecord.findFirst({
       where: { organizationId: orgId, type: { in: ['CONSENT', 'COOKIE'] } },
       orderBy: { createdAt: 'desc' },
@@ -99,7 +105,14 @@ router.get('/consent', authMiddleware, async (req: AuthRequest, res: Response) =
 // POST /api/compliance/consent — record consent (banner or Compliance Center).
 router.post('/consent', authMiddleware, validateRequest(consentSchema), async (req: AuthRequest, res: Response) => {
   try {
-    const orgId = req.user!.organizationId!;
+    const orgId = req.user?.organizationId;
+    if (!orgId) {
+      // SUPER_ADMIN / any org-less caller: consent write requires an FK target.
+      return res.status(400).json({
+        success: false,
+        error: { code: 'ORG_REQUIRED', message: 'Consent records require an organization context.' },
+      });
+    }
     const { type = 'CONSENT', source, ...prefs } = req.body;
     const payload = {
       ...DEFAULT_CONSENT,
