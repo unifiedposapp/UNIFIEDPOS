@@ -4,7 +4,7 @@
 << /Type /Catalog /Pages 2 0 R >>
 endobj
 2 0 obj
-<< /Type /Pages /Count 49 /Kids [7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R 23 0 R 25 0 R 27 0 R 29 0 R 31 0 R 33 0 R 35 0 R 37 0 R 39 0 R 41 0 R 43 0 R 45 0 R 47 0 R 49 0 R 51 0 R 53 0 R 55 0 R 57 0 R 59 0 R 61 0 R 63 0 R 65 0 R 67 0 R 69 0 R 71 0 R 73 0 R 75 0 R 77 0 R 79 0 R 81 0 R 83 0 R 85 0 R 87 0 R 89 0 R 91 0 R 93 0 R 95 0 R 97 0 R 99 0 R 101 0 R 103 0 R] >>
+<< /Type /Pages /Count 53 /Kids [7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R 23 0 R 25 0 R 27 0 R 29 0 R 31 0 R 33 0 R 35 0 R 37 0 R 39 0 R 41 0 R 43 0 R 45 0 R 47 0 R 49 0 R 51 0 R 53 0 R 55 0 R 57 0 R 59 0 R 61 0 R 63 0 R 65 0 R 67 0 R 69 0 R 71 0 R 73 0 R 75 0 R 77 0 R 79 0 R 81 0 R 83 0 R 85 0 R 87 0 R 89 0 R 91 0 R 93 0 R 95 0 R 97 0 R 99 0 R 101 0 R 103 0 R 105 0 R 107 0 R 109 0 R 111 0 R] >>
 endobj
 3 0 obj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
@@ -16,13 +16,13 @@ endobj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>
 endobj
 6 0 obj
-<< /Title (Unified POS - Manual of Use) /Author (Unified POS, a division of Glorified Technology Solution) /Subject (Edition 1.0 - A Division of Glorified Technology Solution \(GTS\)) /Creator (Unified POS) /ModDate (D:20260922000000Z) >>
+<< /Title (Unified POS - Manual of Use) /Author (Unified POS, a division of Glorified Technology Solution) /Subject (Edition 1.1 - A Division of Glorified Technology Solution \(GTS\)) /Creator (Unified POS) /ModDate (D:20260926000000Z) >>
 endobj
 7 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 8 0 R >>
 endobj
 8 0 obj
-<< /Length 1426 >>
+<< /Length 1451 >>
 stream
 0.70 0.53 0.14 RG 2.5 w 64 620 m 548 620 l S
 0.09 0.15 0.35 rg
@@ -30,7 +30,7 @@ BT /F2 30 Tf 1 0 0 1 64.00 560.00 Tm (Unified POS - Comprehensive) Tj ET
 0.09 0.15 0.35 rg
 BT /F2 30 Tf 1 0 0 1 64.00 522.00 Tm (Manual of Use) Tj ET
 0.35 0.38 0.43 rg
-BT /F3 13 Tf 1 0 0 1 64.00 480.00 Tm (Edition 1.0 - A Division of Glorified Technology Solution \(GTS\)) Tj ET
+BT /F3 13 Tf 1 0 0 1 64.00 480.00 Tm (Edition 1.1 - A Division of Glorified Technology Solution \(GTS\)) Tj ET
 0.70 0.53 0.14 rg
 BT /F2 14 Tf 1 0 0 1 64.00 456.00 Tm (Manual of Use) Tj ET
 0.20 0.27 0.42 rg
@@ -40,9 +40,9 @@ BT /F3 10.5 Tf 1 0 0 1 64.00 401.00 Tm (and stock, serving customers, running ma
 0.20 0.27 0.42 rg
 BT /F3 10.5 Tf 1 0 0 1 64.00 386.00 Tm (staffing, hardware, offline sync, reporting, artificial intelligence, compliance, multi-region enterprise, the) Tj ET
 0.20 0.27 0.42 rg
-BT /F3 10.5 Tf 1 0 0 1 64.00 371.00 Tm (developer platform, system health, and settings. Read the section that matches the task in front of you,) Tj ET
+BT /F3 10.5 Tf 1 0 0 1 64.00 371.00 Tm (developer platform, system health, settings, and platform administration. Read the section that matches) Tj ET
 0.20 0.27 0.42 rg
-BT /F3 10.5 Tf 1 0 0 1 64.00 356.00 Tm (or work top to bottom for full onboarding.) Tj ET
+BT /F3 10.5 Tf 1 0 0 1 64.00 356.00 Tm (the task in front of you, or work top to bottom for full onboarding.) Tj ET
 0.35 0.38 0.43 rg
 BT /F1 9.5 Tf 1 0 0 1 64.00 120.00 Tm (Copyright by Unified POS. All Rights Reserved.) Tj ET
 0.35 0.38 0.43 rg
@@ -216,7 +216,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 12 0 R >>
 endobj
 12 0 obj
-<< /Length 1380 >>
+<< /Length 1615 >>
 stream
 0.08 0.08 0.09 rg
 BT /F1 11.5 Tf 1 0 0 1 68.00 652.00 Tm (30. Roles at a Glance) Tj ET
@@ -231,18 +231,23 @@ BT /F2 11.5 Tf 1 0 0 1 535.21 633.00 Tm (40) Tj ET
 0.08 0.08 0.09 rg
 BT /F1 11.5 Tf 1 0 0 1 68.00 614.00 Tm (32. Global Expansion Modules) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 11.5 Tf 1 0 0 1 535.21 614.00 Tm (41) Tj ET
+BT /F2 11.5 Tf 1 0 0 1 535.21 614.00 Tm (42) Tj ET
 0.80 0.82 0.86 RG 0.4 w 68.00 609.00 m 548.00 609.00 l S
 0.08 0.08 0.09 rg
 BT /F1 11.5 Tf 1 0 0 1 68.00 595.00 Tm (33. Storefront, Delivery, Labels and Trading Insights) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 11.5 Tf 1 0 0 1 535.21 595.00 Tm (47) Tj ET
+BT /F2 11.5 Tf 1 0 0 1 535.21 595.00 Tm (48) Tj ET
 0.80 0.82 0.86 RG 0.4 w 68.00 590.00 m 548.00 590.00 l S
 0.08 0.08 0.09 rg
-BT /F1 11.5 Tf 1 0 0 1 68.00 576.00 Tm (34. Getting Help) Tj ET
+BT /F1 11.5 Tf 1 0 0 1 68.00 576.00 Tm (34. Platform Administration \(Super Admin\)) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 11.5 Tf 1 0 0 1 535.21 576.00 Tm (49) Tj ET
+BT /F2 11.5 Tf 1 0 0 1 535.21 576.00 Tm (50) Tj ET
 0.80 0.82 0.86 RG 0.4 w 68.00 571.00 m 548.00 571.00 l S
+0.08 0.08 0.09 rg
+BT /F1 11.5 Tf 1 0 0 1 68.00 557.00 Tm (35. Getting Help) Tj ET
+0.11 0.19 0.44 rg
+BT /F2 11.5 Tf 1 0 0 1 535.21 557.00 Tm (53) Tj ET
+0.80 0.82 0.86 RG 0.4 w 68.00 552.00 m 548.00 552.00 l S
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
 BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
@@ -346,7 +351,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 16 0 R >>
 endobj
 16 0 obj
-<< /Length 5238 >>
+<< /Length 5310 >>
 stream
 0.11 0.19 0.44 rg
 0.11 0.19 0.44 rg
@@ -427,21 +432,18 @@ BT /F2 11 Tf 1 0 0 1 66.00 215.00 Tm (5.) Tj ET
 BT /F1 11 Tf 1 0 0 1 90.00 215.00 Tm (If you forget your password, choose Forgot Password. A secure reset link is emailed to you.) Tj ET
 0.08 0.08 0.09 rg
 BT /F1 11 Tf 1 0 0 1 90.00 200.00 Tm (Open the link, set a new password, and you will be returned to Sign In.) Tj ET
-0.20 0.27 0.42 rg
-BT /F3 10.5 Tf 1 0 0 1 84.00 183.00 Tm (Security: For your protection the password reset link is only ever sent by email. It is never) Tj ET
-0.20 0.27 0.42 rg
-BT /F3 10.5 Tf 1 0 0 1 84.00 169.00 Tm (displayed on screen in a production deployment.) Tj ET
-0.70 0.53 0.14 RG 0 w 70.00 186.00 m 70.00 186.00 l S
-0.70 0.53 0.14 RG 2 w 70 167.00 m 70 183.00 l S
-0.80 0.82 0.86 RG 0.8 w
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 143.00 Tm (Understanding the layout) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 125.00 Tm (•) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 177.00 Tm (Try before you buy) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 125.00 Tm (Left navigation sidebar: all modules, grouped by area, with your profile and sign-out at the) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 159.00 Tm (Unified POS is a subscription service. The Pricing page in the footer lists every plan \(Starter,) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 110.00 Tm (bottom and the legal and manual links in the footer.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 144.00 Tm (Growth, Scale, Enterprise\) with its monthly price, trial length and included features, and every plan) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 129.00 Tm (starts with a free trial - no card is required to open a store. When the trial ends, your tenant moves) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 114.00 Tm (to a short grace window before it is suspended; a single recorded payment restores it and extends) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 99.00 Tm (the paid-through date. Section 34 describes how the platform team manages that lifecycle on your) Tj ET
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
 BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
@@ -455,50 +457,67 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 18 0 R >>
 endobj
 18 0 obj
-<< /Length 2948 >>
+<< /Length 3842 >>
 stream
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 692.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 692.00 Tm (Top bar: search, notifications bell with an unread badge, language selector, and quick actions.) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 675.00 Tm (•) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 675.00 Tm (Main area: the selected module.) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 658.00 Tm (•) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 658.00 Tm (Footer: Privacy, Terms, Cookies, Accessibility, Refunds and the one-click User Manual) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 643.00 Tm (download.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 692.00 Tm (behalf.) Tj ET
+0.20 0.27 0.42 rg
+BT /F3 10.5 Tf 1 0 0 1 84.00 672.00 Tm (Security: For your protection the password reset link is only ever sent by email. It is never) Tj ET
+0.20 0.27 0.42 rg
+BT /F3 10.5 Tf 1 0 0 1 84.00 658.00 Tm (displayed on screen in a production deployment.) Tj ET
+0.70 0.53 0.14 RG 0 w 70.00 675.00 m 70.00 675.00 l S
+0.70 0.53 0.14 RG 2 w 70 656.00 m 70 672.00 l S
+0.80 0.82 0.86 RG 0.8 w
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 620.00 Tm (Choosing your language and region) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 632.00 Tm (Understanding the layout) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 614.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 602.00 Tm (Use the language selector in the top bar to switch the interface language. Seventeen languages) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 614.00 Tm (Left navigation sidebar: all modules, grouped by area, with your profile and sign-out at the) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 587.00 Tm (ship today, each fully translated across the whole interface \(not just the sidebar\): English, Spanish,) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 599.00 Tm (bottom and the legal and manual links in the footer.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 582.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 572.00 Tm (French, German, Portuguese, Arabic, Simplified Chinese, Hindi, Turkish, Japanese, Korean,) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 582.00 Tm (Top bar: search, notifications bell with an unread badge, language selector, and quick actions.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 565.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 557.00 Tm (Vietnamese, Indonesian, Thai, Swahili, Hebrew and Persian. Arabic, Hebrew and Persian flip the) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 565.00 Tm (Main area: the selected module.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 548.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 542.00 Tm (entire shell to right-to-left reading - sidebar, tables, forms and navigation all mirror automatically -) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 548.00 Tm (Footer: Privacy, Terms, Cookies, Accessibility, Refunds and the one-click User Manual) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 527.00 Tm (and dates and numbers are formatted for each language's own conventions. A) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 512.00 Tm (continuous-integration check enforces that no language silently drops back to English, so every) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 497.00 Tm (locale stays complete. Set your business country, address, tax rate and currency in Settings.) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 482.00 Tm (Unified POS supports businesses in every nation and every ISO 4217 currency.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 533.00 Tm (download.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 456.00 Tm (The demo environment) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 510.00 Tm (Choosing your language and region) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 438.00 Tm (A fresh installation seeds a demo business with sample products, an owner, a manager and a) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 492.00 Tm (Use the language selector in the top bar to switch the interface language. Seventeen languages) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 423.00 Tm (cashier so you can explore safely. Replace or remove demo data before going live, and change the) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 477.00 Tm (ship today, each fully translated across the whole interface \(not just the sidebar\): English, Spanish,) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 408.00 Tm (seeded passwords immediately.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 462.00 Tm (French, German, Portuguese, Arabic, Simplified Chinese, Hindi, Turkish, Japanese, Korean,) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 447.00 Tm (Vietnamese, Indonesian, Thai, Swahili, Hebrew and Persian. Arabic, Hebrew and Persian flip the) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 432.00 Tm (entire shell to right-to-left reading - sidebar, tables, forms and navigation all mirror automatically -) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 417.00 Tm (and dates and numbers are formatted for each language's own conventions. A) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 402.00 Tm (continuous-integration check enforces that no language silently drops back to English, so every) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 387.00 Tm (locale stays complete. Set your business country, address, tax rate and currency in Settings.) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 372.00 Tm (Unified POS supports businesses in every nation and every ISO 4217 currency.) Tj ET
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 346.00 Tm (The demo environment) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 328.00 Tm (A fresh installation seeds a demo business with sample products, an owner, a manager and a) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 313.00 Tm (cashier so you can explore safely. Replace or remove demo data before going live, and change the) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 298.00 Tm (seeded passwords immediately.) Tj ET
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
 BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
@@ -5431,7 +5450,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 84 0 R >>
 endobj
 84 0 obj
-<< /Length 1645 >>
+<< /Length 2265 >>
 stream
 0.11 0.19 0.44 rg
 0.11 0.19 0.44 rg
@@ -5453,12 +5472,22 @@ BT /F1 11 Tf 1 0 0 1 84.00 628.00 Tm (Manager: day-to-day operations, purchasing
 BT /F1 11 Tf 1 0 0 1 68.00 611.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
 BT /F1 11 Tf 1 0 0 1 84.00 611.00 Tm (Cashier: register operations, order taking and basic customer lookup.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 594.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 594.00 Tm (Super Admin \(platform only\): the Unified POS operator's account. Sees every tenant across the) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 579.00 Tm (platform, assigns plans, records payments, and drives the account lifecycle from the Admin) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 564.00 Tm (Portal described in section 34. Store staff never hold this role, and it can never be granted from) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 549.00 Tm (inside a tenant.) Tj ET
 0.20 0.27 0.42 rg
-BT /F3 10.5 Tf 1 0 0 1 84.00 594.00 Tm (Access is fully configurable. Your organization can tailor each role's permissions per module and) Tj ET
+BT /F3 10.5 Tf 1 0 0 1 84.00 532.00 Tm (Access is fully configurable. Your organization can tailor each role's permissions per module and) Tj ET
 0.20 0.27 0.42 rg
-BT /F3 10.5 Tf 1 0 0 1 84.00 580.00 Tm (action.) Tj ET
-0.70 0.53 0.14 RG 0 w 70.00 597.00 m 70.00 597.00 l S
-0.70 0.53 0.14 RG 2 w 70 578.00 m 70 594.00 l S
+BT /F3 10.5 Tf 1 0 0 1 84.00 518.00 Tm (action.) Tj ET
+0.70 0.53 0.14 RG 0 w 70.00 535.00 m 70.00 535.00 l S
+0.70 0.53 0.14 RG 2 w 70 516.00 m 70 532.00 l S
 0.80 0.82 0.86 RG 0.8 w
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
@@ -5473,7 +5502,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 86 0 R >>
 endobj
 86 0 obj
-<< /Length 6500 >>
+<< /Length 6710 >>
 stream
 0.11 0.19 0.44 rg
 0.11 0.19 0.44 rg
@@ -5597,6 +5626,10 @@ BT /F1 11 Tf 1 0 0 1 68.00 134.00 Tm (•) Tj ET
 BT /F1 11 Tf 1 0 0 1 84.00 134.00 Tm (Just-in-time provisioning: a staff account created inside your organization the moment the) Tj ET
 0.08 0.08 0.09 rg
 BT /F1 11 Tf 1 0 0 1 84.00 119.00 Tm (identity provider vouches for them at first login.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 102.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 102.00 Tm (Tenant: a single business \(Organization\) signed up on the Unified POS platform.) Tj ET
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
 BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
@@ -5610,6 +5643,49 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 88 0 R >>
 endobj
 88 0 obj
+<< /Length 1838 >>
+stream
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 692.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 692.00 Tm (Platform Plan: the SaaS tier a tenant buys from Unified POS \(Starter, Growth, Scale,) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 677.00 Tm (Enterprise\). Kept separate from SubscriptionPlan, which is how a merchant bills its own) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 662.00 Tm (customers.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 645.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 645.00 Tm (Paid-through date: the day a tenant's current PlatformPayment coverage runs out) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 630.00 Tm (\(currentPeriodEnd\).) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 613.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 613.00 Tm (Grace window: the short period \(default 7 days\) after the paid-through date before the) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 598.00 Tm (scheduler auto-suspends a tenant, so a slow bank transfer does not close a shop.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 581.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 581.00 Tm (Archive vs. Purge: archiving is a recoverable soft-delete a Super Admin can reinstate; purging) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 566.00 Tm (is a permanent, cascade-deleting hard removal guarded by a typed confirmation of the exact) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 551.00 Tm (tenant name.) Tj ET
+0.35 0.38 0.43 rg
+0.35 0.38 0.43 rg
+BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
+0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
+0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
+0.35 0.38 0.43 rg
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 41) Tj ET
+endstream
+endobj
+89 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 90 0 R >>
+endobj
+90 0 obj
 << /Length 5253 >>
 stream
 0.11 0.19 0.44 rg
@@ -5702,13 +5778,13 @@ BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
 0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
 0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
 0.35 0.38 0.43 rg
-BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 41) Tj ET
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 42) Tj ET
 endstream
 endobj
-89 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 90 0 R >>
+91 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 92 0 R >>
 endobj
-90 0 obj
+92 0 obj
 << /Length 5382 >>
 stream
 0.11 0.19 0.44 rg
@@ -5803,13 +5879,13 @@ BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
 0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
 0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
 0.35 0.38 0.43 rg
-BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 42) Tj ET
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 43) Tj ET
 endstream
 endobj
-91 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 92 0 R >>
+93 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 94 0 R >>
 endobj
-92 0 obj
+94 0 obj
 << /Length 5566 >>
 stream
 0.08 0.08 0.09 rg
@@ -5910,13 +5986,13 @@ BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
 0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
 0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
 0.35 0.38 0.43 rg
-BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 43) Tj ET
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 44) Tj ET
 endstream
 endobj
-93 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 94 0 R >>
+95 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 96 0 R >>
 endobj
-94 0 obj
+96 0 obj
 << /Length 5629 >>
 stream
 0.11 0.19 0.44 rg
@@ -6017,13 +6093,13 @@ BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
 0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
 0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
 0.35 0.38 0.43 rg
-BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 44) Tj ET
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 45) Tj ET
 endstream
 endobj
-95 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 96 0 R >>
+97 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 98 0 R >>
 endobj
-96 0 obj
+98 0 obj
 << /Length 6058 >>
 stream
 0.11 0.19 0.44 rg
@@ -6122,13 +6198,13 @@ BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
 0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
 0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
 0.35 0.38 0.43 rg
-BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 45) Tj ET
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 46) Tj ET
 endstream
 endobj
-97 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 98 0 R >>
+99 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 100 0 R >>
 endobj
-98 0 obj
+100 0 obj
 << /Length 4817 >>
 stream
 0.08 0.08 0.09 rg
@@ -6205,13 +6281,13 @@ BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
 0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
 0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
 0.35 0.38 0.43 rg
-BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 46) Tj ET
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 47) Tj ET
 endstream
 endobj
-99 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 100 0 R >>
+101 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 102 0 R >>
 endobj
-100 0 obj
+102 0 obj
 << /Length 5871 >>
 stream
 0.11 0.19 0.44 rg
@@ -6314,13 +6390,13 @@ BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
 0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
 0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
 0.35 0.38 0.43 rg
-BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 47) Tj ET
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 48) Tj ET
 endstream
 endobj
-101 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 102 0 R >>
+103 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 104 0 R >>
 endobj
-102 0 obj
+104 0 obj
 << /Length 4364 >>
 stream
 0.11 0.19 0.44 rg
@@ -6395,18 +6471,307 @@ BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
 0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
 0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
 0.35 0.38 0.43 rg
-BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 48) Tj ET
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 49) Tj ET
 endstream
 endobj
-103 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 104 0 R >>
+105 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 106 0 R >>
 endobj
-104 0 obj
+106 0 obj
+<< /Length 5879 >>
+stream
+0.11 0.19 0.44 rg
+0.11 0.19 0.44 rg
+BT /F2 18 Tf 1 0 0 1 64.00 692.00 Tm (34. Platform Administration \(Super Admin\)) Tj ET
+0.70 0.53 0.14 RG 1.4 w 64.00 684.00 m 548.00 684.00 l S
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 662.00 Tm (Everything in the previous thirty-three sections is what a merchant sees inside their own store. This) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 647.00 Tm (section is what the Unified POS platform team sees across every store - the SaaS-operator surface) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 632.00 Tm (that runs the service itself. It lives at /admin \(Admin Portal in the sidebar\), is visible only to a) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 617.00 Tm (SUPER_ADMIN account, and every action it takes is written to the tenant's audit log.) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 597.00 Tm (Where a merchant's Owner administers their business, a Super Admin administers the platform.) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 582.00 Tm (The two planes never meet: no tenant-side role can reach /admin, and a Super Admin never needs) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 567.00 Tm (to sign in as a merchant to help one.) Tj ET
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 541.00 Tm (The console at a glance) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 523.00 Tm (The header shows six live counters sourced from the platform overview endpoint:) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 503.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 503.00 Tm (Tenants - every Organization on the platform.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 486.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 486.00 Tm (Active - tenants currently covered by a paid period.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 469.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 469.00 Tm (Trialing - tenants in their free trial window.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 452.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 452.00 Tm (Suspended - tenants past the grace window, whether by operator action or by the scheduler.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 435.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 435.00 Tm (MRR - the sum of each active tenant's plan normalised to a monthly figure \(yearly tiers divide) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 420.00 Tm (by twelve\).) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 403.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 403.00 Tm (Lifetime revenue - the total across every PlatformPayment recorded on the platform.) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 386.00 Tm (Below the counters, five tabs organise the console: Accounts, Users, Billing, Revenue and History.) Tj ET
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 360.00 Tm (Accounts) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 342.00 Tm (The Accounts tab lists every tenant with its owner, current platform plan, user count and) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 327.00 Tm (paid-through date, and a colour-coded status badge \(Active, Trialing, Past due, Suspended,) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 312.00 Tm (Cancelled, Archived\). Actions available per row:) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 292.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 292.00 Tm (Assign plan - pick a Platform Plan from the dropdown. Choose Start trial on the row to open the) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 277.00 Tm (plan's configured trial window instead of an immediate charge.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 260.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 260.00 Tm (Suspend - the tenant's staff cannot sign in; the database, orders and history remain fully intact.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 243.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 243.00 Tm (Restore - lift a suspension without changing the paid-through date.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 226.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 226.00 Tm (Cancel - end billing but keep the data. Use this when a customer asks to close the account) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 211.00 Tm (without deleting it.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 194.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 194.00 Tm (Record payment - a small form \(amount, months, method, optional reference\). Saving extends) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 179.00 Tm (the tenant's paid-through date from whichever is later - today or the existing coverage - and) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 164.00 Tm (automatically flips a Suspended or Cancelled tenant back to Active. Each payment appears on) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 149.00 Tm (the Billing tab and increments MRR / lifetime revenue.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 132.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 132.00 Tm (Archive - recoverable soft-delete. Nothing is destroyed; only reinstated by an explicit Reinstate) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 117.00 Tm (action.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 100.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 100.00 Tm (Reinstate - recover an archived or cancelled tenant.) Tj ET
+0.35 0.38 0.43 rg
+0.35 0.38 0.43 rg
+BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
+0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
+0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
+0.35 0.38 0.43 rg
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 50) Tj ET
+endstream
+endobj
+107 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 108 0 R >>
+endobj
+108 0 obj
+<< /Length 5454 >>
+stream
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 692.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 692.00 Tm (Purge permanently - the irreversible action. Requires the operator to type the tenant's exact) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 677.00 Tm (name into the confirmation dialog. Cascade-deletes the tenant's users, employees, orders,) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 662.00 Tm (payments, subscriptions, audit log and everything else. A purge is logged to the server console) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 647.00 Tm (before the delete runs \(the audit row itself cascades with the tenant\), which is the only durable) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 632.00 Tm (record that the tenant ever existed. Use Archive unless a regulator or a court order requires) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 617.00 Tm (erasure.) Tj ET
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 594.00 Tm (Users) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 576.00 Tm (The Users tab is the cross-tenant people view - every account on the platform, which Organization) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 561.00 Tm (they belong to, and their role. Regular tenants see only their own staff on their own Employees) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 546.00 Tm (page; this is the operator's global roster.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 526.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 526.00 Tm (Add user - create a new account inside any existing Organization with a chosen tenant role) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 511.00 Tm (\(Owner, Admin, Manager or Cashier\). Super Admin is deliberately not on the list; the) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 496.00 Tm (platform-admin credential is bootstrapped once via ensurePlatformAdmin\(\) on server start and) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 481.00 Tm (cannot be granted from the console. Every created user is written to the target tenant's audit) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 466.00 Tm (log with the operator's email as the actor.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 449.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 449.00 Tm (Deactivate / Reactivate - toggle a user's ability to sign in. Deactivating is not destructive;) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 434.00 Tm (historic sales and refunds still attribute to them.) Tj ET
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 411.00 Tm (Billing) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 393.00 Tm (Two cards on one page:) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 373.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 373.00 Tm (Platform plans - the four default tiers \(Starter, Growth, Scale, Enterprise\) are seeded) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 358.00 Tm (automatically on first boot. Add new tiers, edit prices, switch a tier to yearly, set trial days, and) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 343.00 Tm (mark a tier inactive so it stops appearing on the Pricing page without breaking any tenant) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 328.00 Tm (currently subscribed to it.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 311.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 311.00 Tm (Payments ledger - every PlatformPayment across the platform, newest first, linked back to the) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 296.00 Tm (tenant that made it. This is the raw record feeding MRR and lifetime revenue.) Tj ET
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 273.00 Tm (Revenue) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 255.00 Tm (A twelve-month bar chart drawn with plain CSS - no chart library, no external dependency. Each) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 240.00 Tm (column is one calendar month and its height is proportional to the highest month in the range. The) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 225.00 Tm (lifetime total is shown alongside. Use this to sanity-check whether the trial-to-paid conversion is) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 210.00 Tm (landing where you expect.) Tj ET
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 184.00 Tm (History) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 166.00 Tm (The History tab is the cross-tenant lifecycle feed. Every account-affecting action - suspend, restore,) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 151.00 Tm (cancel, archive, reinstate, purge, payment recorded, plan assigned, user created, user deactivated) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 136.00 Tm (or reactivated - is an entry with the operator's email, the before-and-after payload, and a link back) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 121.00 Tm (to the tenant. Filters to only the lifecycle action types so merchant-side events \(product edits,) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 106.00 Tm (refunds\) do not drown it out.) Tj ET
+0.35 0.38 0.43 rg
+0.35 0.38 0.43 rg
+BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
+0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
+0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
+0.35 0.38 0.43 rg
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 51) Tj ET
+endstream
+endobj
+109 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 110 0 R >>
+endobj
+110 0 obj
+<< /Length 4234 >>
+stream
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 686.00 Tm (Automatic enforcement) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 668.00 Tm (Beyond the manual controls, the scheduler runs a platform.suspend-overdue job every six hours) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 653.00 Tm (\(with an initial run on start-up\). Any tenant past its paid-through date plus a seven-day grace) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 638.00 Tm (window is auto-suspended and its staff signed out at the next request. The scheduler only ever) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 623.00 Tm (writes status; it never deletes anything, so no automation can produce an irreversible outcome.) Tj ET
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 597.00 Tm (Security model) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 579.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 579.00 Tm (Every route under /api/platform/* is wrapped in requireSuperAdmin middleware. An) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 564.00 Tm (unauthenticated call returns 401; any authenticated non-SUPER_ADMIN call \(including Owner) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 549.00 Tm (of the biggest tenant\) returns 403. Regular tenant admins never see the platform plane, and) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 534.00 Tm (the browser route at /admin redirects them out.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 517.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 517.00 Tm (The console is scoped: platform Super Admin sees across tenants; every tenant role sees only) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 502.00 Tm (inside its own Organization. A related fix ensures the tenant-level GET /api/auth/users endpoint) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 487.00 Tm (now filters by the caller's organization, so a store's Manager cannot enumerate users in) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 472.00 Tm (another store.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 455.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 455.00 Tm (Destructive actions are guarded twice: Suspend is reversible by Restore; Archive is reversible) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 440.00 Tm (by Reinstate; only Purge is permanent and it requires the exact tenant name typed as) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 425.00 Tm (confirmation, so an accidental click cannot destroy a customer's data.) Tj ET
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 402.00 Tm (Getting a Super Admin account) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 384.00 Tm (The account is bootstrapped automatically at every server start \(ensurePlatformAdmin\(\)\), which) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 369.00 Tm (upserts one by email so it is safe to repeat:) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 349.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 349.00 Tm (In development, the fallback is platform@unifiedpos.com with the password printed once to the) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 334.00 Tm (server log.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 317.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 317.00 Tm (In production, the operator must set both PLATFORM_ADMIN_EMAIL and) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 302.00 Tm (PLATFORM_ADMIN_PASSWORD in the environment; without them the account is not created) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 287.00 Tm (and the platform plane is unreachable.) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 270.00 Tm (The seed script creates the same account plus the four default Platform Plans in a fresh database,) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 255.00 Tm (so a first-time install and a live upgrade end up in the same place.) Tj ET
+0.35 0.38 0.43 rg
+0.35 0.38 0.43 rg
+BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
+0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
+0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
+0.35 0.38 0.43 rg
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 52) Tj ET
+endstream
+endobj
+111 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 112 0 R >>
+endobj
+112 0 obj
 << /Length 1412 >>
 stream
 0.11 0.19 0.44 rg
 0.11 0.19 0.44 rg
-BT /F2 18 Tf 1 0 0 1 64.00 692.00 Tm (34. Getting Help) Tj ET
+BT /F2 18 Tf 1 0 0 1 64.00 692.00 Tm (35. Getting Help) Tj ET
 0.70 0.53 0.14 RG 1.4 w 64.00 684.00 m 548.00 684.00 l S
 0.70 0.53 0.14 rg
 BT /F1 11 Tf 1 0 0 1 68.00 662.00 Tm (•) Tj ET
@@ -6433,118 +6798,126 @@ BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
 0.80 0.82 0.86 RG 0.6 w 64.00 738.00 m 548.00 738.00 l S
 0.80 0.82 0.86 RG 0.6 w 64.00 64.00 m 548.00 64.00 l S
 0.35 0.38 0.43 rg
-BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 49) Tj ET
+BT /F1 9 Tf 1 0 0 1 289.24 52.00 Tm (Page 53) Tj ET
 endstream
 endobj
 xref
-0 105
+0 113
 0000000000 65535 f
 0000000015 00000 n
 0000000064 00000 n
-0000000459 00000 n
-0000000556 00000 n
-0000000658 00000 n
-0000000763 00000 n
-0000001017 00000 n
-0000001163 00000 n
-0000002641 00000 n
-0000002788 00000 n
-0000009527 00000 n
-0000009675 00000 n
-0000011108 00000 n
-0000011256 00000 n
-0000015571 00000 n
-0000015719 00000 n
-0000021010 00000 n
-0000021158 00000 n
-0000024159 00000 n
-0000024307 00000 n
-0000032420 00000 n
-0000032568 00000 n
-0000046067 00000 n
-0000046215 00000 n
-0000051611 00000 n
-0000051759 00000 n
-0000055316 00000 n
-0000055464 00000 n
-0000063806 00000 n
-0000063954 00000 n
-0000074172 00000 n
-0000074320 00000 n
-0000075116 00000 n
-0000075264 00000 n
-0000084128 00000 n
-0000084276 00000 n
-0000085073 00000 n
-0000085221 00000 n
-0000092973 00000 n
-0000093121 00000 n
-0000100834 00000 n
-0000100982 00000 n
-0000109109 00000 n
-0000109257 00000 n
-0000118273 00000 n
-0000118421 00000 n
-0000127038 00000 n
-0000127186 00000 n
-0000128780 00000 n
-0000128928 00000 n
-0000137117 00000 n
-0000137265 00000 n
-0000144742 00000 n
-0000144890 00000 n
-0000153444 00000 n
-0000153592 00000 n
-0000163553 00000 n
-0000163701 00000 n
-0000167183 00000 n
-0000167331 00000 n
-0000174960 00000 n
-0000175108 00000 n
-0000183518 00000 n
-0000183666 00000 n
-0000191626 00000 n
-0000191774 00000 n
-0000193071 00000 n
-0000193219 00000 n
-0000200572 00000 n
-0000200720 00000 n
-0000209221 00000 n
-0000209369 00000 n
-0000217007 00000 n
-0000217155 00000 n
-0000225219 00000 n
-0000225367 00000 n
-0000234303 00000 n
-0000234451 00000 n
-0000236438 00000 n
-0000236586 00000 n
-0000240061 00000 n
-0000240209 00000 n
-0000241581 00000 n
-0000241729 00000 n
-0000243427 00000 n
-0000243575 00000 n
-0000250128 00000 n
-0000250276 00000 n
-0000255582 00000 n
-0000255730 00000 n
-0000261165 00000 n
-0000261313 00000 n
-0000266932 00000 n
-0000267080 00000 n
-0000272762 00000 n
-0000272910 00000 n
-0000279021 00000 n
-0000279169 00000 n
-0000284039 00000 n
-0000284188 00000 n
-0000290113 00000 n
-0000290263 00000 n
-0000294681 00000 n
-0000294831 00000 n
+0000000491 00000 n
+0000000588 00000 n
+0000000690 00000 n
+0000000795 00000 n
+0000001049 00000 n
+0000001195 00000 n
+0000002698 00000 n
+0000002845 00000 n
+0000009584 00000 n
+0000009732 00000 n
+0000011400 00000 n
+0000011548 00000 n
+0000015863 00000 n
+0000016011 00000 n
+0000021374 00000 n
+0000021522 00000 n
+0000025417 00000 n
+0000025565 00000 n
+0000033678 00000 n
+0000033826 00000 n
+0000047325 00000 n
+0000047473 00000 n
+0000052869 00000 n
+0000053017 00000 n
+0000056574 00000 n
+0000056722 00000 n
+0000065064 00000 n
+0000065212 00000 n
+0000075430 00000 n
+0000075578 00000 n
+0000076374 00000 n
+0000076522 00000 n
+0000085386 00000 n
+0000085534 00000 n
+0000086331 00000 n
+0000086479 00000 n
+0000094231 00000 n
+0000094379 00000 n
+0000102092 00000 n
+0000102240 00000 n
+0000110367 00000 n
+0000110515 00000 n
+0000119531 00000 n
+0000119679 00000 n
+0000128296 00000 n
+0000128444 00000 n
+0000130038 00000 n
+0000130186 00000 n
+0000138375 00000 n
+0000138523 00000 n
+0000146000 00000 n
+0000146148 00000 n
+0000154702 00000 n
+0000154850 00000 n
+0000164811 00000 n
+0000164959 00000 n
+0000168441 00000 n
+0000168589 00000 n
+0000176218 00000 n
+0000176366 00000 n
+0000184776 00000 n
+0000184924 00000 n
+0000192884 00000 n
+0000193032 00000 n
+0000194329 00000 n
+0000194477 00000 n
+0000201830 00000 n
+0000201978 00000 n
+0000210479 00000 n
+0000210627 00000 n
+0000218265 00000 n
+0000218413 00000 n
+0000226477 00000 n
+0000226625 00000 n
+0000235561 00000 n
+0000235709 00000 n
+0000237696 00000 n
+0000237844 00000 n
+0000241319 00000 n
+0000241467 00000 n
+0000242839 00000 n
+0000242987 00000 n
+0000245305 00000 n
+0000245453 00000 n
+0000252216 00000 n
+0000252364 00000 n
+0000254255 00000 n
+0000254403 00000 n
+0000259709 00000 n
+0000259857 00000 n
+0000265292 00000 n
+0000265440 00000 n
+0000271059 00000 n
+0000271207 00000 n
+0000276889 00000 n
+0000277037 00000 n
+0000283148 00000 n
+0000283297 00000 n
+0000288168 00000 n
+0000288318 00000 n
+0000294243 00000 n
+0000294393 00000 n
+0000298811 00000 n
+0000298961 00000 n
+0000304894 00000 n
+0000305044 00000 n
+0000310552 00000 n
+0000310702 00000 n
+0000314990 00000 n
+0000315140 00000 n
 trailer
-<< /Size 105 /Root 1 0 R /Info 6 0 R >>
+<< /Size 113 /Root 1 0 R /Info 6 0 R >>
 startxref
-296297
+316606
 %%EOF

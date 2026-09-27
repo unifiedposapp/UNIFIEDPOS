@@ -1,8 +1,8 @@
 # Unified POS - Comprehensive Manual of Use
 
-Edition 1.0 - A Division of Glorified Technology Solution (GTS)
+Edition 1.1 - A Division of Glorified Technology Solution (GTS)
 
-> This manual explains every part of Unified POS: signing in, selling at the register, managing products and stock, serving customers, running marketing and commerce, handling money and accounting, staffing, hardware, offline sync, reporting, artificial intelligence, compliance, multi-region enterprise, the developer platform, system health, and settings. Read the section that matches the task in front of you, or work top to bottom for full onboarding.
+> This manual explains every part of Unified POS: signing in, selling at the register, managing products and stock, serving customers, running marketing and commerce, handling money and accounting, staffing, hardware, offline sync, reporting, artificial intelligence, compliance, multi-region enterprise, the developer platform, system health, settings, and platform administration. Read the section that matches the task in front of you, or work top to bottom for full onboarding.
 
 ## 1. Welcome to Unified POS
 
@@ -37,6 +37,10 @@ Unified POS is a complete Business Operating System for retail, restaurant and o
 3. If you do not yet have an account, choose Create Account to register a new business. You will provide a business name, industry, currency, your name, email and a password. The first account becomes the Owner.
 4. If your company uses single sign-on (Okta, Microsoft Entra ID, Google Workspace and any other OIDC or SAML provider), Unified POS recognises your email domain on the Sign In page and routes you to your own identity provider. Your company password never passes through us, and your account is created automatically on first login inside your organization.
 5. If you forget your password, choose Forgot Password. A secure reset link is emailed to you. Open the link, set a new password, and you will be returned to Sign In.
+
+### Try before you buy
+
+Unified POS is a subscription service. The **Pricing** page in the footer lists every plan (Starter, Growth, Scale, Enterprise) with its monthly price, trial length and included features, and every plan starts with a free trial - no card is required to open a store. When the trial ends, your tenant moves to a short grace window before it is suspended; a single recorded payment restores it and extends the paid-through date. Section 34 describes how the platform team manages that lifecycle on your behalf.
 
 > Security: For your protection the password reset link is only ever sent by email. It is never displayed on screen in a production deployment.
 
@@ -521,6 +525,7 @@ Settings configure how the system looks and behaves for your business.
 - Admin: broad operational access across modules, staff and settings.
 - Manager: day-to-day operations, purchasing, inventory, reporting and staff scheduling.
 - Cashier: register operations, order taking and basic customer lookup.
+- Super Admin (platform only): the Unified POS operator's account. Sees every tenant across the platform, assigns plans, records payments, and drives the account lifecycle from the Admin Portal described in section 34. Store staff never hold this role, and it can never be granted from inside a tenant.
 
 > Access is fully configurable. Your organization can tailor each role's permissions per module and action.
 
@@ -551,6 +556,11 @@ Settings configure how the system looks and behaves for your business.
 - OIDC / SAML: the two federation protocols an enterprise identity provider speaks; Unified POS supports both.
 - SCIM: the protocol a directory uses to create, update and deactivate user accounts automatically.
 - Just-in-time provisioning: a staff account created inside your organization the moment the identity provider vouches for them at first login.
+- Tenant: a single business (Organization) signed up on the Unified POS platform.
+- Platform Plan: the SaaS tier a tenant buys from Unified POS (Starter, Growth, Scale, Enterprise). Kept separate from SubscriptionPlan, which is how a merchant bills its own customers.
+- Paid-through date: the day a tenant's current PlatformPayment coverage runs out (currentPeriodEnd).
+- Grace window: the short period (default 7 days) after the paid-through date before the scheduler auto-suspends a tenant, so a slow bank transfer does not close a shop.
+- Archive vs. Purge: archiving is a recoverable soft-delete a Super Admin can reinstate; purging is a permanent, cascade-deleting hard removal guarded by a typed confirmation of the exact tenant name.
 
 ## 32. Global Expansion Modules
 
@@ -747,7 +757,80 @@ Two reports that turn raw history into decisions.
 - **Reports > Trading patterns** renders a Monday-first day-by-hour heatmap computed in each store's own time zone, with the busiest and quietest slots, revenue per slot and a trade-concentration figure — the evidence for rota and stock decisions.
 - **Reports > Dead stock** flags lines that have not sold, grades them SLOW / DEAD / FROZEN, estimates months of cover, ranks them by the cash actually tied up, and suggests an action (promote, discount, transfer or write off).
 
-## 34. Getting Help
+## 34. Platform Administration (Super Admin)
+
+Everything in the previous thirty-three sections is what a merchant sees inside their own store. This section is what the **Unified POS platform team** sees across every store - the SaaS-operator surface that runs the service itself. It lives at **/admin** (Admin Portal in the sidebar), is visible only to a **SUPER_ADMIN** account, and every action it takes is written to the tenant's audit log.
+
+Where a merchant's Owner administers their business, a Super Admin administers the platform. The two planes never meet: no tenant-side role can reach /admin, and a Super Admin never needs to sign in as a merchant to help one.
+
+### The console at a glance
+
+The header shows six live counters sourced from the platform overview endpoint:
+
+- **Tenants** - every Organization on the platform.
+- **Active** - tenants currently covered by a paid period.
+- **Trialing** - tenants in their free trial window.
+- **Suspended** - tenants past the grace window, whether by operator action or by the scheduler.
+- **MRR** - the sum of each active tenant's plan normalised to a monthly figure (yearly tiers divide by twelve).
+- **Lifetime revenue** - the total across every PlatformPayment recorded on the platform.
+
+Below the counters, five tabs organise the console: Accounts, Users, Billing, Revenue and History.
+
+### Accounts
+
+The Accounts tab lists every tenant with its owner, current platform plan, user count and paid-through date, and a colour-coded status badge (Active, Trialing, Past due, Suspended, Cancelled, Archived). Actions available per row:
+
+- **Assign plan** - pick a Platform Plan from the dropdown. Choose Start trial on the row to open the plan's configured trial window instead of an immediate charge.
+- **Suspend** - the tenant's staff cannot sign in; the database, orders and history remain fully intact.
+- **Restore** - lift a suspension without changing the paid-through date.
+- **Cancel** - end billing but keep the data. Use this when a customer asks to close the account without deleting it.
+- **Record payment** - a small form (amount, months, method, optional reference). Saving extends the tenant's paid-through date from whichever is later - today or the existing coverage - and automatically flips a Suspended or Cancelled tenant back to Active. Each payment appears on the Billing tab and increments MRR / lifetime revenue.
+- **Archive** - recoverable soft-delete. Nothing is destroyed; only reinstated by an explicit Reinstate action.
+- **Reinstate** - recover an archived or cancelled tenant.
+- **Purge permanently** - the irreversible action. Requires the operator to type the tenant's exact name into the confirmation dialog. Cascade-deletes the tenant's users, employees, orders, payments, subscriptions, audit log and everything else. A purge is logged to the server console before the delete runs (the audit row itself cascades with the tenant), which is the only durable record that the tenant ever existed. Use Archive unless a regulator or a court order requires erasure.
+
+### Users
+
+The Users tab is the cross-tenant people view - every account on the platform, which Organization they belong to, and their role. Regular tenants see only their own staff on their own Employees page; this is the operator's global roster.
+
+- **Add user** - create a new account inside any existing Organization with a chosen tenant role (Owner, Admin, Manager or Cashier). Super Admin is deliberately **not** on the list; the platform-admin credential is bootstrapped once via `ensurePlatformAdmin()` on server start and cannot be granted from the console. Every created user is written to the target tenant's audit log with the operator's email as the actor.
+- **Deactivate / Reactivate** - toggle a user's ability to sign in. Deactivating is not destructive; historic sales and refunds still attribute to them.
+
+### Billing
+
+Two cards on one page:
+
+- **Platform plans** - the four default tiers (Starter, Growth, Scale, Enterprise) are seeded automatically on first boot. Add new tiers, edit prices, switch a tier to yearly, set trial days, and mark a tier inactive so it stops appearing on the Pricing page without breaking any tenant currently subscribed to it.
+- **Payments ledger** - every PlatformPayment across the platform, newest first, linked back to the tenant that made it. This is the raw record feeding MRR and lifetime revenue.
+
+### Revenue
+
+A twelve-month bar chart drawn with plain CSS - no chart library, no external dependency. Each column is one calendar month and its height is proportional to the highest month in the range. The lifetime total is shown alongside. Use this to sanity-check whether the trial-to-paid conversion is landing where you expect.
+
+### History
+
+The History tab is the cross-tenant lifecycle feed. Every account-affecting action - suspend, restore, cancel, archive, reinstate, purge, payment recorded, plan assigned, user created, user deactivated or reactivated - is an entry with the operator's email, the before-and-after payload, and a link back to the tenant. Filters to only the lifecycle action types so merchant-side events (product edits, refunds) do not drown it out.
+
+### Automatic enforcement
+
+Beyond the manual controls, the scheduler runs a **platform.suspend-overdue** job every six hours (with an initial run on start-up). Any tenant past its paid-through date plus a seven-day grace window is auto-suspended and its staff signed out at the next request. The scheduler only ever writes status; it never deletes anything, so no automation can produce an irreversible outcome.
+
+### Security model
+
+- Every route under `/api/platform/*` is wrapped in `requireSuperAdmin` middleware. An unauthenticated call returns **401**; any authenticated non-SUPER_ADMIN call (including Owner of the biggest tenant) returns **403**. Regular tenant admins never see the platform plane, and the browser route at `/admin` redirects them out.
+- The console is scoped: platform Super Admin sees across tenants; every tenant role sees only inside its own Organization. A related fix ensures the tenant-level `GET /api/auth/users` endpoint now filters by the caller's organization, so a store's Manager cannot enumerate users in another store.
+- Destructive actions are guarded twice: Suspend is reversible by Restore; Archive is reversible by Reinstate; only Purge is permanent and it requires the exact tenant name typed as confirmation, so an accidental click cannot destroy a customer's data.
+
+### Getting a Super Admin account
+
+The account is bootstrapped automatically at every server start (`ensurePlatformAdmin()`), which upserts one by email so it is safe to repeat:
+
+- In **development**, the fallback is `platform@unifiedpos.com` with the password printed once to the server log.
+- In **production**, the operator must set both `PLATFORM_ADMIN_EMAIL` and `PLATFORM_ADMIN_PASSWORD` in the environment; without them the account is not created and the platform plane is unreachable.
+
+The seed script creates the same account plus the four default Platform Plans in a fresh database, so a first-time install and a live upgrade end up in the same place.
+
+## 35. Getting Help
 
 - Use this manual at any time from the footer link: User Manual (PDF).
 - Review the legal and policy documents from the footer and the Compliance Center.
