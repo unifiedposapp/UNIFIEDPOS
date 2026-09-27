@@ -761,6 +761,8 @@ Two reports that turn raw history into decisions.
 
 Everything in the previous thirty-three sections is what a merchant sees inside their own store. This section is what the **Unified POS platform team** sees across every store - the SaaS-operator surface that runs the service itself. It lives at **/admin** (Admin Portal in the sidebar), is visible only to a **SUPER_ADMIN** account, and every action it takes is written to the tenant's audit log.
 
+The entrance is a dedicated sign-in page at **/platform/login**, reachable from a small **Platform Console** link in the legal footer of every screen. It uses the same credential check as the regular Sign In but refuses any account that is not SUPER_ADMIN, so a tenant employee who wanders into the wrong door is bounced with a clear message rather than being signed in under a session they cannot use. Once an operator is through, the browser is redirected to **/admin**.
+
 Where a merchant's Owner administers their business, a Super Admin administers the platform. The two planes never meet: no tenant-side role can reach /admin, and a Super Admin never needs to sign in as a merchant to help one.
 
 ### The console at a glance

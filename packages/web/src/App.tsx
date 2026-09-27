@@ -11,6 +11,7 @@ import Layout from './components/Layout';
 //
 // Auth (unauthenticated shell)
 const LoginPage = lazy(() => import('./pages/LoginPage'));
+const PlatformLoginPage = lazy(() => import('./pages/PlatformLoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
 const LegalPage = lazy(() => import('./pages/LegalPage'));
@@ -137,8 +138,10 @@ function App() {
   // Public guest surfaces (§9 payment-link checkout, §17 scan-to-order, online
   // storefront shop) render regardless of auth state and never mount the
   // authenticated shell — a customer scanning a QR code or browsing the web shop
-  // has no account in this system.
-  if (/^\/(pay|order|shop)\//.test(location.pathname)) {
+  // has no account in this system. /platform/* is the operator entrance: it also
+  // renders without the tenant Layout, and its own component decides whether to
+  // sign out a stale tenant session or bounce a genuine Super Admin forward.
+  if (/^\/(pay|order|shop|platform)\//.test(location.pathname)) {
     return (
       <Suspense fallback={<RouteFallback />}>
         <Routes>
@@ -146,6 +149,7 @@ function App() {
           <Route path="/order/:token" element={<GuestOrderPage />} />
           <Route path="/shop/:slug" element={<ShopPage />} />
           <Route path="/shop/:slug/status/:token" element={<ShopPage />} />
+          <Route path="/platform/login" element={<PlatformLoginPage />} />
         </Routes>
       </Suspense>
     );

@@ -19,6 +19,10 @@ export default function LegalFooter({ tone = 'light', className = '' }: Props) {
     tone === 'dark'
       ? 'text-amber-300 hover:text-amber-200'
       : 'text-amber-700 hover:text-amber-900';
+  const platformCls =
+    tone === 'dark'
+      ? 'text-indigo-300 hover:text-indigo-200'
+      : 'text-indigo-700 hover:text-indigo-900';
 
   return (
     <footer className={`text-center space-y-1 ${className}`}>
@@ -56,6 +60,27 @@ export default function LegalFooter({ tone = 'light', className = '' }: Props) {
           </svg>
           User Manual (PDF)
         </a>
+        <span className={textCls}>&middot;</span>
+        <Link
+          to="/platform/login"
+          className={`inline-flex items-center gap-1 ${platformCls}`}
+          title="UnifiedPOS platform operator sign-in"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-3.5 w-3.5"
+            aria-hidden="true"
+          >
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+          Platform Console
+        </Link>
       </div>
       <p className={`text-[11px] leading-relaxed ${textCls}`}>{COPYRIGHT}</p>
     </footer>

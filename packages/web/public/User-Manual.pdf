@@ -6478,7 +6478,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 106 0 R >>
 endobj
 106 0 obj
-<< /Length 5879 >>
+<< /Length 5903 >>
 stream
 0.11 0.19 0.44 rg
 0.11 0.19 0.44 rg
@@ -6493,91 +6493,87 @@ BT /F1 11 Tf 1 0 0 1 64.00 632.00 Tm (that runs the service itself. It lives at 
 0.08 0.08 0.09 rg
 BT /F1 11 Tf 1 0 0 1 64.00 617.00 Tm (SUPER_ADMIN account, and every action it takes is written to the tenant's audit log.) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 597.00 Tm (Where a merchant's Owner administers their business, a Super Admin administers the platform.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 597.00 Tm (The entrance is a dedicated sign-in page at /platform/login, reachable from a small Platform) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 582.00 Tm (The two planes never meet: no tenant-side role can reach /admin, and a Super Admin never needs) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 582.00 Tm (Console link in the legal footer of every screen. It uses the same credential check as the regular) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 567.00 Tm (to sign in as a merchant to help one.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 567.00 Tm (Sign In but refuses any account that is not SUPER_ADMIN, so a tenant employee who wanders) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 552.00 Tm (into the wrong door is bounced with a clear message rather than being signed in under a session) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 537.00 Tm (they cannot use. Once an operator is through, the browser is redirected to /admin.) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 517.00 Tm (Where a merchant's Owner administers their business, a Super Admin administers the platform.) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 502.00 Tm (The two planes never meet: no tenant-side role can reach /admin, and a Super Admin never needs) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 487.00 Tm (to sign in as a merchant to help one.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 541.00 Tm (The console at a glance) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 461.00 Tm (The console at a glance) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 523.00 Tm (The header shows six live counters sourced from the platform overview endpoint:) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 443.00 Tm (The header shows six live counters sourced from the platform overview endpoint:) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 503.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 423.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 503.00 Tm (Tenants - every Organization on the platform.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 423.00 Tm (Tenants - every Organization on the platform.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 486.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 406.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 486.00 Tm (Active - tenants currently covered by a paid period.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 406.00 Tm (Active - tenants currently covered by a paid period.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 469.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 389.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 469.00 Tm (Trialing - tenants in their free trial window.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 389.00 Tm (Trialing - tenants in their free trial window.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 452.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 372.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 452.00 Tm (Suspended - tenants past the grace window, whether by operator action or by the scheduler.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 372.00 Tm (Suspended - tenants past the grace window, whether by operator action or by the scheduler.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 435.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 355.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 435.00 Tm (MRR - the sum of each active tenant's plan normalised to a monthly figure \(yearly tiers divide) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 355.00 Tm (MRR - the sum of each active tenant's plan normalised to a monthly figure \(yearly tiers divide) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 420.00 Tm (by twelve\).) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 340.00 Tm (by twelve\).) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 403.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 323.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 403.00 Tm (Lifetime revenue - the total across every PlatformPayment recorded on the platform.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 323.00 Tm (Lifetime revenue - the total across every PlatformPayment recorded on the platform.) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 386.00 Tm (Below the counters, five tabs organise the console: Accounts, Users, Billing, Revenue and History.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 306.00 Tm (Below the counters, five tabs organise the console: Accounts, Users, Billing, Revenue and History.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 360.00 Tm (Accounts) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 280.00 Tm (Accounts) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 342.00 Tm (The Accounts tab lists every tenant with its owner, current platform plan, user count and) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 262.00 Tm (The Accounts tab lists every tenant with its owner, current platform plan, user count and) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 327.00 Tm (paid-through date, and a colour-coded status badge \(Active, Trialing, Past due, Suspended,) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 247.00 Tm (paid-through date, and a colour-coded status badge \(Active, Trialing, Past due, Suspended,) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 312.00 Tm (Cancelled, Archived\). Actions available per row:) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 232.00 Tm (Cancelled, Archived\). Actions available per row:) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 292.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 212.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 292.00 Tm (Assign plan - pick a Platform Plan from the dropdown. Choose Start trial on the row to open the) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 212.00 Tm (Assign plan - pick a Platform Plan from the dropdown. Choose Start trial on the row to open the) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 277.00 Tm (plan's configured trial window instead of an immediate charge.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 197.00 Tm (plan's configured trial window instead of an immediate charge.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 260.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 180.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 260.00 Tm (Suspend - the tenant's staff cannot sign in; the database, orders and history remain fully intact.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 180.00 Tm (Suspend - the tenant's staff cannot sign in; the database, orders and history remain fully intact.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 243.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 163.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 243.00 Tm (Restore - lift a suspension without changing the paid-through date.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 163.00 Tm (Restore - lift a suspension without changing the paid-through date.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 226.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 146.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 226.00 Tm (Cancel - end billing but keep the data. Use this when a customer asks to close the account) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 146.00 Tm (Cancel - end billing but keep the data. Use this when a customer asks to close the account) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 211.00 Tm (without deleting it.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 131.00 Tm (without deleting it.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 194.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 114.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 194.00 Tm (Record payment - a small form \(amount, months, method, optional reference\). Saving extends) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 114.00 Tm (Record payment - a small form \(amount, months, method, optional reference\). Saving extends) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 179.00 Tm (the tenant's paid-through date from whichever is later - today or the existing coverage - and) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 164.00 Tm (automatically flips a Suspended or Cancelled tenant back to Active. Each payment appears on) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 149.00 Tm (the Billing tab and increments MRR / lifetime revenue.) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 132.00 Tm (•) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 132.00 Tm (Archive - recoverable soft-delete. Nothing is destroyed; only reinstated by an explicit Reinstate) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 117.00 Tm (action.) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 100.00 Tm (•) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 100.00 Tm (Reinstate - recover an archived or cancelled tenant.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 99.00 Tm (the tenant's paid-through date from whichever is later - today or the existing coverage - and) Tj ET
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
 BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
@@ -6591,90 +6587,92 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 108 0 R >>
 endobj
 108 0 obj
-<< /Length 5454 >>
+<< /Length 5385 >>
 stream
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 692.00 Tm (automatically flips a Suspended or Cancelled tenant back to Active. Each payment appears on) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 677.00 Tm (the Billing tab and increments MRR / lifetime revenue.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 692.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 660.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 692.00 Tm (Purge permanently - the irreversible action. Requires the operator to type the tenant's exact) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 660.00 Tm (Archive - recoverable soft-delete. Nothing is destroyed; only reinstated by an explicit Reinstate) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 677.00 Tm (name into the confirmation dialog. Cascade-deletes the tenant's users, employees, orders,) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 645.00 Tm (action.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 628.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 662.00 Tm (payments, subscriptions, audit log and everything else. A purge is logged to the server console) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 628.00 Tm (Reinstate - recover an archived or cancelled tenant.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 611.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 647.00 Tm (before the delete runs \(the audit row itself cascades with the tenant\), which is the only durable) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 611.00 Tm (Purge permanently - the irreversible action. Requires the operator to type the tenant's exact) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 632.00 Tm (record that the tenant ever existed. Use Archive unless a regulator or a court order requires) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 596.00 Tm (name into the confirmation dialog. Cascade-deletes the tenant's users, employees, orders,) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 617.00 Tm (erasure.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 581.00 Tm (payments, subscriptions, audit log and everything else. A purge is logged to the server console) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 566.00 Tm (before the delete runs \(the audit row itself cascades with the tenant\), which is the only durable) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 551.00 Tm (record that the tenant ever existed. Use Archive unless a regulator or a court order requires) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 536.00 Tm (erasure.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 594.00 Tm (Users) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 513.00 Tm (Users) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 576.00 Tm (The Users tab is the cross-tenant people view - every account on the platform, which Organization) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 495.00 Tm (The Users tab is the cross-tenant people view - every account on the platform, which Organization) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 561.00 Tm (they belong to, and their role. Regular tenants see only their own staff on their own Employees) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 480.00 Tm (they belong to, and their role. Regular tenants see only their own staff on their own Employees) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 546.00 Tm (page; this is the operator's global roster.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 465.00 Tm (page; this is the operator's global roster.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 526.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 445.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 526.00 Tm (Add user - create a new account inside any existing Organization with a chosen tenant role) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 445.00 Tm (Add user - create a new account inside any existing Organization with a chosen tenant role) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 511.00 Tm (\(Owner, Admin, Manager or Cashier\). Super Admin is deliberately not on the list; the) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 430.00 Tm (\(Owner, Admin, Manager or Cashier\). Super Admin is deliberately not on the list; the) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 496.00 Tm (platform-admin credential is bootstrapped once via ensurePlatformAdmin\(\) on server start and) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 415.00 Tm (platform-admin credential is bootstrapped once via ensurePlatformAdmin\(\) on server start and) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 481.00 Tm (cannot be granted from the console. Every created user is written to the target tenant's audit) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 400.00 Tm (cannot be granted from the console. Every created user is written to the target tenant's audit) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 466.00 Tm (log with the operator's email as the actor.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 385.00 Tm (log with the operator's email as the actor.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 449.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 368.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 449.00 Tm (Deactivate / Reactivate - toggle a user's ability to sign in. Deactivating is not destructive;) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 368.00 Tm (Deactivate / Reactivate - toggle a user's ability to sign in. Deactivating is not destructive;) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 434.00 Tm (historic sales and refunds still attribute to them.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 353.00 Tm (historic sales and refunds still attribute to them.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 411.00 Tm (Billing) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 330.00 Tm (Billing) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 393.00 Tm (Two cards on one page:) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 312.00 Tm (Two cards on one page:) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 373.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 292.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 373.00 Tm (Platform plans - the four default tiers \(Starter, Growth, Scale, Enterprise\) are seeded) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 292.00 Tm (Platform plans - the four default tiers \(Starter, Growth, Scale, Enterprise\) are seeded) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 358.00 Tm (automatically on first boot. Add new tiers, edit prices, switch a tier to yearly, set trial days, and) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 277.00 Tm (automatically on first boot. Add new tiers, edit prices, switch a tier to yearly, set trial days, and) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 343.00 Tm (mark a tier inactive so it stops appearing on the Pricing page without breaking any tenant) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 262.00 Tm (mark a tier inactive so it stops appearing on the Pricing page without breaking any tenant) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 328.00 Tm (currently subscribed to it.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 247.00 Tm (currently subscribed to it.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 311.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 230.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 311.00 Tm (Payments ledger - every PlatformPayment across the platform, newest first, linked back to the) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 230.00 Tm (Payments ledger - every PlatformPayment across the platform, newest first, linked back to the) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 296.00 Tm (tenant that made it. This is the raw record feeding MRR and lifetime revenue.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 215.00 Tm (tenant that made it. This is the raw record feeding MRR and lifetime revenue.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 273.00 Tm (Revenue) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 192.00 Tm (Revenue) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 255.00 Tm (A twelve-month bar chart drawn with plain CSS - no chart library, no external dependency. Each) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 174.00 Tm (A twelve-month bar chart drawn with plain CSS - no chart library, no external dependency. Each) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 240.00 Tm (column is one calendar month and its height is proportional to the highest month in the range. The) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 159.00 Tm (column is one calendar month and its height is proportional to the highest month in the range. The) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 225.00 Tm (lifetime total is shown alongside. Use this to sanity-check whether the trial-to-paid conversion is) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 144.00 Tm (lifetime total is shown alongside. Use this to sanity-check whether the trial-to-paid conversion is) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 210.00 Tm (landing where you expect.) Tj ET
-0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 184.00 Tm (History) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 166.00 Tm (The History tab is the cross-tenant lifecycle feed. Every account-affecting action - suspend, restore,) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 151.00 Tm (cancel, archive, reinstate, purge, payment recorded, plan assigned, user created, user deactivated) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 136.00 Tm (or reactivated - is an entry with the operator's email, the before-and-after payload, and a link back) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 121.00 Tm (to the tenant. Filters to only the lifecycle action types so merchant-side events \(product edits,) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 106.00 Tm (refunds\) do not drown it out.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 129.00 Tm (landing where you expect.) Tj ET
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
 BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
@@ -6688,72 +6686,84 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 110 0 R >>
 endobj
 110 0 obj
-<< /Length 4234 >>
+<< /Length 5054 >>
 stream
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 686.00 Tm (Automatic enforcement) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 686.00 Tm (History) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 668.00 Tm (Beyond the manual controls, the scheduler runs a platform.suspend-overdue job every six hours) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 668.00 Tm (The History tab is the cross-tenant lifecycle feed. Every account-affecting action - suspend, restore,) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 653.00 Tm (\(with an initial run on start-up\). Any tenant past its paid-through date plus a seven-day grace) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 653.00 Tm (cancel, archive, reinstate, purge, payment recorded, plan assigned, user created, user deactivated) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 638.00 Tm (window is auto-suspended and its staff signed out at the next request. The scheduler only ever) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 638.00 Tm (or reactivated - is an entry with the operator's email, the before-and-after payload, and a link back) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 623.00 Tm (writes status; it never deletes anything, so no automation can produce an irreversible outcome.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 623.00 Tm (to the tenant. Filters to only the lifecycle action types so merchant-side events \(product edits,) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 608.00 Tm (refunds\) do not drown it out.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 597.00 Tm (Security model) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 579.00 Tm (•) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 582.00 Tm (Automatic enforcement) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 579.00 Tm (Every route under /api/platform/* is wrapped in requireSuperAdmin middleware. An) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 564.00 Tm (Beyond the manual controls, the scheduler runs a platform.suspend-overdue job every six hours) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 564.00 Tm (unauthenticated call returns 401; any authenticated non-SUPER_ADMIN call \(including Owner) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 549.00 Tm (\(with an initial run on start-up\). Any tenant past its paid-through date plus a seven-day grace) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 549.00 Tm (of the biggest tenant\) returns 403. Regular tenant admins never see the platform plane, and) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 534.00 Tm (window is auto-suspended and its staff signed out at the next request. The scheduler only ever) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 534.00 Tm (the browser route at /admin redirects them out.) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 517.00 Tm (•) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 517.00 Tm (The console is scoped: platform Super Admin sees across tenants; every tenant role sees only) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 502.00 Tm (inside its own Organization. A related fix ensures the tenant-level GET /api/auth/users endpoint) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 487.00 Tm (now filters by the caller's organization, so a store's Manager cannot enumerate users in) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 472.00 Tm (another store.) Tj ET
-0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 455.00 Tm (•) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 455.00 Tm (Destructive actions are guarded twice: Suspend is reversible by Restore; Archive is reversible) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 440.00 Tm (by Reinstate; only Purge is permanent and it requires the exact tenant name typed as) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 425.00 Tm (confirmation, so an accidental click cannot destroy a customer's data.) Tj ET
+BT /F1 11 Tf 1 0 0 1 64.00 519.00 Tm (writes status; it never deletes anything, so no automation can produce an irreversible outcome.) Tj ET
 0.11 0.19 0.44 rg
-BT /F2 13 Tf 1 0 0 1 64.00 402.00 Tm (Getting a Super Admin account) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 384.00 Tm (The account is bootstrapped automatically at every server start \(ensurePlatformAdmin\(\)\), which) Tj ET
-0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 369.00 Tm (upserts one by email so it is safe to repeat:) Tj ET
+BT /F2 13 Tf 1 0 0 1 64.00 493.00 Tm (Security model) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 349.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 475.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 349.00 Tm (In development, the fallback is platform@unifiedpos.com with the password printed once to the) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 475.00 Tm (Every route under /api/platform/* is wrapped in requireSuperAdmin middleware. An) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 334.00 Tm (server log.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 460.00 Tm (unauthenticated call returns 401; any authenticated non-SUPER_ADMIN call \(including Owner) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 445.00 Tm (of the biggest tenant\) returns 403. Regular tenant admins never see the platform plane, and) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 430.00 Tm (the browser route at /admin redirects them out.) Tj ET
 0.70 0.53 0.14 rg
-BT /F1 11 Tf 1 0 0 1 68.00 317.00 Tm (•) Tj ET
+BT /F1 11 Tf 1 0 0 1 68.00 413.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 317.00 Tm (In production, the operator must set both PLATFORM_ADMIN_EMAIL and) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 413.00 Tm (The console is scoped: platform Super Admin sees across tenants; every tenant role sees only) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 302.00 Tm (PLATFORM_ADMIN_PASSWORD in the environment; without them the account is not created) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 398.00 Tm (inside its own Organization. A related fix ensures the tenant-level GET /api/auth/users endpoint) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 84.00 287.00 Tm (and the platform plane is unreachable.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 383.00 Tm (now filters by the caller's organization, so a store's Manager cannot enumerate users in) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 270.00 Tm (The seed script creates the same account plus the four default Platform Plans in a fresh database,) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 368.00 Tm (another store.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 351.00 Tm (•) Tj ET
 0.08 0.08 0.09 rg
-BT /F1 11 Tf 1 0 0 1 64.00 255.00 Tm (so a first-time install and a live upgrade end up in the same place.) Tj ET
+BT /F1 11 Tf 1 0 0 1 84.00 351.00 Tm (Destructive actions are guarded twice: Suspend is reversible by Restore; Archive is reversible) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 336.00 Tm (by Reinstate; only Purge is permanent and it requires the exact tenant name typed as) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 321.00 Tm (confirmation, so an accidental click cannot destroy a customer's data.) Tj ET
+0.11 0.19 0.44 rg
+BT /F2 13 Tf 1 0 0 1 64.00 298.00 Tm (Getting a Super Admin account) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 280.00 Tm (The account is bootstrapped automatically at every server start \(ensurePlatformAdmin\(\)\), which) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 265.00 Tm (upserts one by email so it is safe to repeat:) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 245.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 245.00 Tm (In development, the fallback is platform@unifiedpos.com with the password printed once to the) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 230.00 Tm (server log.) Tj ET
+0.70 0.53 0.14 rg
+BT /F1 11 Tf 1 0 0 1 68.00 213.00 Tm (•) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 213.00 Tm (In production, the operator must set both PLATFORM_ADMIN_EMAIL and) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 198.00 Tm (PLATFORM_ADMIN_PASSWORD in the environment; without them the account is not created) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 84.00 183.00 Tm (and the platform plane is unreachable.) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 166.00 Tm (The seed script creates the same account plus the four default Platform Plans in a fresh database,) Tj ET
+0.08 0.08 0.09 rg
+BT /F1 11 Tf 1 0 0 1 64.00 151.00 Tm (so a first-time install and a live upgrade end up in the same place.) Tj ET
 0.35 0.38 0.43 rg
 0.35 0.38 0.43 rg
 BT /F1 8.5 Tf 1 0 0 1 64.00 744.00 Tm (Unified POS - Manual of Use) Tj ET
@@ -6910,14 +6920,14 @@ xref
 0000294393 00000 n
 0000298811 00000 n
 0000298961 00000 n
-0000304894 00000 n
-0000305044 00000 n
-0000310552 00000 n
-0000310702 00000 n
-0000314990 00000 n
-0000315140 00000 n
+0000304918 00000 n
+0000305068 00000 n
+0000310507 00000 n
+0000310657 00000 n
+0000315765 00000 n
+0000315915 00000 n
 trailer
 << /Size 113 /Root 1 0 R /Info 6 0 R >>
 startxref
-316606
+317381
 %%EOF
