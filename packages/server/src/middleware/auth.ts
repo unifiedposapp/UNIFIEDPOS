@@ -36,10 +36,39 @@ export function authMiddleware(req: AuthRequest, res: Response, next: NextFuncti
       employeeId?: string;
     };
     req.user = decoded;
+
+    // Cross-tenant guard for platform operators. Every tenant-data route in
+    // this API reads req.user.organizationId (a JWT claim that only exists when
+    // the caller has an Employee row). A SUPER_ADMIN authenticates WITHOUT one,
+    // because the operator sits above every tenant. Letting such a token reach a
+    // tenant handler makes Prisma throw a null-FK error and surface as a 500.
+    // Rather than guard the ~400 call sites individually, we enforce the rule at
+    // this single choke point: an organization-less operator may only touch the
+    // auth surface and the /platform console; anything else is a clean 403.
+    // Tenant users (who always carry an organizationId) are unaffected, so this
+    // never changes existing behaviour for them.
+    if (req.user.role === 'SUPER_ADMIN' && !req.user.organizationId && !isOrgLessAllowed(req)) {
+      res.status(403).json({
+        success: false,
+        code: 'ORG_CONTEXT_REQUIRED',
+        error: 'Platform operators have no organization context; only /auth and /platform APIs are available to this account.',
+      });
+      return;
+    }
+
     next();
   } catch {
     res.status(401).json({ success: false, error: 'Invalid or expired token' });
   }
+}
+
+// Path prefixes an organization-less SUPER_ADMIN is allowed to reach. Both the
+// raw (/api) and versioned (/api/v1) mounts are covered, for the exact segment,
+// a nested path, or a query string.
+const ORG_LESS_ALLOWED_PREFIXES = ['/api/auth', '/api/platform', '/api/v1/auth', '/api/v1/platform'];
+function isOrgLessAllowed(req: AuthRequest): boolean {
+  const url = req.originalUrl || req.url || '';
+  return ORG_LESS_ALLOWED_PREFIXES.some((p) => url === p || url.startsWith(`${p}/`) || url.startsWith(`${p}?`));
 }
 
 export function requireRole(...roles: string[]) {
