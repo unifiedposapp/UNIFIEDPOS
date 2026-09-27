@@ -68,9 +68,17 @@ export function statusTone(status: unknown): keyof typeof BADGE_TONES {
 }
 
 export function Badge({ children, tone }: { children: ReactNode; tone?: keyof typeof BADGE_TONES }) {
+  // Only auto-map a colour from the text when the caller passed a plain string
+  // or number badge (e.g. <Badge>ACTIVE</Badge>). When children is a React
+  // element (e.g. an icon + label) fall back to neutral, and honour any
+  // explicit `tone` prop. Rendering `{children}` instead of `String(children)`
+  // is what keeps the icon visible; the previous version stringified React
+  // elements to `[object Object]`.
+  const isPrimitive = typeof children === 'string' || typeof children === 'number';
+  const resolved: keyof typeof BADGE_TONES = tone ?? (isPrimitive ? statusTone(children) : 'neutral');
   return (
-    <span className={clsx('text-xs px-2 py-0.5 rounded font-medium whitespace-nowrap', BADGE_TONES[tone ?? statusTone(children)])}>
-      {String(children)}
+    <span className={clsx('text-xs px-2 py-0.5 rounded font-medium whitespace-nowrap', BADGE_TONES[resolved])}>
+      {children}
     </span>
   );
 }

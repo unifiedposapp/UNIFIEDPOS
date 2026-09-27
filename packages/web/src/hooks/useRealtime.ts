@@ -33,6 +33,12 @@ function openStream(token: string) {
     sharedSource.close();
     sharedSource = null;
   }
+  // The server scopes the stream to a single organizationId (see
+  // packages/server/src/routes/realtime.ts). A platform SUPER_ADMIN token has
+  // no organization, so opening the stream is guaranteed to return 401 and
+  // the browser logs a red "Failed to load resource" every page paint.
+  // Skip it cleanly instead of pretending the console is broken.
+  if (!readOrgIdFromJwt(token)) return;
   sharedToken = token;
   const url = `${API_BASE}/realtime/stream?token=${encodeURIComponent(token)}`;
   try {
@@ -85,6 +91,24 @@ function closeStream() {
     sharedSource = null;
   }
   sharedToken = null;
+}
+
+/**
+ * Decode just enough of the JWT to answer "does this session belong to an
+ * organization?" No signature verification here - that is the server's job on
+ * every request; we are only deciding whether to bother opening the stream at
+ * all. Returns null if the token isn't a well-formed JWT or the payload has
+ * no organizationId (platform accounts).
+ */
+function readOrgIdFromJwt(token: string): string | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+    return typeof payload?.organizationId === 'string' ? payload.organizationId : null;
+  } catch {
+    return null;
+  }
 }
 
 /**

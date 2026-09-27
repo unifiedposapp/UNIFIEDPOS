@@ -47,6 +47,12 @@ export default function PlatformLoginPage() {
         setError('This account is not a platform operator. Please use the standard Sign In instead.');
         return;
       }
+      // Wipe any stale tenant artefacts (employee, organization) from a prior
+      // merchant session before we persist the platform one, so the auth store
+      // hydrates cleanly with just { user, token } and a Super Admin never
+      // inherits an organizationId from a previous tenant login.
+      localStorage.removeItem('pos_employee');
+      localStorage.removeItem('pos_organization');
       login(data.user as never, data.token, data.employee as never);
       navigate('/admin', { replace: true });
     } catch (err) {

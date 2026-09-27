@@ -99,6 +99,15 @@ export default function AdminPortalPage() {
   const loadOverview = useCallback(async () => {
     setOverview(await call(() => api.getPlatformOverview(), setError));
   }, []);
+  // Plans are needed by two tabs: the Accounts row-level plan picker AND the
+  // Billing management card. Loading them alongside Overview on mount means
+  // the Accounts tab's dropdown is populated the first time you land on the
+  // page, not only after you switch to Billing once. Payments stay lazy on
+  // the Billing tab because they are the ledger, not a control input.
+  const loadPlans = useCallback(async () => {
+    const p = await call(() => api.getPlatformPlans(), setError);
+    if (p) setPlans(p as PlatformPlan[]);
+  }, []);
   const loadOrgs = useCallback(async () => {
     const params: Record<string, string> = {};
     if (statusFilter) params.status = statusFilter;
@@ -127,10 +136,13 @@ export default function AdminPortalPage() {
     if (rows) setHistory(rows as HistoryRow[]);
   }, []);
 
-  // Overview is always relevant; load once on mount (guarded).
+  // Overview + plans are always relevant; load once on mount (guarded).
   useEffect(() => {
-    if (isSuperAdmin) void loadOverview();
-  }, [isSuperAdmin, loadOverview]);
+    if (isSuperAdmin) {
+      void loadOverview();
+      void loadPlans();
+    }
+  }, [isSuperAdmin, loadOverview, loadPlans]);
 
   // (Re)load the active tab's collection whenever we switch to it.
   useEffect(() => {
