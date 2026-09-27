@@ -1279,4 +1279,34 @@ export const api = {
     request<any>(`/delivery/orders/${orderId}/dispatch`, { method: 'POST', body: JSON.stringify(data || {}) }),
   trackDelivery: (orderId: string) => request<any>(`/delivery/orders/${orderId}/track`, { method: 'POST' }),
   getDeliveryOverview: () => request<any>('/delivery/overview'),
+
+  // ── Platform admin console (SUPER_ADMIN only, cross-tenant) ──
+  getPlatformOverview: () => request<any>('/platform/overview'),
+  getPlatformOrganizations: (params?: Record<string, string>) => {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>(`/platform/organizations${query}`);
+  },
+  assignPlatformPlan: (orgId: string, data: { platformPlanId: string | null; startTrial?: boolean }) =>
+    request<any>(`/platform/organizations/${orgId}/plan`, { method: 'POST', body: JSON.stringify(data) }),
+  suspendOrganization: (id: string) => request<any>(`/platform/organizations/${id}/suspend`, { method: 'POST' }),
+  restoreOrganization: (id: string) => request<any>(`/platform/organizations/${id}/restore`, { method: 'POST' }),
+  cancelOrganization: (id: string) => request<any>(`/platform/organizations/${id}/cancel`, { method: 'POST' }),
+  archiveOrganization: (id: string) => request<any>(`/platform/organizations/${id}/archive`, { method: 'POST' }),
+  reinstateOrganization: (id: string) => request<any>(`/platform/organizations/${id}/reinstate`, { method: 'POST' }),
+  purgeOrganization: (id: string, confirm: string) =>
+    request<any>(`/platform/organizations/${id}/purge`, { method: 'POST', body: JSON.stringify({ confirm }) }),
+  recordPlatformPayment: (orgId: string, data: { amount: number; months?: number; method?: string; reference?: string; currency?: string }) =>
+    request<any>(`/platform/organizations/${orgId}/payments`, { method: 'POST', body: JSON.stringify(data) }),
+  getPlatformUsers: () => request<any>('/platform/users'),
+  createPlatformUser: (data: { name: string; email: string; password: string; role: string; organizationId: string }) =>
+    request<any>('/platform/users', { method: 'POST', body: JSON.stringify(data) }),
+  deactivatePlatformUser: (id: string) => request<any>(`/platform/users/${id}/deactivate`, { method: 'POST' }),
+  reactivatePlatformUser: (id: string) => request<any>(`/platform/users/${id}/reactivate`, { method: 'POST' }),
+  getPlatformPlans: () => request<any>('/platform/plans'),
+  createPlatformPlan: (data: any) => request<any>('/platform/plans', { method: 'POST', body: JSON.stringify(data) }),
+  updatePlatformPlan: (id: string, data: any) =>
+    request<any>(`/platform/plans/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  getPlatformPayments: () => request<any>('/platform/payments'),
+  getPlatformRevenue: (months = 12) => request<any>(`/platform/revenue?months=${months}`),
+  getPlatformHistory: (limit = 100) => request<any>(`/platform/history?limit=${limit}`),
 };

@@ -8,6 +8,8 @@
 
 import { prisma } from '../db/client.js';
 import { runSubscriptionCycle } from './subscriptionBilling.js';
+import { isOverdue } from './platformBilling.js';
+import { createAuditEvent } from '../utils/audit.js';
 import { registerJob, type JobResult } from './scheduler.js';
 import { emitEvent } from './eventBus.js';
 import { sendEmail, isEmailConfigured } from './email.js';
@@ -383,6 +385,37 @@ async function subscriptionCycleJob(): Promise<JobResult> {
   return { recordsProcessed: touched, ...r };
 }
 
+// Auto-suspend tenants whose platform coverage (paid-through or trial) lapsed
+// past the grace window. Status-only — it never deletes anything; a recorded
+// payment or a manual restore brings the tenant straight back.
+async function suspendOverdueAccountsJob(): Promise<JobResult> {
+  const now = new Date();
+  const candidates = await prisma.organization.findMany({
+    where: { status: { in: ['ACTIVE', 'TRIALING'] }, isActive: true },
+    select: { id: true, name: true, status: true, isActive: true, trialEnd: true, currentPeriodEnd: true },
+    take: 1000,
+  });
+  let suspended = 0;
+  for (const org of candidates) {
+    if (!isOverdue(org, now)) continue;
+    await prisma.organization.update({
+      where: { id: org.id },
+      data: { status: 'SUSPENDED', isActive: false, suspendedAt: now },
+    });
+    await createAuditEvent({
+      organizationId: org.id,
+      action: 'ACCOUNT_SUSPENDED',
+      resourceType: 'ORGANIZATION',
+      resourceId: org.id,
+      previousValue: { status: org.status, isActive: true },
+      newValue: { status: 'SUSPENDED', isActive: false },
+      metadata: { by: 'system:platform.suspend-overdue', reason: 'coverage lapsed' },
+    });
+    suspended += 1;
+  }
+  return { recordsProcessed: suspended, message: suspended ? `suspended ${suspended}` : undefined };
+}
+
 /** Register every scheduled job. Idempotent (registerJob replaces by name). */
 export function registerAllJobs(): void {
   registerJob({ name: 'webhooks.retry-failed', intervalMs: 30 * SEC, runOnStart: true, handler: retryFailedWebhooks });
@@ -395,6 +428,7 @@ export function registerAllJobs(): void {
   registerJob({ name: 'loyalty.expire-points', intervalMs: 6 * HOUR, handler: expireLoyaltyPoints });
   registerJob({ name: 'compliance.retention-purge', intervalMs: DAY, handler: retentionPurge });
   registerJob({ name: 'billing.subscription-cycle', intervalMs: 15 * MIN, runOnStart: true, handler: subscriptionCycleJob });
+  registerJob({ name: 'platform.suspend-overdue', intervalMs: 6 * HOUR, runOnStart: true, handler: suspendOverdueAccountsJob });
   // Global-expansion jobs (fiscal chain, sweeps, replenishment drafts, royalty
   // close, benchmark cells, mesh leases) live in their own registry module.
   registerGlobalJobs();

@@ -141,12 +141,21 @@ export function rateLimiter(
 // every request); per-instance limiting is the norm for a coarse abuse guard.
 // Health/readiness are exempt: orchestrator probes run every few seconds per
 // node and must never consume (or be denied by) the abuse budget.
+// Local development is exempt too: one browser hitting the dashboard fires a
+// burst (products, categories, settings, customers, held orders, register
+// session/pin/policy) plus realtime polling, all from a single ::1 IP. That
+// trips a 100/min fixed window and 429s the whole UI until the window resets —
+// the limiter is an internet-abuse guard, and there is no abuser on localhost.
+// The security-critical auth/login/payment limiters stay active in every env.
 // The ceiling is deployment-tunable via RATE_LIMIT_MAX_PER_MIN (e.g. load tests).
 export const apiRateLimiter = rateLimiter({
   name: 'api',
   maxRequests: Number(process.env.RATE_LIMIT_MAX_PER_MIN || 100),
   windowSeconds: 60,
-  skip: (req) => req.path === '/api/health' || req.path === '/api/ready',
+  skip: (req) =>
+    req.path === '/api/health' ||
+    req.path === '/api/ready' ||
+    process.env.NODE_ENV === 'development',
 });
 
 // Auth limiter: brute-force protection must be shared across instances → DB.

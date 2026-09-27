@@ -78,6 +78,8 @@ const AppsPage = lazy(() => import('./pages/AppsPage'));
 const BenchmarkPage = lazy(() => import('./pages/BenchmarkPage'));
 const FxPage = lazy(() => import('./pages/FxPage'));
 const SubscriptionsPage = lazy(() => import('./pages/SubscriptionsPage'));
+const PricingPage = lazy(() => import('./pages/PricingPage'));
+const AdminPortalPage = lazy(() => import('./pages/AdminPortalPage'));
 
 /** Centered spinner shown while a lazy route chunk is being fetched. */
 function RouteFallback() {
@@ -221,6 +223,8 @@ function App() {
           <Route path="/benchmark" element={<BenchmarkPage />} />
           <Route path="/fx" element={<FxPage />} />
           <Route path="/subscriptions" element={<SubscriptionsPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/admin" element={<AdminPortalPage />} />
           <Route path="/legal/:doc" element={<LegalPage />} />
           <Route path="*" element={<Navigate to="/pos" replace />} />
         </Routes>

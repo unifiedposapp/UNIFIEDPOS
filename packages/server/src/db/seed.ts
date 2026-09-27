@@ -926,11 +926,35 @@ async function main() {
   });
   console.log('Created 3 notifications');
 
+  // ── Platform (SaaS-operator) records ──────────────────────────
+  console.log('\nSeeding platform plans + SUPER_ADMIN...');
+  await prisma.platformPlan.createMany({
+    data: [
+      { name: 'Starter', code: 'starter', priceMonthly: 39, interval: 'MONTH', trialDays: 14, features: JSON.stringify(['1 location', 'Unlimited sales', 'Email support']) },
+      { name: 'Growth', code: 'growth', priceMonthly: 119, interval: 'MONTH', trialDays: 14, features: JSON.stringify(['3 locations', 'Inventory + purchasing', 'Loyalty & marketing', 'Priority support']) },
+      { name: 'Scale', code: 'scale', priceMonthly: 299, interval: 'MONTH', trialDays: 14, features: JSON.stringify(['Unlimited locations', 'Advanced analytics + AI', 'API & webhooks', 'Phone support']) },
+      { name: 'Enterprise', code: 'enterprise', priceMonthly: 499, interval: 'MONTH', trialDays: 30, features: JSON.stringify(['Everything in Scale', 'SSO / SCIM', 'Multi-region fiscalisation', 'Dedicated success manager']) },
+    ],
+  });
+  await prisma.user.upsert({
+    where: { email: 'platform@unifiedpos.com' },
+    update: { role: 'SUPER_ADMIN' },
+    create: {
+      email: 'platform@unifiedpos.com',
+      name: 'Platform Administrator',
+      password: await bcrypt.hash('Platform_2025', 10),
+      role: 'SUPER_ADMIN',
+      isActive: true,
+    },
+  });
+  console.log('Created 4 platform plans + SUPER_ADMIN (platform@unifiedpos.com / Platform_2025)');
+
   console.log('\nSeeding completed successfully!');
   console.log('\nLogin credentials:');
   console.log('  Admin (OWNER):  admin@pos.com / admin123');
   console.log('  Manager:        manager@pos.com / manager123');
   console.log('  Cashier:        cashier@pos.com / cashier123');
+  console.log('  SUPER_ADMIN:    platform@unifiedpos.com / Platform_2025');
 }
 
 main()

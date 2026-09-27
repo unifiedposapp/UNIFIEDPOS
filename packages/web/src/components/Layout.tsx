@@ -57,6 +57,7 @@ import {
   CandlestickChart,
   Tags,
   Navigation,
+  Sparkles,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
@@ -69,7 +70,7 @@ import { useRealtime, useRealtimeStatus } from '../hooks/useRealtime';
 
 // Navigation grouped into luxury "collections" so the deep feature set stays elegant.
 // Labels are i18n keys resolved at render via `t()` (see i18n/translations.ts).
-const navGroups: { labelKey: TranslationKey; items: { to: string; labelKey: TranslationKey; icon: any }[] }[] = [
+const navGroups: { labelKey: TranslationKey; items: { to: string; labelKey: TranslationKey; icon: any; roles?: string[] }[] }[] = [
   {
     labelKey: 'nav.group.sell',
     items: [
@@ -150,11 +151,13 @@ const navGroups: { labelKey: TranslationKey; items: { to: string; labelKey: Tran
       { to: '/benchmark', labelKey: 'nav.benchmark', icon: Scale },
       { to: '/fx', labelKey: 'nav.fx', icon: CandlestickChart },
       { to: '/subscriptions', labelKey: 'nav.subscriptions', icon: Repeat },
+      { to: '/pricing', labelKey: 'nav.pricing', icon: Sparkles },
     ],
   },
   {
     labelKey: 'nav.group.admin',
     items: [
+      { to: '/admin', labelKey: 'nav.adminPortal', icon: ShieldCheck, roles: ['SUPER_ADMIN'] },
       { to: '/notifications', labelKey: 'nav.notifications', icon: Bell },
       { to: '/audit', labelKey: 'nav.audit', icon: FileText },
       { to: '/fraud', labelKey: 'nav.fraud', icon: ShieldAlert },
@@ -242,12 +245,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
           {/* Nav */}
           <nav className="flex-1 overflow-y-auto py-3" aria-label={t('a11y.mainNav')}>
-            {navGroups.map((group) => (
+            {navGroups.map((group) => {
+              const items = group.items.filter((item) => !item.roles || (user?.role && item.roles.includes(user.role)));
+              if (items.length === 0) return null;
+              return (
               <div key={group.labelKey} className="mb-1">
                 <p className="px-6 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-luxe text-ink-400/50">
                   {t(group.labelKey)}
                 </p>
-                {group.items.map((item) => (
+                {items.map((item) => (
                   <NavLink
                     key={item.to}
                     to={item.to}
@@ -285,7 +291,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   </NavLink>
                 ))}
               </div>
-            ))}
+            );
+            })}
           </nav>
 
           {/* User */}

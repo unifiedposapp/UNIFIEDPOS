@@ -310,10 +310,14 @@ router.get('/me', authMiddleware, async (req: AuthRequest, res: Response) => {
   }
 });
 
-// GET /api/auth/users
-router.get('/users', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (_req: AuthRequest, res: Response) => {
+// GET /api/auth/users — this tenant's users only. Scoped through the Employee
+// join so a store admin can never enumerate accounts belonging to another
+// organization. Cross-tenant listing lives behind the SUPER_ADMIN console.
+router.get('/users', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
+    const organizationId = req.user!.organizationId;
     const users = await prisma.user.findMany({
+      where: { employee: { organizationId } },
       select: { id: true, email: true, name: true, role: true, isActive: true, createdAt: true },
       orderBy: { createdAt: 'desc' },
     });

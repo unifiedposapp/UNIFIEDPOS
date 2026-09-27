@@ -57,3 +57,23 @@ export function requireRole(...roles: string[]) {
     next();
   };
 }
+
+/**
+ * Gates the cross-tenant platform console. Unlike requireRole (which stays
+ * within a caller's own organization), SUPER_ADMIN is a platform-operator
+ * privilege that intentionally sees across every tenant, so it is a single
+ * dedicated role rather than one that any organization can grant itself. The
+ * role never comes from self-service register/create (both enum their roles to
+ * the four tenant values); it exists only on a seeded/bootstrapped account.
+ */
+export function requireSuperAdmin(req: AuthRequest, res: Response, next: NextFunction): void {
+  if (!req.user) {
+    res.status(401).json({ success: false, error: 'Authentication required' });
+    return;
+  }
+  if (req.user.role !== 'SUPER_ADMIN') {
+    res.status(403).json({ success: false, error: 'Platform administrator access required' });
+    return;
+  }
+  next();
+}

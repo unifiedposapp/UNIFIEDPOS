@@ -21,8 +21,24 @@ model Organization {
   country   String?  // full country name (e.g. "Nigeria")
   countryCode String? // ISO 3166-1 alpha-2 (e.g. "NG")
   isActive  Boolean  @default(true)
+  // ── Platform (SaaS-operator) lifecycle ─────────────────────────
+  // A tenant is itself an account that pays UnifiedPOS. `status` is the
+  // operator-controlled lifecycle state; `currentPeriodEnd` is the paid-through
+  // date and `trialEnd` the free-trial expiry. The billing job suspends tenants
+  // whose coverage lapses; recording a payment restores them. This is distinct
+  // from the per-tenant Subscription engine (a merchant billing ITS customers).
+  status          String   @default("ACTIVE") // ACTIVE, TRIALING, SUSPENDED, CANCELLED, ARCHIVED
+  platformPlanId  String?
+  trialEnd        DateTime?
+  currentPeriodEnd DateTime?
+  suspendedAt     DateTime?
+  canceledAt      DateTime?
+  archivedAt      DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  platformPlan    PlatformPlan?  @relation(fields: [platformPlanId], references: [id])
+  platformPayments PlatformPayment[]
 
   locations       Location[]
   regions         Region[]
@@ -82,6 +98,45 @@ model Organization {
   serialNumbers   SerialNumber[]
 
   @@map("organizations")
+}
+
+// ─── PLATFORM BILLING (what tenants pay UnifiedPOS) ───────────────
+// Global SaaS tiers, referenced by Organization.platformPlanId. Not to be
+// confused with the per-tenant SubscriptionPlan model (a merchant's own plans).
+model PlatformPlan {
+  id           String   @id @default(uuid())
+  name         String
+  code         String   @unique
+  priceMonthly Decimal  @db.Decimal(14, 2)
+  interval     String   @default("MONTH") // MONTH, YEAR
+  trialDays    Int      @default(0)
+  features     Json?
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  organizations Organization[]
+
+  @@map("platform_plans")
+}
+
+// Ledger of payments a tenant has made to the platform. Recording one extends
+// the tenant's paid-through date and is the source of platform revenue.
+model PlatformPayment {
+  id                 String   @id @default(uuid())
+  organizationId     String
+  amount             Decimal  @db.Decimal(14, 2)
+  currency           String   @default("USD")
+  method             String   @default("OTHER") // CARD, BANK_TRANSFER, CASH, PAYPAL, OTHER
+  reference          String?
+  periodCoveredUntil DateTime
+  recordedById       String?
+  createdAt          DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("platform_payments")
 }
 
 model Location {

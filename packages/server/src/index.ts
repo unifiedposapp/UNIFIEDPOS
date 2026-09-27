@@ -60,6 +60,7 @@ import appsRoutes from './routes/apps.js';
 import benchmarkRoutes from './routes/benchmark.js';
 import fxRoutes from './routes/fx.js';
 import subscriptionRoutes from './routes/subscriptions.js';
+import platformRoutes from './routes/platform.js';
 import ssoRoutes from './routes/sso.js';
 import wellKnownRoutes from './routes/wellKnown.js';
 import { requestLogger, errorLogger } from './middleware/logger.js';
@@ -75,6 +76,7 @@ import { initObservability, metricsMiddleware, renderMetrics, metricsAuthorized,
 import { reviewProductionConfig, formatConfigReview, strictProdConfig } from './services/productionConfig.js';
 import { startScheduler, stopScheduler } from './services/scheduler.js';
 import { registerAllJobs } from './services/scheduledJobs.js';
+import { ensurePlatformAdmin, ensureDefaultPlatformPlans } from './services/platformBootstrap.js';
 import { startPgListener, stopPgListener } from './services/realtime.js';
 import path from 'node:path';
 import fs from 'node:fs';
@@ -248,6 +250,7 @@ const routeTable: { path: string; stack: any[] }[] = [
   { path: '/benchmark', stack: [benchmarkRoutes] }, // Peer benchmarking (k-anonymous, noised)
   { path: '/fx', stack: [fxRoutes] }, // FX / exchange-rate layer (multi-currency consolidation)
   { path: '/subscriptions', stack: [subscriptionRoutes] }, // Recurring subscription billing engine
+  { path: '/platform', stack: [platformRoutes] }, // SaaS-operator admin console (SUPER_ADMIN only, cross-tenant)
   { path: '/sso', stack: [ssoRoutes] }, // Enterprise SSO (OIDC/SAML) + SCIM provisioning
 ];
 for (const r of routeTable) {
@@ -319,6 +322,10 @@ if (isMainProcess) {
     // retention purge, expiry + reconciliation) once HTTP is accepting traffic.
     registerAllJobs();
     startScheduler();
+    // Ensure the platform operator account + default SaaS tiers exist so the
+    // admin console is reachable without a destructive reseed (idempotent).
+    void ensureDefaultPlatformPlans().catch((e) => console.error('[platform] plan bootstrap failed:', e));
+    void ensurePlatformAdmin().catch((e) => console.error('[platform] admin bootstrap failed:', e));
     // Multi-replica SSE fan-out (no-op unless REALTIME_MODE=pg-notify).
     void startPgListener();
   });
