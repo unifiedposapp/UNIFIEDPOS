@@ -81,8 +81,14 @@ router.post('/', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), valid
 // PUT /api/products/:id
 router.put('/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), validateRequest(productSchema.partial()), async (req: AuthRequest, res: Response) => {
   try {
+    // Tenant-scoped lookup: a bare id must not reach another organization's product.
+    const owned = await prisma.product.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Product not found' });
     const product = await prisma.product.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: req.body,
       include: { category: true, variants: true, modifiers: true },
     });
@@ -95,8 +101,13 @@ router.put('/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), val
 // DELETE /api/products/:id
 router.delete('/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
+    const owned = await prisma.product.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Product not found' });
     await prisma.product.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: { isActive: false },
     });
     res.json({ success: true, message: 'Product deactivated' });
@@ -244,8 +255,10 @@ router.post('/categories', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGE
 // PUT /api/categories/:id
 router.put('/categories/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
+    const owned = await prisma.category.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! }, select: { id: true } });
+    if (!owned) return res.status(404).json({ success: false, message: 'Category not found' });
     const category = await prisma.category.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: req.body,
     });
     res.json({ success: true, data: category });
@@ -257,7 +270,9 @@ router.put('/categories/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MAN
 // DELETE /api/categories/:id
 router.delete('/categories/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.category.delete({ where: { id: String(req.params.id) } });
+    const owned = await prisma.category.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! }, select: { id: true } });
+    if (!owned) return res.status(404).json({ success: false, message: 'Category not found' });
+    await prisma.category.delete({ where: { id: owned.id } });
     res.json({ success: true, message: 'Category deleted' });
   } catch (error) {
     handleError(error, res);

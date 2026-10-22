@@ -168,20 +168,26 @@ const navGroups: { labelKey: TranslationKey; items: { to: string; labelKey: Tran
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const { user, logout } = useAuthStore();
+  const { user, organization, logout } = useAuthStore();
   const { t, localeTag } = useI18n();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  // A platform operator with no employee row has no tenant context: every
+  // merchant route would answer 403 ORG_CONTEXT_REQUIRED, so only the Platform
+  // Console is offered and nothing tenant-specific is polled.
+  const isOperatorWithoutOrg = user?.role === 'SUPER_ADMIN' && !organization;
+
   const refreshUnread = useCallback(async () => {
+    if (isOperatorWithoutOrg) return;
     try {
       const res = await api.getUnreadCount();
       setUnreadCount(res.data?.count || 0);
     } catch {
       /* ignore polling errors */
     }
-  }, []);
+  }, [isOperatorWithoutOrg]);
 
   // Real-time: refresh the badge the instant the server emits a business event
   // (order/payment/inventory/notification). SSE replaces the old 30s poll; a
@@ -190,10 +196,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const realtimeStatus = useRealtimeStatus();
 
   useEffect(() => {
+    if (isOperatorWithoutOrg) return;
     refreshUnread();
     const interval = setInterval(refreshUnread, 120000);
     return () => clearInterval(interval);
-  }, [refreshUnread]);
+  }, [refreshUnread, isOperatorWithoutOrg]);
 
   const handleLogout = () => {
     logout();
@@ -246,7 +253,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           {/* Nav */}
           <nav className="flex-1 overflow-y-auto py-3" aria-label={t('a11y.mainNav')}>
             {navGroups.map((group) => {
-              const items = group.items.filter((item) => !item.roles || (user?.role && item.roles.includes(user.role)));
+              const items = group.items.filter(
+                (item) =>
+                  (!item.roles || (user?.role && item.roles.includes(user.role))) &&
+                  (!isOperatorWithoutOrg || item.to === '/admin')
+              );
               if (items.length === 0) return null;
               return (
               <div key={group.labelKey} className="mb-1">
@@ -343,19 +354,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               {new Date().toLocaleDateString(localeTag, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </span>
             <LanguageSwitcher />
-            <button
-              onClick={() => navigate('/notifications')}
-              title={t('nav.notifications')}
-              aria-label={t('nav.notifications')}
-              className="relative rounded-lg p-2 text-ink-500 transition-colors hover:bg-gold-50 hover:text-gold-600"
-            >
-              <Bell size={20} />
-              {unreadCount > 0 && (
-                <span className="absolute -end-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
-                  {unreadCount > 99 ? '99+' : unreadCount}
-                </span>
-              )}
-            </button>
+            {!isOperatorWithoutOrg && (
+              <button
+                onClick={() => navigate('/notifications')}
+                title={t('nav.notifications')}
+                aria-label={t('nav.notifications')}
+                className="relative rounded-lg p-2 text-ink-500 transition-colors hover:bg-gold-50 hover:text-gold-600"
+              >
+                <Bell size={20} />
+                {unreadCount > 0 && (
+                  <span className="absolute -end-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </button>
+            )}
           </div>
         </header>
 

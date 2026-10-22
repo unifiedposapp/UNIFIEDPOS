@@ -192,6 +192,13 @@ router.post('/chargebacks', authMiddleware, validateRequest(chargebackSchema), a
   try {
     const orgId = req.user!.organizationId!;
     const { paymentId, amount, reason } = req.body;
+    // The referenced payment must belong to this tenant; otherwise a chargeback
+    // could be filed against another organisation's payment id.
+    const owned = await prisma.payment.findFirst({
+      where: { id: paymentId, order: { organizationId: orgId } },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Payment not found' });
     const chargeback = await prisma.chargeback.create({
       data: { organizationId: orgId, paymentId, amount, reason, status: 'OPEN' },
     });
@@ -231,6 +238,11 @@ router.post('/disputes', authMiddleware, validateRequest(chargebackSchema), asyn
   try {
     const orgId = req.user!.organizationId!;
     const { paymentId, amount, reason } = req.body;
+    const owned = await prisma.payment.findFirst({
+      where: { id: paymentId, order: { organizationId: orgId } },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Payment not found' });
     const dispute = await prisma.dispute.create({
       data: { organizationId: orgId, paymentId, amount, reason, status: 'OPEN' },
     });
@@ -271,6 +283,13 @@ router.post('/payouts', authMiddleware, validateRequest(payoutSchema), async (re
   try {
     const orgId = req.user!.organizationId!;
     const { amount, currency, paymentId, scheduledAt } = req.body;
+    if (paymentId) {
+      const owned = await prisma.payment.findFirst({
+        where: { id: paymentId, order: { organizationId: orgId } },
+        select: { id: true },
+      });
+      if (!owned) return res.status(404).json({ success: false, message: 'Payment not found' });
+    }
     const payout = await prisma.payout.create({
       data: {
         organizationId: orgId, amount, currency: normalizeCurrency(currency) || 'USD',
@@ -335,17 +354,20 @@ router.post('/process', authMiddleware, requireUnlockedRegister, validateRequest
     const method = normalizePaymentMethod(req.body.method) || String(req.body.method).toUpperCase();
     const orgId = req.user!.organizationId!;
 
-    // Idempotency check
+    // Idempotency check, scoped through the order so a key reused by another
+    // tenant can never return someone else's payment record.
     if (idempotencyKey) {
-      const existing = await prisma.payment.findUnique({ where: { idempotencyKey } });
+      const existing = await prisma.payment.findFirst({
+        where: { idempotencyKey, order: { organizationId: orgId } },
+      });
       if (existing) {
         return res.json({ success: true, data: existing, idempotent: true });
       }
     }
 
     // Validate order
-    const order = await prisma.order.findUnique({
-      where: { id: orderId },
+    const order = await prisma.order.findFirst({
+      where: { id: orderId, organizationId: orgId },
       include: { payments: true },
     });
 
@@ -476,7 +498,9 @@ router.post('/process', authMiddleware, requireUnlockedRegister, validateRequest
 router.post('/:id/void', authMiddleware, requireUnlockedRegister, async (req: AuthRequest, res: Response) => {
   try {
     const orgId = req.user!.organizationId!;
-    const payment = await prisma.payment.findUnique({ where: { id: String(req.params.id) } });
+    const payment = await prisma.payment.findFirst({
+      where: { id: String(req.params.id), order: { organizationId: orgId } },
+    });
 
     if (!payment) return res.status(404).json({ success: false, message: 'Payment not found' });
     if (['VOIDED', 'REFUNDED', 'SETTLED', 'RECONCILED'].includes(payment.status)) {
@@ -515,8 +539,8 @@ router.post('/refund', authMiddleware, requireUnlockedRegister, validateRequest(
     const { paymentId, amount, reason, method } = req.body;
     const orgId = req.user!.organizationId!;
 
-    const payment = await prisma.payment.findUnique({
-      where: { id: paymentId },
+    const payment = await prisma.payment.findFirst({
+      where: { id: paymentId, order: { organizationId: orgId } },
       include: { order: true, refunds: true },
     });
 
@@ -624,7 +648,9 @@ router.post('/refund', authMiddleware, requireUnlockedRegister, validateRequest(
 // PUT /api/payments/:id/settle - Mark payment as settled
 router.put('/:id/settle', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const payment = await prisma.payment.findUnique({ where: { id: String(req.params.id) } });
+    const payment = await prisma.payment.findFirst({
+      where: { id: String(req.params.id), order: { organizationId: req.user!.organizationId! } },
+    });
     if (!payment) return res.status(404).json({ success: false, message: 'Payment not found' });
     if (!['COMPLETED', 'CAPTURED'].includes(payment.status)) {
       return res.status(400).json({ success: false, message: 'Payment must be COMPLETED or CAPTURED to settle' });
@@ -644,7 +670,9 @@ router.put('/:id/settle', authMiddleware, async (req: AuthRequest, res: Response
 // PUT /api/payments/:id/reconcile - Mark payment as reconciled
 router.put('/:id/reconcile', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const payment = await prisma.payment.findUnique({ where: { id: String(req.params.id) } });
+    const payment = await prisma.payment.findFirst({
+      where: { id: String(req.params.id), order: { organizationId: req.user!.organizationId! } },
+    });
     if (!payment) return res.status(404).json({ success: false, message: 'Payment not found' });
     if (payment.status !== 'SETTLED') {
       return res.status(400).json({ success: false, message: 'Payment must be SETTLED to reconcile' });

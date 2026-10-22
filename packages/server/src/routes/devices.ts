@@ -1,4 +1,4 @@
-import { Router, Response } from 'express';
+import { Router, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import crypto from 'crypto';
 import { prisma } from '../db/client.js';
@@ -7,6 +7,19 @@ import { handleError } from '../middleware/error.js';
 import { createAuditEvent } from '../utils/audit.js';
 
 const router = Router();
+
+/**
+ * Heartbeats arrive either from the operator console (Bearer/cookie session)
+ * or from the device itself, which presents the credential issued once at
+ * registration. Without this a bare POST could flip any tenant's device online.
+ */
+function deviceOrOperator(req: AuthRequest, res: Response, next: NextFunction): void {
+  if (req.header('x-device-credential')) {
+    next();
+    return;
+  }
+  authMiddleware(req, res, next);
+}
 
 // ═══════════════════════════════════════════════════════════════
 // DEVICE LIFECYCLE (§38)
@@ -83,8 +96,18 @@ router.put('/:id/assign', authMiddleware, requireRole('OWNER', 'ADMIN'), async (
       registerId: z.string().optional(),
     }).parse(req.body);
 
-    const device = await prisma.device.update({
-      where: { id: String(req.params.id) },
+    const device = await prisma.device.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!device) return res.status(404).json({ success: false, message: 'Device not found' });
+    if (locationId) {
+      const loc = await prisma.location.findFirst({ where: { id: locationId, organizationId: req.user!.organizationId! }, select: { id: true } });
+      if (!loc) return res.status(404).json({ success: false, message: 'Location not found' });
+    }
+
+    const updated = await prisma.device.update({
+      where: { id: device.id },
       data: { locationId, registerId },
     });
 
@@ -93,11 +116,11 @@ router.put('/:id/assign', authMiddleware, requireRole('OWNER', 'ADMIN'), async (
       actorId: req.user!.employeeId,
       action: 'DEVICE_ASSIGNED',
       resourceType: 'DEVICE',
-      resourceId: device.id,
+      resourceId: updated.id,
       newValue: { locationId, registerId },
     });
 
-    res.json({ success: true, data: device });
+    res.json({ success: true, data: updated });
   } catch (error) {
     handleError(error, res);
   }
@@ -110,8 +133,13 @@ router.put('/:id/status', authMiddleware, requireRole('OWNER', 'ADMIN'), async (
       status: z.enum(['ONLINE', 'OFFLINE', 'MAINTENANCE', 'RETIRED']),
     }).parse(req.body);
 
+    const owned = await prisma.device.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Device not found' });
     const device = await prisma.device.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: { status },
     });
 
@@ -132,8 +160,13 @@ router.put('/:id/status', authMiddleware, requireRole('OWNER', 'ADMIN'), async (
 // DELETE /api/devices/:id - Retire a device
 router.delete('/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
+    const owned = await prisma.device.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Device not found' });
     const device = await prisma.device.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: { status: 'RETIRED', deviceCredential: null },
     });
 
@@ -152,15 +185,24 @@ router.delete('/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req:
 });
 
 // POST /api/devices/:id/heartbeat - Device heartbeat
-router.post('/:id/heartbeat', async (req: AuthRequest, res: Response) => {
+router.post('/:id/heartbeat', deviceOrOperator, async (req: AuthRequest, res: Response) => {
   try {
     const { softwareVersion, configVersion } = z.object({
       softwareVersion: z.string().optional(),
       configVersion: z.string().optional(),
     }).parse(req.body);
 
+    const credential = req.header('x-device-credential');
+    const owned = await prisma.device.findFirst({
+      where: credential
+        ? { id: String(req.params.id), deviceCredential: credential }
+        : { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Device not found' });
+
     await prisma.device.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: {
         lastHeartbeatAt: new Date(),
         status: 'ONLINE',
@@ -178,8 +220,8 @@ router.post('/:id/heartbeat', async (req: AuthRequest, res: Response) => {
 // GET /api/devices/:id/sync-config - Get device sync configuration
 router.get('/:id/sync-config', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const device = await prisma.device.findUnique({
-      where: { id: String(req.params.id) },
+    const device = await prisma.device.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
     });
 
     if (!device) return res.status(404).json({ success: false, message: 'Device not found' });
@@ -222,8 +264,13 @@ router.get('/:id/sync-config', authMiddleware, async (req: AuthRequest, res: Res
 // POST /api/devices/:id/revoke - Revoke device credential
 router.post('/:id/revoke', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
+    const owned = await prisma.device.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Device not found' });
     const device = await prisma.device.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: { deviceCredential: null, status: 'OFFLINE' },
     });
 
@@ -261,6 +308,20 @@ router.get('/overview', authMiddleware, async (req: AuthRequest, res: Response) 
     };
 
     res.json({ success: true, data: { devices, summary } });
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
+// GET /api/devices/:id - Device detail (declared after /overview so the static
+// path keeps winning over the :id parameter).
+router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const device = await prisma.device.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+    });
+    if (!device) return res.status(404).json({ success: false, message: 'Device not found' });
+    res.json({ success: true, data: device });
   } catch (error) {
     handleError(error, res);
   }

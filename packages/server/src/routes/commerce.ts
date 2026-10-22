@@ -183,8 +183,13 @@ router.post('/channels', authMiddleware, requireRole('OWNER', 'ADMIN'), validate
 
 router.put('/channels/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), validateRequest(channelSchema.partial()), async (req: AuthRequest, res: Response) => {
   try {
+    const owned = await prisma.salesChannel.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, error: 'Channel not found' });
     const channel = await prisma.salesChannel.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: req.body,
     });
     res.json({ success: true, data: channel });
@@ -195,7 +200,12 @@ router.put('/channels/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), valid
 
 router.delete('/channels/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.salesChannel.delete({ where: { id: String(req.params.id) } });
+    const owned = await prisma.salesChannel.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, error: 'Channel not found' });
+    await prisma.salesChannel.delete({ where: { id: owned.id } });
     res.json({ success: true, message: 'Channel deleted' });
   } catch (error) {
     handleError(error, res);
@@ -205,7 +215,7 @@ router.delete('/channels/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), as
 router.get('/channels/:id/stats', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const orgId = req.user!.organizationId!;
-    const channel = await prisma.salesChannel.findUnique({ where: { id: String(req.params.id) } });
+    const channel = await prisma.salesChannel.findFirst({ where: { id: String(req.params.id), organizationId: orgId } });
     if (!channel) return res.status(404).json({ success: false, error: 'Channel not found' });
     const agg = await prisma.order.aggregate({
       where: { organizationId: orgId, channel: channel.key, status: { in: ['PAID', 'COMPLETED', 'FULFILLED'] } },
@@ -255,9 +265,23 @@ router.post('/orders', authMiddleware, validateRequest(onlineOrderSchema), async
 
     const locId = await defaultLocationId(orgId, locationId);
 
+    // Only this tenant's records may be attached to the order.
+    if (customerId) {
+      const customer = await prisma.customer.findFirst({
+        where: { id: customerId, organizationId: orgId },
+        select: { id: true },
+      });
+      if (!customer) return res.status(404).json({ success: false, error: 'Customer not found' });
+    }
+
     // Resolve product prices & names
     const productIds = items.map((i: any) => i.productId);
-    const products = await prisma.product.findMany({ where: { id: { in: productIds } } });
+    const products = await prisma.product.findMany({
+      where: { id: { in: productIds }, organizationId: orgId },
+    });
+    if (products.length !== new Set(productIds).size) {
+      return res.status(400).json({ success: false, error: 'One or more products are not available' });
+    }
     const productMap = new Map(products.map((p) => [p.id, p]));
 
     let subtotal = 0;
@@ -475,8 +499,14 @@ router.get('/pickup', authMiddleware, async (req: AuthRequest, res: Response) =>
 
 router.post('/pickup/:id/ready', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
+    const orgId = req.user!.organizationId!;
+    const owned = await prisma.orderFulfillment.findFirst({
+      where: { id: String(req.params.id), order: { organizationId: orgId } },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, error: 'Fulfillment not found' });
     const fulfillment = await prisma.orderFulfillment.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: { status: 'READY', readyAt: new Date() },
       include: { order: true },
     });
@@ -488,7 +518,9 @@ router.post('/pickup/:id/ready', authMiddleware, async (req: AuthRequest, res: R
 
 router.post('/pickup/:id/complete', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const existing = await prisma.orderFulfillment.findUnique({ where: { id: String(req.params.id) } });
+    const existing = await prisma.orderFulfillment.findFirst({
+      where: { id: String(req.params.id), order: { organizationId: req.user!.organizationId! } },
+    });
     if (!existing) return res.status(404).json({ success: false, error: 'Fulfillment not found' });
     const fulfillment = await prisma.orderFulfillment.update({
       where: { id: existing.id },
@@ -535,7 +567,12 @@ router.post('/delivery/zones', authMiddleware, requireRole('OWNER', 'ADMIN', 'MA
 
 router.put('/delivery/zones/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), validateRequest(zoneSchema.partial()), async (req: AuthRequest, res: Response) => {
   try {
-    const zone = await prisma.deliveryZone.update({ where: { id: String(req.params.id) }, data: req.body });
+    const owned = await prisma.deliveryZone.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, error: 'Delivery zone not found' });
+    const zone = await prisma.deliveryZone.update({ where: { id: owned.id }, data: req.body });
     res.json({ success: true, data: zone });
   } catch (error) {
     handleError(error, res);
@@ -544,7 +581,12 @@ router.put('/delivery/zones/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 
 
 router.delete('/delivery/zones/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.deliveryZone.delete({ where: { id: String(req.params.id) } });
+    const owned = await prisma.deliveryZone.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, error: 'Delivery zone not found' });
+    await prisma.deliveryZone.delete({ where: { id: owned.id } });
     res.json({ success: true, message: 'Delivery zone deleted' });
   } catch (error) {
     handleError(error, res);
@@ -597,8 +639,13 @@ router.get('/deliveries', authMiddleware, async (req: AuthRequest, res: Response
 router.post('/deliveries/:id/dispatch', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { courier, etaMinutes } = req.body as { courier?: string; etaMinutes?: number };
+    const owned = await prisma.orderFulfillment.findFirst({
+      where: { id: String(req.params.id), order: { organizationId: req.user!.organizationId! } },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, error: 'Delivery not found' });
     const delivery = await prisma.orderFulfillment.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: { status: 'OUT_FOR_DELIVERY', courier: courier || null, etaMinutes: etaMinutes ?? null },
       include: { order: true },
     });
@@ -610,7 +657,9 @@ router.post('/deliveries/:id/dispatch', authMiddleware, async (req: AuthRequest,
 
 router.post('/deliveries/:id/delivered', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const existing = await prisma.orderFulfillment.findUnique({ where: { id: String(req.params.id) } });
+    const existing = await prisma.orderFulfillment.findFirst({
+      where: { id: String(req.params.id), order: { organizationId: req.user!.organizationId! } },
+    });
     if (!existing) return res.status(404).json({ success: false, error: 'Delivery not found' });
     const delivery = await prisma.orderFulfillment.update({
       where: { id: existing.id },
@@ -664,9 +713,14 @@ router.post('/integrations', authMiddleware, requireRole('OWNER', 'ADMIN'), vali
 
 router.put('/integrations/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
+    const owned = await prisma.integrationConnection.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, error: 'Integration not found' });
     const { name, status, config } = req.body;
     const integration = await prisma.integrationConnection.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: { ...(name !== undefined ? { name } : {}), ...(status !== undefined ? { status } : {}), ...(config !== undefined ? { config } : {}) },
     });
     res.json({ success: true, data: integration });
@@ -677,7 +731,12 @@ router.put('/integrations/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), a
 
 router.delete('/integrations/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.integrationConnection.delete({ where: { id: String(req.params.id) } });
+    const owned = await prisma.integrationConnection.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, error: 'Integration not found' });
+    await prisma.integrationConnection.delete({ where: { id: owned.id } });
     res.json({ success: true, message: 'Integration disconnected' });
   } catch (error) {
     handleError(error, res);

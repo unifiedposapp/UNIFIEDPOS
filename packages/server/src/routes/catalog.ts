@@ -45,7 +45,11 @@ router.post('/brands', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'),
 
 router.put('/brands/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
-    const brand = await prisma.brand.update({ where: { id: String(req.params.id) }, data: req.body });
+    // Scope the lookup to the caller's tenant: an id alone must never reach
+    // another organization's row (cross-tenant IDOR).
+    const owned = await prisma.brand.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! } });
+    if (!owned) return res.status(404).json({ success: false, error: 'Brand not found' });
+    const brand = await prisma.brand.update({ where: { id: owned.id }, data: req.body });
     res.json({ success: true, data: brand });
   } catch (error) {
     handleError(error, res);
@@ -54,7 +58,9 @@ router.put('/brands/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER
 
 router.delete('/brands/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.brand.update({ where: { id: String(req.params.id) }, data: { isActive: false } });
+    const owned = await prisma.brand.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! } });
+    if (!owned) return res.status(404).json({ success: false, error: 'Brand not found' });
+    await prisma.brand.update({ where: { id: owned.id }, data: { isActive: false } });
     res.json({ success: true, message: 'Brand deactivated' });
   } catch (error) {
     handleError(error, res);
@@ -94,7 +100,9 @@ router.post('/tax-rules', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER
 
 router.put('/tax-rules/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
-    const rule = await prisma.taxRule.update({ where: { id: String(req.params.id) }, data: req.body });
+    const owned = await prisma.taxRule.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! } });
+    if (!owned) return res.status(404).json({ success: false, error: 'Tax rule not found' });
+    const rule = await prisma.taxRule.update({ where: { id: owned.id }, data: req.body });
     res.json({ success: true, data: rule });
   } catch (error) {
     handleError(error, res);
@@ -103,7 +111,9 @@ router.put('/tax-rules/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANA
 
 router.delete('/tax-rules/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.taxRule.update({ where: { id: String(req.params.id) }, data: { isActive: false } });
+    const owned = await prisma.taxRule.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! } });
+    if (!owned) return res.status(404).json({ success: false, error: 'Tax rule not found' });
+    await prisma.taxRule.update({ where: { id: owned.id }, data: { isActive: false } });
     res.json({ success: true, message: 'Tax rule deactivated' });
   } catch (error) {
     handleError(error, res);
@@ -122,8 +132,14 @@ const variantSchema = z.object({
 
 router.get('/products/:productId/variants', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
+    // Variants have no organizationId of their own; ownership flows through Product.
+    const product = await prisma.product.findFirst({
+      where: { id: String(req.params.productId), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!product) return res.status(404).json({ success: false, error: 'Product not found' });
     const variants = await prisma.productVariant.findMany({
-      where: { productId: String(req.params.productId) },
+      where: { productId: product.id },
       orderBy: { name: 'asc' },
     });
     res.json({ success: true, data: variants });
@@ -134,7 +150,12 @@ router.get('/products/:productId/variants', authMiddleware, async (req: AuthRequ
 
 router.post('/variants', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), validateRequest(variantSchema), async (req: AuthRequest, res: Response) => {
   try {
-    const variant = await prisma.productVariant.create({ data: req.body });
+    const product = await prisma.product.findFirst({
+      where: { id: req.body.productId, organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!product) return res.status(404).json({ success: false, error: 'Product not found' });
+    const variant = await prisma.productVariant.create({ data: { ...req.body, productId: product.id } });
     res.status(201).json({ success: true, data: variant });
   } catch (error) {
     handleError(error, res);
@@ -143,7 +164,12 @@ router.post('/variants', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'
 
 router.delete('/variants/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.productVariant.delete({ where: { id: String(req.params.id) } });
+    const owned = await prisma.productVariant.findFirst({
+      where: { id: String(req.params.id), product: { organizationId: req.user!.organizationId! } },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, error: 'Variant not found' });
+    await prisma.productVariant.delete({ where: { id: owned.id } });
     res.json({ success: true, message: 'Variant deleted' });
   } catch (error) {
     handleError(error, res);
@@ -183,7 +209,9 @@ router.post('/modifier-groups', authMiddleware, requireRole('OWNER', 'ADMIN', 'M
 
 router.delete('/modifier-groups/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.modifierGroup.delete({ where: { id: String(req.params.id) } });
+    const owned = await prisma.modifierGroup.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! }, select: { id: true } });
+    if (!owned) return res.status(404).json({ success: false, error: 'Modifier group not found' });
+    await prisma.modifierGroup.delete({ where: { id: owned.id } });
     res.json({ success: true, message: 'Modifier group deleted' });
   } catch (error) {
     handleError(error, res);
@@ -200,7 +228,15 @@ const modifierSchema = z.object({
 router.get('/modifiers', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { modifierGroupId } = req.query;
-    const where: any = {};
+    // Modifiers hang off either a modifier group or a product; both paths must
+    // resolve to the caller's organization or the row is not theirs.
+    const orgId = req.user!.organizationId!;
+    const where: any = {
+      OR: [
+        { modifierGroup: { organizationId: orgId } },
+        { product: { organizationId: orgId } },
+      ],
+    };
     if (modifierGroupId) where.modifierGroupId = String(modifierGroupId);
     const modifiers = await prisma.modifier.findMany({ where, orderBy: { name: 'asc' } });
     res.json({ success: true, data: modifiers });
@@ -211,6 +247,15 @@ router.get('/modifiers', authMiddleware, async (req: AuthRequest, res: Response)
 
 router.post('/modifiers', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), validateRequest(modifierSchema), async (req: AuthRequest, res: Response) => {
   try {
+    const orgId = req.user!.organizationId!;
+    if (req.body.modifierGroupId) {
+      const group = await prisma.modifierGroup.findFirst({ where: { id: req.body.modifierGroupId, organizationId: orgId }, select: { id: true } });
+      if (!group) return res.status(404).json({ success: false, error: 'Modifier group not found' });
+    }
+    if (req.body.productId) {
+      const product = await prisma.product.findFirst({ where: { id: req.body.productId, organizationId: orgId }, select: { id: true } });
+      if (!product) return res.status(404).json({ success: false, error: 'Product not found' });
+    }
     const modifier = await prisma.modifier.create({ data: req.body });
     res.status(201).json({ success: true, data: modifier });
   } catch (error) {
@@ -220,7 +265,19 @@ router.post('/modifiers', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER
 
 router.delete('/modifiers/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.modifier.delete({ where: { id: String(req.params.id) } });
+    const orgId = req.user!.organizationId!;
+    const owned = await prisma.modifier.findFirst({
+      where: {
+        id: String(req.params.id),
+        OR: [
+          { modifierGroup: { organizationId: orgId } },
+          { product: { organizationId: orgId } },
+        ],
+      },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, error: 'Modifier not found' });
+    await prisma.modifier.delete({ where: { id: owned.id } });
     res.json({ success: true, message: 'Modifier deleted' });
   } catch (error) {
     handleError(error, res);
@@ -252,8 +309,8 @@ router.get('/price-lists', authMiddleware, async (req: AuthRequest, res: Respons
 
 router.get('/price-lists/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const list = await prisma.priceList.findUnique({
-      where: { id: String(req.params.id) },
+    const list = await prisma.priceList.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
       include: { items: true },
     });
     if (!list) return res.status(404).json({ success: false, error: 'Price list not found' });
@@ -288,9 +345,14 @@ const priceListItemSchema = z.object({
 
 router.post('/price-lists/:id/items', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), validateRequest(priceListItemSchema), async (req: AuthRequest, res: Response) => {
   try {
+    const orgId = req.user!.organizationId!;
+    const list = await prisma.priceList.findFirst({ where: { id: String(req.params.id), organizationId: orgId }, select: { id: true } });
+    if (!list) return res.status(404).json({ success: false, error: 'Price list not found' });
+    const product = await prisma.product.findFirst({ where: { id: req.body.productId, organizationId: orgId }, select: { id: true } });
+    if (!product) return res.status(404).json({ success: false, error: 'Product not found' });
     const item = await prisma.priceListItem.upsert({
-      where: { priceListId_productId: { priceListId: String(req.params.id), productId: req.body.productId } },
-      create: { priceListId: String(req.params.id), productId: req.body.productId, price: req.body.price },
+      where: { priceListId_productId: { priceListId: list.id, productId: product.id } },
+      create: { priceListId: list.id, productId: product.id, price: req.body.price },
       update: { price: req.body.price },
     });
     res.status(201).json({ success: true, data: item });
@@ -301,7 +363,9 @@ router.post('/price-lists/:id/items', authMiddleware, requireRole('OWNER', 'ADMI
 
 router.delete('/price-lists/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.priceList.delete({ where: { id: String(req.params.id) } });
+    const owned = await prisma.priceList.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! }, select: { id: true } });
+    if (!owned) return res.status(404).json({ success: false, error: 'Price list not found' });
+    await prisma.priceList.delete({ where: { id: owned.id } });
     res.json({ success: true, message: 'Price list deleted' });
   } catch (error) {
     handleError(error, res);
@@ -349,7 +413,9 @@ router.post('/bundles', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER')
 
 router.delete('/bundles/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.bundle.delete({ where: { id: String(req.params.id) } });
+    const owned = await prisma.bundle.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! }, select: { id: true } });
+    if (!owned) return res.status(404).json({ success: false, error: 'Bundle not found' });
+    await prisma.bundle.delete({ where: { id: owned.id } });
     res.json({ success: true, message: 'Bundle deleted' });
   } catch (error) {
     handleError(error, res);
@@ -396,7 +462,9 @@ router.post('/kits', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), v
 
 router.delete('/kits/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.kit.delete({ where: { id: String(req.params.id) } });
+    const owned = await prisma.kit.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! }, select: { id: true } });
+    if (!owned) return res.status(404).json({ success: false, error: 'Kit not found' });
+    await prisma.kit.delete({ where: { id: owned.id } });
     res.json({ success: true, message: 'Kit deleted' });
   } catch (error) {
     handleError(error, res);
@@ -445,8 +513,10 @@ const compositeOptionSchema = z.object({
 
 router.post('/composites/:id/options', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), validateRequest(compositeOptionSchema), async (req: AuthRequest, res: Response) => {
   try {
+    const composite = await prisma.compositeProduct.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! }, select: { id: true } });
+    if (!composite) return res.status(404).json({ success: false, error: 'Composite product not found' });
     const option = await prisma.compositeProductOption.create({
-      data: { ...req.body, compositeId: String(req.params.id) },
+      data: { ...req.body, compositeId: composite.id },
       include: { composite: true },
     });
     res.status(201).json({ success: true, data: option });
@@ -462,8 +532,15 @@ const compositeValueSchema = z.object({
 
 router.post('/options/:optionId/values', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), validateRequest(compositeValueSchema), async (req: AuthRequest, res: Response) => {
   try {
+    const option = await prisma.compositeProductOption.findFirst({
+      where: { id: String(req.params.optionId), compositeProduct: { organizationId: req.user!.organizationId! } },
+      select: { id: true },
+    });
+    if (!option) return res.status(404).json({ success: false, error: 'Composite option not found' });
+    const product = await prisma.product.findFirst({ where: { id: req.body.productId, organizationId: req.user!.organizationId! }, select: { id: true } });
+    if (!product) return res.status(404).json({ success: false, error: 'Product not found' });
     const value = await prisma.compositeProductOptionValue.create({
-      data: { ...req.body, optionId: String(req.params.optionId) },
+      data: { ...req.body, productId: product.id, optionId: option.id },
     });
     res.status(201).json({ success: true, data: value });
   } catch (error) {
@@ -473,7 +550,9 @@ router.post('/options/:optionId/values', authMiddleware, requireRole('OWNER', 'A
 
 router.delete('/composites/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.compositeProduct.delete({ where: { id: String(req.params.id) } });
+    const owned = await prisma.compositeProduct.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! }, select: { id: true } });
+    if (!owned) return res.status(404).json({ success: false, error: 'Composite product not found' });
+    await prisma.compositeProduct.delete({ where: { id: owned.id } });
     res.json({ success: true, message: 'Composite product deleted' });
   } catch (error) {
     handleError(error, res);
@@ -492,7 +571,7 @@ router.get('/overview', authMiddleware, async (req: AuthRequest, res: Response) 
       prisma.bundle.count({ where: { organizationId: orgId, isActive: true } }),
       prisma.kit.count({ where: { organizationId: orgId, isActive: true } }),
       prisma.compositeProduct.count({ where: { organizationId: orgId, isActive: true } }),
-      prisma.productVariant.count(),
+      prisma.productVariant.count({ where: { product: { organizationId: orgId } } }),
     ]);
     res.json({ success: true, data: { brands, taxRules, modifierGroups, priceLists, bundles, kits, composites, variants } });
   } catch (error) {

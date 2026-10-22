@@ -317,8 +317,13 @@ router.put('/breaches/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async
   try {
     const id = String(req.params.id);
     const { status, severity, affectedRecords, description } = req.body || {};
+    const owned = await prisma.breachIncident.findFirst({
+      where: { id, organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Incident not found' });
     const incident = await prisma.breachIncident.update({
-      where: { id },
+      where: { id: owned.id },
       data: {
         ...(status ? { status, ...(status === 'ASSESSED' ? { assessedAt: new Date() } : {}) } : {}),
         ...(severity ? { severity } : {}),
@@ -337,8 +342,10 @@ router.post('/breaches/:id/notify', authMiddleware, requireRole('OWNER'), valida
     const orgId = req.user!.organizationId!;
     const id = String(req.params.id);
     const now = new Date();
+    const owned = await prisma.breachIncident.findFirst({ where: { id, organizationId: orgId }, select: { id: true } });
+    if (!owned) return res.status(404).json({ success: false, message: 'Incident not found' });
     const incident = await prisma.breachIncident.update({
-      where: { id },
+      where: { id: owned.id },
       data: {
         status: 'NOTIFIED',
         assessedAt: now,

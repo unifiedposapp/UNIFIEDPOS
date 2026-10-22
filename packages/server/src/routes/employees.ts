@@ -26,8 +26,8 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 // GET /api/employees/:id
 router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const employee = await prisma.employee.findUnique({
-      where: { id: String(req.params.id) },
+    const employee = await prisma.employee.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
       include: {
         user: { select: { name: true, email: true, role: true } },
         locations: { include: { location: true } },
@@ -54,8 +54,13 @@ router.put('/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: Au
       employeeNumber: z.string().optional(),
     }).parse(req.body);
 
+    const owned = await prisma.employee.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Employee not found' });
     const employee = await prisma.employee.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: { department, position, hourlyRate, isActive, employeeNumber },
     });
     res.json({ success: true, data: employee });
@@ -72,6 +77,11 @@ router.post('/:id/time', authMiddleware, async (req: AuthRequest, res: Response)
     }).parse(req.body);
 
     const employeeId = String(req.params.id);
+    const owned = await prisma.employee.findFirst({
+      where: { id: employeeId, organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Employee not found' });
 
     if (action === 'CLOCK_IN') {
       const entry = await prisma.timeEntry.create({
@@ -105,8 +115,13 @@ router.post('/:id/time', authMiddleware, async (req: AuthRequest, res: Response)
 // GET /api/employees/:id/time-entries
 router.get('/:id/time-entries', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
+    const owned = await prisma.employee.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Employee not found' });
     const entries = await prisma.timeEntry.findMany({
-      where: { employeeId: String(req.params.id) },
+      where: { employeeId: owned.id },
       orderBy: { clockIn: 'desc' },
       take: 50,
     });

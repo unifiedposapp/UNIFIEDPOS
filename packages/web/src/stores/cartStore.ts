@@ -33,6 +33,7 @@ interface CartState {
   setTip: (tip: number) => void;
   setCustomer: (customerId?: string) => void;
   setNotes: (notes?: string) => void;
+  restoreCart: (items: Partial<CartItem>[], customerId?: string) => void;
   clearCart: () => void;
   getSubtotal: () => number;
   getTotal: () => number;
@@ -104,6 +105,31 @@ export const useCartStore = create<CartState>((set, get) => ({
   setCustomer: (customerId) => set({ customerId }),
 
   setNotes: (notes) => set({ notes }),
+
+  // Recall a parked cart (retail suspended cart) into the live POS basket.
+  // Values arrive as JSON, so every field is normalised before use.
+  restoreCart: (items, customerId) => {
+    set({
+      items: items
+        .filter((i) => i && i.productId)
+        .map((i) => ({
+          productId: String(i.productId),
+          variantId: i.variantId,
+          name: String(i.name || 'Item'),
+          variantName: i.variantName,
+          price: Number(i.price) || 0,
+          quantity: Math.max(1, Number(i.quantity) || 1),
+          discount: Number(i.discount) || 0,
+          modifiers: Array.isArray(i.modifiers) ? i.modifiers : [],
+          notes: i.notes || '',
+        })),
+      customerId,
+      discount: 0,
+      discountType: undefined,
+      tip: 0,
+      notes: undefined,
+    });
+  },
 
   clearCart: () => set({ items: [], customerId: undefined, discount: 0, discountType: undefined, tip: 0, notes: undefined }),
 

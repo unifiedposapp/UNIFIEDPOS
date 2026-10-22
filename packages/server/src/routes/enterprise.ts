@@ -133,8 +133,13 @@ router.post('/regions', authMiddleware, requireRole('OWNER', 'ADMIN'), validateR
 
 router.put('/regions/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), validateRequest(regionSchema.partial()), async (req: AuthRequest, res: Response) => {
   try {
+    const owned = await prisma.region.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, error: 'Region not found' });
     const region = await prisma.region.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: req.body,
     });
     res.json({ success: true, data: region });
@@ -145,8 +150,10 @@ router.put('/regions/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), valida
 
 router.delete('/regions/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
-    const id = String(req.params.id);
-    const region = await prisma.region.findUnique({ where: { id }, select: { type: true } });
+    const region = await prisma.region.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true, type: true },
+    });
     if (!region) {
       res.status(404).json({ success: false, error: 'Region not found' });
       return;
@@ -155,7 +162,7 @@ router.delete('/regions/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), asy
       res.status(400).json({ success: false, error: 'Global regions cannot be deleted — they guarantee worldwide coverage of every nation.' });
       return;
     }
-    await prisma.region.delete({ where: { id } });
+    await prisma.region.delete({ where: { id: region.id } });
     res.json({ success: true, message: 'Region deleted' });
   } catch (error) {
     handleError(error, res);
@@ -165,9 +172,19 @@ router.delete('/regions/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), asy
 // Assign location to region
 router.put('/locations/:locationId/assign-region', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
-    const { regionId } = req.body;
+    const orgId = req.user!.organizationId!;
+    const { regionId } = req.body as { regionId?: string | null };
+    const owned = await prisma.location.findFirst({
+      where: { id: String(req.params.locationId), organizationId: orgId },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, error: 'Location not found' });
+    if (regionId) {
+      const region = await prisma.region.findFirst({ where: { id: regionId, organizationId: orgId }, select: { id: true } });
+      if (!region) return res.status(404).json({ success: false, error: 'Region not found' });
+    }
     const location = await prisma.location.update({
-      where: { id: String(req.params.locationId) },
+      where: { id: owned.id },
       data: { regionId: regionId || null },
     });
     res.json({ success: true, data: location });
@@ -203,8 +220,13 @@ router.post('/warehouses', authMiddleware, requireRole('OWNER', 'ADMIN'), valida
 
 router.put('/warehouses/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), validateRequest(warehouseSchema.partial()), async (req: AuthRequest, res: Response) => {
   try {
+    const owned = await prisma.warehouse.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, error: 'Warehouse not found' });
     const warehouse = await prisma.warehouse.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: req.body,
     });
     res.json({ success: true, data: warehouse });
@@ -215,7 +237,12 @@ router.put('/warehouses/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), val
 
 router.delete('/warehouses/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.warehouse.delete({ where: { id: String(req.params.id) } });
+    const owned = await prisma.warehouse.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, error: 'Warehouse not found' });
+    await prisma.warehouse.delete({ where: { id: owned.id } });
     res.json({ success: true, message: 'Warehouse deleted' });
   } catch (error) {
     handleError(error, res);

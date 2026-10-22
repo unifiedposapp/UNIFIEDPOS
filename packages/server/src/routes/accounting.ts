@@ -70,9 +70,11 @@ router.post('/entries', authMiddleware, async (req: AuthRequest, res: Response) 
 });
 
 // PUT /api/accounting/entries/:id/reconcile
-router.put('/:id/reconcile', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.put('/entries/:id/reconcile', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const entry = await prisma.accountingEntry.findUnique({ where: { id: String(req.params.id) } });
+    const entry = await prisma.accountingEntry.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+    });
     if (!entry) return res.status(404).json({ success: false, message: 'Entry not found' });
 
     // §34: Immutable financial records - cannot modify RECONCILED entries
@@ -84,7 +86,7 @@ router.put('/:id/reconcile', authMiddleware, async (req: AuthRequest, res: Respo
     }
 
     const updated = await prisma.accountingEntry.update({
-      where: { id: String(req.params.id) },
+      where: { id: entry.id },
       data: { status: 'RECONCILED', reconciledAt: new Date() },
     });
 
@@ -103,9 +105,11 @@ router.put('/:id/reconcile', authMiddleware, async (req: AuthRequest, res: Respo
 });
 
 // POST /api/accounting/entries/:id/void - Void an entry (§34 immutability)
-router.post('/:id/void', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
+router.post('/entries/:id/void', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
-    const entry = await prisma.accountingEntry.findUnique({ where: { id: String(req.params.id) } });
+    const entry = await prisma.accountingEntry.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+    });
     if (!entry) return res.status(404).json({ success: false, message: 'Entry not found' });
 
     // §34: Cannot void RECONCILED entries directly - must create corrective event
@@ -277,7 +281,7 @@ router.put('/reconcile/:id/confirm', authMiddleware, requireRole('OWNER', 'ADMIN
       notes: z.string().optional(),
     }).parse(req.body);
 
-    const recon = await prisma.reconciliation.findUnique({ where: { id: String(req.params.id) } });
+    const recon = await prisma.reconciliation.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! } });
     if (!recon) return res.status(404).json({ success: false, message: 'Reconciliation not found' });
 
     const variance = actualBalance - Number(recon.expectedBalance);
@@ -533,8 +537,13 @@ router.post('/expenses', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'
 // PUT /api/accounting/expenses/:id/approve
 router.put('/expenses/:id/approve', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
+    const owned = await prisma.expense.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Expense not found' });
     const expense = await prisma.expense.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: { status: 'APPROVED', approvedBy: req.user!.employeeId },
     });
     res.json({ success: true, data: expense });
@@ -586,12 +595,29 @@ router.post('/invoices', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'
       notes: z.string().optional(),
     }).parse(req.body);
 
-    const invCount = await prisma.invoice.count({ where: { organizationId: req.user!.organizationId! } });
+    const orgId = req.user!.organizationId!;
+    // An invoice may only reference this tenant's customer and order.
+    if (customerId) {
+      const customer = await prisma.customer.findFirst({
+        where: { id: customerId, organizationId: orgId },
+        select: { id: true },
+      });
+      if (!customer) return res.status(404).json({ success: false, message: 'Customer not found' });
+    }
+    if (orderId) {
+      const order = await prisma.order.findFirst({
+        where: { id: orderId, organizationId: orgId },
+        select: { id: true },
+      });
+      if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    const invCount = await prisma.invoice.count({ where: { organizationId: orgId } });
     const invoiceNumber = `INV-${Date.now()}-${invCount + 1}`;
 
     const invoice = await prisma.invoice.create({
       data: {
-        organizationId: req.user!.organizationId!,
+        organizationId: orgId,
         invoiceNumber,
         customerId,
         orderId,
@@ -611,14 +637,19 @@ router.post('/invoices', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'
 });
 
 // PUT /api/accounting/invoices/:id/status
-router.put('/invoices/:id/status', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.put('/invoices/:id/status', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
     const { status } = z.object({ status: z.enum(['DRAFT', 'SENT', 'PAID', 'OVERDUE', 'CANCELLED']) }).parse(req.body);
     const data: any = { status };
     if (status === 'PAID') data.paidAt = new Date();
 
+    const owned = await prisma.invoice.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Invoice not found' });
     const invoice = await prisma.invoice.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data,
     });
     res.json({ success: true, data: invoice });

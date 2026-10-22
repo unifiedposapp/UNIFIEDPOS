@@ -8,7 +8,10 @@ import { listJobs, isSchedulerRunning } from '../services/scheduler.js';
 const router = Router();
 
 // GET /api/system/health - System health and metrics
-router.get('/health', async (_req, res: Response) => {
+// Requires a session: the payload carries store statistics, which must never be
+// readable by an unauthenticated caller. Liveness/readiness probes live at
+// /api/health and /api/ready and stay public.
+router.get('/health', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const startTime = Date.now();
 
@@ -16,12 +19,13 @@ router.get('/health', async (_req, res: Response) => {
     await prisma.$queryRaw`SELECT 1`;
     const dbLatency = Date.now() - startTime;
 
-    // Get counts
+    // Get counts (scoped to the caller's organization)
+    const orgId = req.user!.organizationId!;
     const [orgCount, orderCount, productCount, customerCount] = await Promise.all([
-      prisma.organization.count(),
-      prisma.order.count(),
-      prisma.product.count(),
-      prisma.customer.count(),
+      prisma.organization.count({ where: { id: orgId } }),
+      prisma.order.count({ where: { organizationId: orgId } }),
+      prisma.product.count({ where: { organizationId: orgId } }),
+      prisma.customer.count({ where: { organizationId: orgId } }),
     ]);
 
     res.json({
@@ -240,16 +244,18 @@ router.get('/observability', authMiddleware, async (req: AuthRequest, res: Respo
 });
 
 // GET /api/system/backup-config - Backup & DR configuration (§40)
-router.get('/backup-config', authMiddleware, async (_req: AuthRequest, res: Response) => {
+router.get('/backup-config', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     // Database backup status
     const dbStart = Date.now();
     await prisma.$queryRaw`SELECT 1`;
     const dbLatency = Date.now() - dbStart;
 
+    // Event counts are tenant data, so they are scoped to the caller.
+    const orgId = req.user!.organizationId!;
     const [eventCount, auditCount] = await Promise.all([
-      prisma.businessEvent.count(),
-      prisma.auditEvent.count(),
+      prisma.businessEvent.count({ where: { organizationId: orgId } }),
+      prisma.auditEvent.count({ where: { organizationId: orgId } }),
     ]);
 
     res.json({
@@ -304,17 +310,18 @@ router.get('/backup-config', authMiddleware, async (_req: AuthRequest, res: Resp
 });
 
 // GET /api/system/nfr - Non-functional requirements status (§46)
-router.get('/nfr', authMiddleware, async (_req: AuthRequest, res: Response) => {
+router.get('/nfr', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const mem = process.memoryUsage();
     const dbStart = Date.now();
     await prisma.$queryRaw`SELECT 1`;
     const dbLatency = Date.now() - dbStart;
 
+    const orgId = req.user!.organizationId!;
     const [totalOrders, totalProducts, totalOrgs] = await Promise.all([
-      prisma.order.count(),
-      prisma.product.count(),
-      prisma.organization.count(),
+      prisma.order.count({ where: { organizationId: orgId } }),
+      prisma.product.count({ where: { organizationId: orgId } }),
+      prisma.organization.count({ where: { id: orgId } }),
     ]);
 
     res.json({

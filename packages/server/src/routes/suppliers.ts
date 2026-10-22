@@ -44,8 +44,10 @@ router.post('/', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async
 router.put('/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
     const data = supplierSchema.partial().parse(req.body);
+    const owned = await prisma.supplier.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! }, select: { id: true } });
+    if (!owned) return res.status(404).json({ success: false, message: 'Supplier not found' });
     const supplier = await prisma.supplier.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data,
     });
     res.json({ success: true, data: supplier });
@@ -57,7 +59,9 @@ router.put('/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), asy
 // DELETE /api/suppliers/:id
 router.delete('/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.supplier.delete({ where: { id: String(req.params.id) } });
+    const owned = await prisma.supplier.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! }, select: { id: true } });
+    if (!owned) return res.status(404).json({ success: false, message: 'Supplier not found' });
+    await prisma.supplier.delete({ where: { id: owned.id } });
     res.json({ success: true, message: 'Supplier deleted' });
   } catch (error) {
     handleError(error, res);

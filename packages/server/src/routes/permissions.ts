@@ -110,14 +110,22 @@ router.put('/roles/:id/permissions', authMiddleware, requireRole('OWNER', 'ADMIN
 
     const roleId = String(req.params.id);
 
+    // A role belongs to one organization; rewriting another tenant's role
+    // permissions would leak privilege across the tenant boundary.
+    const owned = await prisma.role.findFirst({
+      where: { id: roleId, organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Role not found' });
+
     // Delete existing permissions and create new ones
-    await prisma.rolePermission.deleteMany({ where: { roleId } });
+    await prisma.rolePermission.deleteMany({ where: { roleId: owned.id } });
     await prisma.rolePermission.createMany({
-      data: permissionIds.map(pid => ({ roleId, permissionId: pid })),
+      data: permissionIds.map(pid => ({ roleId: owned.id, permissionId: pid })),
     });
 
     const role = await prisma.role.findUnique({
-      where: { id: roleId },
+      where: { id: owned.id },
       include: { permissions: { include: { permission: true } } },
     });
     res.json({ success: true, data: role });
@@ -231,13 +239,23 @@ router.post('/seed', authMiddleware, requireRole('OWNER'), async (_req: AuthRequ
 router.put('/employees/:id/role', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
     const { roleId } = z.object({ roleId: z.string() }).parse(req.body);
+    const orgId = req.user!.organizationId!;
 
-    const employee = await prisma.employee.update({
-      where: { id: String(req.params.id) },
-      data: { roleId },
+    // Both sides of the assignment must belong to the caller's organization,
+    // otherwise an id from another tenant could be used to grant its role.
+    const [employee, role] = await Promise.all([
+      prisma.employee.findFirst({ where: { id: String(req.params.id), organizationId: orgId }, select: { id: true } }),
+      prisma.role.findFirst({ where: { id: roleId, organizationId: orgId }, select: { id: true } }),
+    ]);
+    if (!employee) return res.status(404).json({ success: false, message: 'Employee not found' });
+    if (!role) return res.status(404).json({ success: false, message: 'Role not found' });
+
+    const updated = await prisma.employee.update({
+      where: { id: employee.id },
+      data: { roleId: role.id },
       include: { role: true },
     });
-    res.json({ success: true, data: employee });
+    res.json({ success: true, data: updated });
   } catch (error) {
     handleError(error, res);
   }

@@ -125,9 +125,11 @@ router.post('/', authMiddleware, validateRequest(customerSchema), async (req: Au
 // PUT /api/customers/:id
 router.put('/:id', authMiddleware, validateRequest(customerSchema.partial()), async (req: AuthRequest, res: Response) => {
   try {
+    const owned = await prisma.customer.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! }, select: { id: true } });
+    if (!owned) return res.status(404).json({ success: false, message: 'Customer not found' });
     const data: any = { ...req.body };
     if (data.birthday) data.birthday = new Date(data.birthday);
-    const customer = await prisma.customer.update({ where: { id: String(req.params.id) }, data });
+    const customer = await prisma.customer.update({ where: { id: owned.id }, data });
     await emitEvent({ organizationId: req.user!.organizationId!, event: 'customer.updated', data: { id: customer.id } });
     res.json({ success: true, data: customer });
   } catch (error) {
@@ -138,7 +140,9 @@ router.put('/:id', authMiddleware, validateRequest(customerSchema.partial()), as
 // DELETE /api/customers/:id
 router.delete('/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.customer.update({ where: { id: String(req.params.id) }, data: { isActive: false } });
+    const owned = await prisma.customer.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! }, select: { id: true } });
+    if (!owned) return res.status(404).json({ success: false, message: 'Customer not found' });
+    await prisma.customer.update({ where: { id: owned.id }, data: { isActive: false } });
     res.json({ success: true, message: 'Customer deleted' });
   } catch (error) {
     handleError(error, res);

@@ -196,8 +196,13 @@ router.get('/conflicts', authMiddleware, async (req: AuthRequest, res: Response)
 // POST /api/sync/conflicts/:id/resolve — mark a conflicted transaction resolved
 router.post('/conflicts/:id/resolve', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
+    const owned = await prisma.syncTransaction.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Conflict not found' });
     const updated = await prisma.syncTransaction.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: { status: 'SYNCED', conflictReason: null, result: { manuallyResolved: true, by: req.user!.id } as any },
     });
     res.json({ success: true, data: updated });

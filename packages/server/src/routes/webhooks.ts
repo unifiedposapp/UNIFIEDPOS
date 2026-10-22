@@ -42,8 +42,13 @@ router.post('/', authMiddleware, requireRole('OWNER', 'ADMIN'), validateRequest(
 // PUT /api/webhooks/:id - Update webhook
 router.put('/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), validateRequest(webhookSchema.partial()), async (req: AuthRequest, res: Response) => {
   try {
+    const owned = await prisma.webhook.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, error: 'Webhook not found' });
     const webhook = await prisma.webhook.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: req.body,
     });
     res.json({ success: true, data: webhook });
@@ -55,7 +60,12 @@ router.put('/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), validateReques
 // DELETE /api/webhooks/:id - Delete webhook
 router.delete('/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.webhook.delete({ where: { id: String(req.params.id) } });
+    const owned = await prisma.webhook.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, error: 'Webhook not found' });
+    await prisma.webhook.delete({ where: { id: owned.id } });
     res.json({ success: true, message: 'Webhook deleted' });
   } catch (error) {
     handleError(error, res);

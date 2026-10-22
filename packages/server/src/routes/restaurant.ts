@@ -171,8 +171,13 @@ router.post('/reservations', authMiddleware, async (req: AuthRequest, res: Respo
 router.put('/reservations/:id/status', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { status } = z.object({ status: z.enum(['PENDING', 'CONFIRMED', 'SEATED', 'COMPLETED', 'CANCELLED', 'NO_SHOW']) }).parse(req.body);
+    const owned = await prisma.reservation.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Reservation not found' });
     const reservation = await prisma.reservation.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: { status },
     });
     res.json({ success: true, data: reservation });
@@ -184,7 +189,10 @@ router.put('/reservations/:id/status', authMiddleware, async (req: AuthRequest, 
 // DELETE /api/restaurant/reservations/:id
 router.delete('/reservations/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.reservation.delete({ where: { id: String(req.params.id) } });
+    const deleted = await prisma.reservation.deleteMany({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+    });
+    if (!deleted.count) return res.status(404).json({ success: false, message: 'Reservation not found' });
     res.json({ success: true, message: 'Reservation deleted' });
   } catch (error) {
     handleError(error, res);
@@ -233,8 +241,13 @@ router.put('/waitlist/:id/status', authMiddleware, async (req: AuthRequest, res:
     if (status === 'NOTIFIED') data.notifiedAt = new Date();
     if (status === 'SEATED') data.seatedAt = new Date();
     
+    const owned = await prisma.waitlistEntry.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Waitlist entry not found' });
     const entry = await prisma.waitlistEntry.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data,
     });
     res.json({ success: true, data: entry });
@@ -365,8 +378,13 @@ router.put('/kitchen/:id/status', authMiddleware, async (req: AuthRequest, res: 
     if (status === 'READY') data.readyAt = new Date();
     if (status === 'SERVED') data.servedAt = new Date();
 
+    const owned = await prisma.kitchenOrder.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Kitchen order not found' });
     const order = await prisma.kitchenOrder.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data,
       include: { items: true },
     });
@@ -383,8 +401,13 @@ router.put('/kitchen/:id/items/:itemId', authMiddleware, async (req: AuthRequest
       status: z.enum(['PENDING', 'PREPARING', 'READY', 'CANCELLED']),
     }).parse(req.body);
 
+    const owned = await prisma.kitchenOrderItem.findFirst({
+      where: { id: String(req.params.itemId), kitchenOrder: { id: String(req.params.id), organizationId: req.user!.organizationId! } },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Kitchen order item not found' });
     const item = await prisma.kitchenOrderItem.update({
-      where: { id: String(req.params.itemId) },
+      where: { id: owned.id },
       data: { status },
     });
     res.json({ success: true, data: item });

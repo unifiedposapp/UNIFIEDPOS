@@ -5,8 +5,9 @@ import { AuthRequest, authMiddleware } from '../middleware/auth.js';
 import { validateRequest, handleError, HttpError } from '../middleware/error.js';
 import { RegisterRequest, requireUnlockedRegister } from '../middleware/registerAccess.js';
 import { createAuditEvent } from '../utils/audit.js';
-import { normalizePaymentMethod } from '../data/paymentMethods.js';
-import { computeOrderTotals, planGiftCardDeduction, planStoreCreditDeduction } from '../services/moneyMath.js';
+import { normalizePaymentMethod, isGatewayMethod } from '../data/paymentMethods.js';
+import { refundCharge } from '../services/paymentProvider.js';
+import { computeOrderTotals, planGiftCardDeduction, planStoreCreditDeduction, round2 } from '../services/moneyMath.js';
 
 const router = Router();
 
@@ -31,8 +32,10 @@ const createOrderSchema = z.object({
     giftCardNumber: z.string().optional(),
   })).optional(),
   notes: z.string().optional(),
-  status: z.string().optional(),
+  status: z.enum(['DRAFT', 'HELD']).optional(),
   couponCode: z.string().optional(),
+  discount: z.number().min(0).optional(),
+  discountType: z.enum(['PERCENTAGE', 'FIXED']).optional(),
   channel: z.string().optional(),
   fulfillmentType: z.string().optional(),
   tipAmount: z.number().optional(),
@@ -142,6 +145,7 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
         discounts: true,
         taxes: true,
         fulfillments: true,
+        refunds: true,
         customer: true,
         employee: { include: { user: { select: { name: true } } } },
       },
@@ -160,7 +164,7 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
 // (see middleware/registerAccess.ts).
 router.post('/', authMiddleware, requireUnlockedRegister, validateRequest(createOrderSchema), async (req: RegisterRequest, res: Response) => {
   try {
-    const { items, customerId, paymentMethod, amountPaid, giftCardNumber, payments, notes, status, couponCode, channel, fulfillmentType, tipAmount, serviceCharge } = req.body;
+    const { items, customerId, paymentMethod, amountPaid, giftCardNumber, payments, notes, status, couponCode, discount, discountType, channel, fulfillmentType, tipAmount, serviceCharge } = req.body;
     
     // Get default location for organization
     const location = await prisma.location.findFirst({
@@ -168,6 +172,16 @@ router.post('/', authMiddleware, requireUnlockedRegister, validateRequest(create
     });
     
     if (!location) return res.status(400).json({ success: false, message: 'No location configured' });
+
+    // Tenant-scope every referenced record: a guessed product or customer id
+    // from another business must never be attached to this order.
+    if (customerId) {
+      const customer = await prisma.customer.findFirst({
+        where: { id: customerId, organizationId: req.user!.organizationId! },
+        select: { id: true },
+      });
+      if (!customer) return res.status(404).json({ success: false, message: 'Customer not found' });
+    }
 
     // Bind the sale to the drawer it is rung on. The session was resolved by the
     // lock middleware from the CALLER's token, so an order can never be parked on
@@ -204,8 +218,11 @@ router.post('/', authMiddleware, requireUnlockedRegister, validateRequest(create
     // Get product names
     const productIds = items.map((i: any) => i.productId);
     const products = await prisma.product.findMany({
-      where: { id: { in: productIds } },
+      where: { id: { in: productIds }, organizationId: req.user!.organizationId! },
     });
+    if (products.length !== new Set(productIds).size) {
+      return res.status(400).json({ success: false, message: 'One or more products are not available' });
+    }
     
     const productMap = new Map(products.map(p => [p.id, p]));
     orderItems.forEach((oi: any) => {
@@ -219,7 +236,28 @@ router.post('/', authMiddleware, requireUnlockedRegister, validateRequest(create
     });
     const taxRate = Number(org?.taxRate || 0);
     // Pure, unit-tested order math (subtotal → tax → total), rounded to 2dp.
-    const { subtotal, taxAmount, total: totalAmount } = computeOrderTotals(items, taxRate);
+    // An order-level discount (the POS "Discount" action) reduces the taxable
+    // subtotal exactly as the register displays it, and is persisted so the
+    // receipt and the payment can never disagree.
+    const { subtotal } = computeOrderTotals(items, taxRate);
+    const requestedDiscount = Number(discount) || 0;
+    const orderDiscount = discountType === 'PERCENTAGE'
+      ? round2(subtotal * (Math.min(100, requestedDiscount) / 100))
+      : round2(Math.min(subtotal, Math.max(0, requestedDiscount)));
+    const taxableAmount = round2(subtotal - orderDiscount);
+    const taxAmount = round2(taxableAmount * (taxRate / 100));
+    const totalAmount = round2(taxableAmount + taxAmount);
+
+    // A sale may only be marked paid when the tendered amount actually covers
+    // the total; otherwise the register would record a short payment as PAID.
+    if (payments && payments.length > 0) {
+      const tendered = payments.reduce((sum: number, p: any) => sum + Number(p.amount || 0), 0);
+      if (tendered + 0.005 < totalAmount) {
+        return res.status(400).json({ success: false, message: 'Payment does not cover the order total' });
+      }
+    } else if (paymentMethod && amountPaid !== undefined && Number(amountPaid) + 0.005 < totalAmount) {
+      return res.status(400).json({ success: false, message: 'Payment does not cover the order total' });
+    }
     
     // Generate order number
     const orderCount = await prisma.order.count({
@@ -243,7 +281,7 @@ router.post('/', authMiddleware, requireUnlockedRegister, validateRequest(create
         employeeId: req.user!.employeeId,
         customerId,
         subtotal,
-        discountAmount: 0,
+        discountAmount: orderDiscount,
         taxAmount,
         totalAmount,
         tipAmount: tipAmount || 0,
@@ -296,7 +334,7 @@ router.post('/', authMiddleware, requireUnlockedRegister, validateRequest(create
           }
         }
 
-        await prisma.payment.create({
+        const payment = await prisma.payment.create({
           data: {
             orderId: order.id,
             method: pmtMethod,
@@ -309,7 +347,7 @@ router.post('/', authMiddleware, requireUnlockedRegister, validateRequest(create
         await prisma.paymentTransaction.create({
           data: {
             organizationId: req.user!.organizationId!,
-            paymentId: order.id, // will reference payment after creation
+            paymentId: payment.id,
             type: 'CAPTURED',
             amount: pmt.amount,
             status: 'COMPLETED',
@@ -374,7 +412,7 @@ router.post('/', authMiddleware, requireUnlockedRegister, validateRequest(create
         }
       }
 
-      await prisma.payment.create({
+      const payment = await prisma.payment.create({
         data: {
           orderId: order.id,
           method: singleMethod,
@@ -387,7 +425,7 @@ router.post('/', authMiddleware, requireUnlockedRegister, validateRequest(create
       await prisma.paymentTransaction.create({
         data: {
           organizationId: req.user!.organizationId!,
-          paymentId: order.id,
+          paymentId: payment.id,
           type: 'CAPTURED',
           amount: amountPaid,
           status: 'COMPLETED',
@@ -527,26 +565,118 @@ router.post('/:id/cancel', authMiddleware, requireUnlockedRegister, async (req: 
 // POST /api/orders/:id/refund
 router.post('/:id/refund', authMiddleware, requireUnlockedRegister, async (req: RegisterRequest, res: Response) => {
   try {
-    const { amount, reason } = req.body;
-    if (!(await loadMutableOrder(req, res))) return;
+    const loaded = await loadMutableOrder(req, res);
+    if (!loaded) return;
 
-    const order = await prisma.order.update({
-      where: { id: String(req.params.id) },
-      data: { 
-        status: amount >= Number(req.body.originalTotal) ? 'REFUNDED' : 'PARTIALLY_REFUNDED',
+    // No amount means "refund the whole order", which is what the Back Office
+    // button asks for. Refunds are allocated across the order's captured
+    // payments, oldest first, and each one is recorded against its payment so
+    // the order and payment states can never drift apart.
+    const orderTotal = Number(loaded.totalAmount);
+    const requested = req.body?.amount;
+    const amount = requested === undefined || requested === null ? orderTotal : Number(requested);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      return res.status(400).json({ success: false, message: 'Refund amount must be greater than zero' });
+    }
+    const reason = typeof req.body?.reason === 'string' ? req.body.reason : undefined;
+    const refundMethod = typeof req.body?.method === 'string' ? req.body.method : 'ORIGINAL';
+
+    const payments = await prisma.payment.findMany({
+      where: {
+        orderId: loaded.id,
+        status: { in: ['COMPLETED', 'CAPTURED', 'SETTLED', 'RECONCILED', 'PARTIALLY_REFUNDED'] },
       },
+      include: { refunds: true },
+      orderBy: { createdAt: 'asc' },
     });
-    
+    const refundable = payments.reduce(
+      (sum, p) => sum + Math.max(0, Number(p.amount) - p.refunds.reduce((s, r) => s + Number(r.amount), 0)),
+      0,
+    );
+    if (amount > refundable + 0.005) {
+      return res.status(400).json({ success: false, message: 'Refund exceeds the refundable payment amount' });
+    }
+
+    let remaining = Math.round(amount * 100) / 100;
+    for (const payment of payments) {
+      if (remaining <= 0) break;
+      const alreadyRefunded = payment.refunds.reduce((s, r) => s + Number(r.amount), 0);
+      const available = Math.max(0, Number(payment.amount) - alreadyRefunded);
+      const refundAmount = Math.round(Math.min(available, remaining) * 100) / 100;
+      if (refundAmount <= 0) continue;
+
+      // Card money must move back through the gateway before the internal
+      // refund record is written, mirroring POST /api/payments/refund.
+      let gatewayRef: string | undefined;
+      if (isGatewayMethod(payment.method) && payment.reference) {
+        const gw = await refundCharge({
+          reference: payment.reference,
+          amount: refundAmount,
+          currency: payment.currency || 'USD',
+          reason,
+          idempotencyKey: `${payment.id}:${alreadyRefunded}:${refundAmount}`,
+        });
+        if (gw.status === 'FAILED') {
+          return res.status(502).json({ success: false, message: gw.message || 'Gateway refund failed' });
+        }
+        gatewayRef = gw.reference;
+      }
+
+      await prisma.$transaction(async (tx) => {
+        const refund = await tx.refund.create({
+          data: {
+            organizationId: req.user!.organizationId!,
+            orderId: loaded.id,
+            paymentId: payment.id,
+            customerId: loaded.customerId,
+            amount: refundAmount,
+            reason,
+            method: refundMethod,
+            status: 'PROCESSED',
+            processedAt: new Date(),
+            processedBy: req.user!.employeeId,
+          },
+        });
+        const newPaymentStatus =
+          alreadyRefunded + refundAmount >= Number(payment.amount) ? 'REFUNDED' : 'PARTIALLY_REFUNDED';
+        await tx.payment.update({ where: { id: payment.id }, data: { status: newPaymentStatus } });
+        await tx.accountingEntry.create({
+          data: {
+            organizationId: req.user!.organizationId!,
+            type: 'REFUND',
+            referenceType: 'REFUND',
+            referenceId: refund.id,
+            amount: -refundAmount,
+            description: `Order ${loaded.orderNumber} refund${gatewayRef ? ` (${gatewayRef})` : ''}`,
+            status: 'POSTED',
+          },
+        });
+      });
+      remaining = Math.round((remaining - refundAmount) * 100) / 100;
+    }
+
+    // Derive the order state from everything refunded so far, not from the
+    // amount on this one request, so successive partials converge on REFUNDED.
+    const refunds = await prisma.refund.aggregate({
+      where: { orderId: loaded.id, status: 'PROCESSED' },
+      _sum: { amount: true },
+    });
+    const totalRefunded = Number(refunds._sum.amount || 0);
+    const updated = await prisma.order.update({
+      where: { id: loaded.id },
+      data: { status: totalRefunded >= orderTotal - 0.005 ? 'REFUNDED' : 'PARTIALLY_REFUNDED' },
+    });
+
     await createAuditEvent({
       organizationId: req.user!.organizationId!,
       actorId: req.user!.employeeId,
       action: 'REFUND_CREATED',
       resourceType: 'ORDER',
-      resourceId: order.id,
-      newValue: { amount, reason },
+      resourceId: updated.id,
+      newValue: { amount, reason, totalRefunded },
     });
-    
-    res.json({ success: true, data: order });
+
+    res.json({ success: true, data: updated });
   } catch (error) {
     handleError(error, res);
   }

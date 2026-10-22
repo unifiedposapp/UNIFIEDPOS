@@ -120,6 +120,11 @@ router.post('/gift-cards', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGE
     const existing = await prisma.giftCard.findUnique({ where: { cardNumber: finalNumber } });
     if (existing) return res.status(409).json({ success: false, message: 'Card number already exists' });
 
+    if (customerId) {
+      const customer = await prisma.customer.findFirst({ where: { id: customerId, organizationId: req.user!.organizationId! }, select: { id: true } });
+      if (!customer) return res.status(404).json({ success: false, message: 'Customer not found' });
+    }
+
     const card = await prisma.giftCard.create({
       data: {
         organizationId: req.user!.organizationId!,
@@ -266,6 +271,12 @@ router.post('/store-credits', authMiddleware, requireRole('OWNER', 'ADMIN', 'MAN
       expiresAt: z.string().optional(),
     }).parse(req.body);
 
+    const customer = await prisma.customer.findFirst({
+      where: { id: customerId, organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!customer) return res.status(404).json({ success: false, message: 'Customer not found' });
+
     const credit = await prisma.storeCredit.create({
       data: {
         organizationId: req.user!.organizationId!,
@@ -371,7 +382,29 @@ router.post('/layaways', authMiddleware, async (req: AuthRequest, res: Response)
       notes: z.string().optional(),
     }).parse(req.body);
 
-    const totalAmount = round2(items.reduce((sum, i) => sum + i.price * i.quantity, 0));
+    const orgId = req.user!.organizationId!;
+    const customer = await prisma.customer.findFirst({
+      where: { id: customerId, organizationId: orgId },
+      select: { id: true },
+    });
+    if (!customer) return res.status(404).json({ success: false, message: 'Customer not found' });
+
+    // Price the layaway from the catalogue, never from the request body.
+    const productIds = [...new Set(items.map((i) => i.productId))];
+    const products = await prisma.product.findMany({
+      where: { id: { in: productIds }, organizationId: orgId },
+      select: { id: true, name: true, price: true },
+    });
+    if (products.length !== productIds.length) {
+      return res.status(400).json({ success: false, message: 'One or more products are not available' });
+    }
+    const productMap = new Map(products.map((p) => [p.id, p]));
+    const pricedItems = items.map((item) => {
+      const product = productMap.get(item.productId)!;
+      return { ...item, name: product.name, price: Number(product.price) };
+    });
+
+    const totalAmount = round2(pricedItems.reduce((sum, i) => sum + i.price * i.quantity, 0));
     const orderCount = await prisma.layaway.count({ where: { organizationId: req.user!.organizationId! } });
     const orderNumber = `LAY-${Date.now()}-${orderCount + 1}`;
 
@@ -383,7 +416,7 @@ router.post('/layaways', authMiddleware, async (req: AuthRequest, res: Response)
         totalAmount,
         depositAmount,
         paidAmount: depositAmount,
-        items,
+        items: pricedItems,
         dueDate: new Date(dueDate),
         notes,
         status: 'ACTIVE',
@@ -409,7 +442,9 @@ router.post('/layaways', authMiddleware, async (req: AuthRequest, res: Response)
 router.put('/layaways/:id/pay', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { amount } = z.object({ amount: z.number().positive() }).parse(req.body);
-    const layaway = await prisma.layaway.findUnique({ where: { id: String(req.params.id) } });
+    const layaway = await prisma.layaway.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+    });
     if (!layaway) return res.status(404).json({ success: false, message: 'Layaway not found' });
     if (layaway.status !== 'ACTIVE') return res.status(400).json({ success: false, message: 'Layaway is not active' });
 
@@ -435,7 +470,9 @@ router.put('/layaways/:id/pay', authMiddleware, async (req: AuthRequest, res: Re
 router.put('/layaways/:id/cancel', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
     const { cancellationFee } = z.object({ cancellationFee: z.number().min(0).optional() }).parse(req.body);
-    const layaway = await prisma.layaway.findUnique({ where: { id: String(req.params.id) } });
+    const layaway = await prisma.layaway.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+    });
     if (!layaway) return res.status(404).json({ success: false, message: 'Layaway not found' });
 
     const updated = await prisma.layaway.update({
@@ -548,8 +585,8 @@ router.post('/purchase-orders', authMiddleware, requireRole('OWNER', 'ADMIN', 'M
 // PUT /api/retail/purchase-orders/:id/receive - Receive purchase order
 router.put('/purchase-orders/:id/receive', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
-    const po = await prisma.purchaseOrder.findUnique({
-      where: { id: String(req.params.id) },
+    const po = await prisma.purchaseOrder.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
       include: { items: true },
     });
     if (!po) return res.status(404).json({ success: false, message: 'Purchase order not found' });
@@ -621,8 +658,13 @@ router.put('/purchase-orders/:id/receive', authMiddleware, requireRole('OWNER', 
 // PUT /api/retail/purchase-orders/:id/send - Mark PO as sent to supplier
 router.put('/purchase-orders/:id/send', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
+    const owned = await prisma.purchaseOrder.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Purchase order not found' });
     const updated = await prisma.purchaseOrder.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: { status: 'SENT' },
     });
     res.json({ success: true, data: updated });
@@ -757,13 +799,29 @@ router.post('/suspended-carts', authMiddleware, async (req: AuthRequest, res: Re
   }
 });
 
-// DELETE /api/retail/suspended-carts/:id - Resume and remove suspended cart
+// POST /api/retail/suspended-carts/:id/resume - Recall a suspended cart
+router.post('/suspended-carts/:id/resume', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const owned = await prisma.suspendedCart.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Suspended cart not found' });
+    // Recalling a cart consumes it so the same basket cannot be rung up twice.
+    const cart = await prisma.suspendedCart.delete({ where: { id: owned.id } });
+    res.json({ success: true, data: cart });
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
+// DELETE /api/retail/suspended-carts/:id - Discard a suspended cart
 router.delete('/suspended-carts/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const cart = await prisma.suspendedCart.delete({
-      where: { id: String(req.params.id) },
+    const deleted = await prisma.suspendedCart.deleteMany({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
     });
-    res.json({ success: true, data: cart });
+    if (!deleted.count) return res.status(404).json({ success: false, message: 'Suspended cart not found' });
+    res.json({ success: true, message: 'Suspended cart deleted' });
   } catch (error) {
     handleError(error, res);
   }

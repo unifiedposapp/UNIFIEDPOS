@@ -1,7 +1,7 @@
 import { Router, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../db/client.js';
-import { AuthRequest, authMiddleware } from '../middleware/auth.js';
+import { AuthRequest, authMiddleware, requireRole } from '../middleware/auth.js';
 import { validateRequest, handleError } from '../middleware/error.js';
 
 const router = Router();
@@ -154,7 +154,7 @@ router.get('/promotions', authMiddleware, async (req: AuthRequest, res: Response
   }
 });
 
-router.post('/promotions', authMiddleware, validateRequest(promotionSchema), async (req: AuthRequest, res: Response) => {
+router.post('/promotions', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), validateRequest(promotionSchema), async (req: AuthRequest, res: Response) => {
   try {
     const promotion = await prisma.promotion.create({
       data: {
@@ -170,14 +170,19 @@ router.post('/promotions', authMiddleware, validateRequest(promotionSchema), asy
   }
 });
 
-router.put('/promotions/:id', authMiddleware, validateRequest(promotionSchema.partial()), async (req: AuthRequest, res: Response) => {
+router.put('/promotions/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), validateRequest(promotionSchema.partial()), async (req: AuthRequest, res: Response) => {
   try {
     const data: any = { ...req.body };
     if (data.startDate) data.startDate = new Date(data.startDate);
     if (data.endDate) data.endDate = new Date(data.endDate);
 
+    const owned = await prisma.promotion.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Promotion not found' });
     const promotion = await prisma.promotion.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data,
     });
     res.json({ success: true, data: promotion });
@@ -186,10 +191,15 @@ router.put('/promotions/:id', authMiddleware, validateRequest(promotionSchema.pa
   }
 });
 
-router.delete('/promotions/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.delete('/promotions/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
+    const owned = await prisma.promotion.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Promotion not found' });
     await prisma.promotion.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: { isActive: false },
     });
     res.json({ success: true, message: 'Promotion deactivated' });
@@ -212,7 +222,7 @@ router.get('/coupons', authMiddleware, async (req: AuthRequest, res: Response) =
   }
 });
 
-router.post('/coupons', authMiddleware, validateRequest(couponSchema), async (req: AuthRequest, res: Response) => {
+router.post('/coupons', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), validateRequest(couponSchema), async (req: AuthRequest, res: Response) => {
   try {
     const orgId = req.user!.organizationId!;
 
@@ -239,15 +249,20 @@ router.post('/coupons', authMiddleware, validateRequest(couponSchema), async (re
   }
 });
 
-router.put('/coupons/:id', authMiddleware, validateRequest(couponSchema.partial()), async (req: AuthRequest, res: Response) => {
+router.put('/coupons/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), validateRequest(couponSchema.partial()), async (req: AuthRequest, res: Response) => {
   try {
     const data: any = { ...req.body };
     if (data.code) data.code = data.code.toUpperCase();
     if (data.startDate) data.startDate = new Date(data.startDate);
     if (data.endDate) data.endDate = new Date(data.endDate);
 
+    const owned = await prisma.coupon.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Coupon not found' });
     const coupon = await prisma.coupon.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data,
     });
     res.json({ success: true, data: coupon });
@@ -256,10 +271,15 @@ router.put('/coupons/:id', authMiddleware, validateRequest(couponSchema.partial(
   }
 });
 
-router.delete('/coupons/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.delete('/coupons/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
+    const owned = await prisma.coupon.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Coupon not found' });
     await prisma.coupon.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: { isActive: false },
     });
     res.json({ success: true, message: 'Coupon deactivated' });
@@ -324,7 +344,7 @@ router.get('/campaigns', authMiddleware, async (req: AuthRequest, res: Response)
   }
 });
 
-router.post('/campaigns', authMiddleware, validateRequest(campaignSchema), async (req: AuthRequest, res: Response) => {
+router.post('/campaigns', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), validateRequest(campaignSchema), async (req: AuthRequest, res: Response) => {
   try {
     const campaign = await prisma.campaign.create({
       data: {
@@ -339,13 +359,18 @@ router.post('/campaigns', authMiddleware, validateRequest(campaignSchema), async
   }
 });
 
-router.put('/campaigns/:id', authMiddleware, validateRequest(campaignSchema.partial()), async (req: AuthRequest, res: Response) => {
+router.put('/campaigns/:id', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), validateRequest(campaignSchema.partial()), async (req: AuthRequest, res: Response) => {
   try {
     const data: any = { ...req.body };
     if (data.scheduledAt) data.scheduledAt = new Date(data.scheduledAt);
 
+    const owned = await prisma.campaign.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Campaign not found' });
     const campaign = await prisma.campaign.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data,
     });
     res.json({ success: true, data: campaign });
@@ -355,11 +380,11 @@ router.put('/campaigns/:id', authMiddleware, validateRequest(campaignSchema.part
 });
 
 // POST /api/marketing/campaigns/:id/launch - Launch campaign to a segment
-router.post('/campaigns/:id/launch', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/campaigns/:id/launch', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
     const orgId = req.user!.organizationId!;
-    const campaign = await prisma.campaign.findUnique({
-      where: { id: String(req.params.id) },
+    const campaign = await prisma.campaign.findFirst({
+      where: { id: String(req.params.id), organizationId: orgId },
     });
 
     if (!campaign) return res.status(404).json({ success: false, message: 'Campaign not found' });
@@ -384,13 +409,18 @@ router.post('/campaigns/:id/launch', authMiddleware, async (req: AuthRequest, re
 
 // POST /api/marketing/campaigns/:id/engage - Record an open or conversion.
 // Drives real open-rate / conversion-rate metrics on the dashboard.
-router.post('/campaigns/:id/engage', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/campaigns/:id/engage', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
+    const owned = await prisma.campaign.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Campaign not found' });
     const type = String(req.body?.type || 'open');
     const data = type === 'convert'
       ? { convertedCount: { increment: 1 } }
       : { openedCount: { increment: 1 } };
-    const campaign = await prisma.campaign.update({ where: { id: String(req.params.id) }, data });
+    const campaign = await prisma.campaign.update({ where: { id: owned.id }, data });
     res.json({ success: true, data: campaign });
   } catch (error) {
     handleError(error, res);
@@ -398,10 +428,15 @@ router.post('/campaigns/:id/engage', authMiddleware, async (req: AuthRequest, re
 });
 
 // POST /api/marketing/campaigns/:id/cancel - Cancel a campaign
-router.post('/campaigns/:id/cancel', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/campaigns/:id/cancel', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   try {
+    const owned = await prisma.campaign.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Campaign not found' });
     const campaign = await prisma.campaign.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: { status: 'CANCELLED' },
     });
     res.json({ success: true, data: campaign });
@@ -413,7 +448,7 @@ router.post('/campaigns/:id/cancel', authMiddleware, async (req: AuthRequest, re
 // POST /api/marketing/coupons/:id/redeem - Increment usage (respecting limits)
 router.post('/coupons/:id/redeem', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const coupon = await prisma.coupon.findUnique({ where: { id: String(req.params.id) } });
+    const coupon = await prisma.coupon.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! } });
     if (!coupon) return res.status(404).json({ success: false, message: 'Coupon not found' });
     if (!coupon.isActive) return res.status(400).json({ success: false, message: 'Coupon is inactive' });
     if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {

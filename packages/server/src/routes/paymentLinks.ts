@@ -48,6 +48,22 @@ router.post('/', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER'), valid
   try {
     const orgId = req.user!.organizationId!;
     const { amount, currency, description, customerId, orderId, maxPayments, expiresAt } = req.body;
+    // A link may only point at this tenant's own customer and order: the public
+    // pay step later writes a Payment against that order.
+    if (customerId) {
+      const customer = await prisma.customer.findFirst({
+        where: { id: customerId, organizationId: orgId },
+        select: { id: true },
+      });
+      if (!customer) return res.status(404).json({ success: false, message: 'Customer not found' });
+    }
+    if (orderId) {
+      const order = await prisma.order.findFirst({
+        where: { id: orderId, organizationId: orgId },
+        select: { id: true },
+      });
+      if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+    }
     const token = crypto.randomBytes(16).toString('hex');
     const link = await prisma.paymentLink.create({
       data: {

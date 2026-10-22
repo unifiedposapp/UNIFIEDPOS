@@ -9,8 +9,8 @@ const router = Router();
 // GET /api/receipts/:orderId - Generate receipt data for an order
 router.get('/:orderId', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const order = await prisma.order.findUnique({
-      where: { id: String(req.params.orderId) },
+    const order = await prisma.order.findFirst({
+      where: { id: String(req.params.orderId), organizationId: req.user!.organizationId! },
       include: {
         items: {
           include: {

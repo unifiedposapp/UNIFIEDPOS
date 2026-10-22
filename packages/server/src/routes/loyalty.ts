@@ -46,8 +46,13 @@ router.post('/programs', authMiddleware, requireRole('OWNER', 'ADMIN'), async (r
 router.put('/programs/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
     const data = programSchema.partial().parse(req.body);
+    const owned = await prisma.loyaltyProgram.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Loyalty program not found' });
     const program = await prisma.loyaltyProgram.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data,
     });
     res.json({ success: true, data: program });
@@ -93,7 +98,7 @@ router.post('/earn', authMiddleware, async (req: AuthRequest, res: Response) => 
     if (!program) return res.status(404).json({ success: false, message: 'No active loyalty program' });
 
     // Get customer's current balance
-    const customer = await prisma.customer.findUnique({ where: { id: customerId } });
+    const customer = await prisma.customer.findFirst({ where: { id: customerId, organizationId: orgId } });
     if (!customer) return res.status(404).json({ success: false, message: 'Customer not found' });
 
     const newBalance = customer.loyaltyPoints + points;
@@ -146,7 +151,7 @@ router.post('/redeem', authMiddleware, async (req: AuthRequest, res: Response) =
     });
     if (!program) return res.status(404).json({ success: false, message: 'No active loyalty program' });
 
-    const customer = await prisma.customer.findUnique({ where: { id: customerId } });
+    const customer = await prisma.customer.findFirst({ where: { id: customerId, organizationId: orgId } });
     if (!customer) return res.status(404).json({ success: false, message: 'Customer not found' });
     if (customer.loyaltyPoints < points) return res.status(400).json({ success: false, message: 'Insufficient points' });
 

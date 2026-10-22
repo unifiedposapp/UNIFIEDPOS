@@ -2,7 +2,7 @@ import { Router, Response } from 'express';
 import { z } from 'zod';
 import crypto from 'crypto';
 import { prisma } from '../db/client.js';
-import { encryptJson } from '../services/crypto.js';
+import { encryptJson, decryptJson } from '../services/crypto.js';
 import { AuthRequest, authMiddleware, requireRole } from '../middleware/auth.js';
 import { handleError } from '../middleware/error.js';
 import { INTEGRATION_PROVIDERS, INTEGRATION_CATEGORIES, CATEGORY_CONFIG_FIELDS, providersByCategory, CATALOG_STATS } from '../data/integrationCatalog.js';
@@ -142,7 +142,7 @@ router.get('/oauth/authorize', async (req, res: Response) => {
 // POST /api/developer/oauth/token - OAuth token endpoint
 router.post('/oauth/token', async (req, res: Response) => {
   try {
-    const { client_id } = z.object({
+    const { client_id, client_secret } = z.object({
       grant_type: z.enum(['authorization_code', 'refresh_token']),
       client_id: z.string(),
       client_secret: z.string(),
@@ -150,16 +150,23 @@ router.post('/oauth/token', async (req, res: Response) => {
       refresh_token: z.string().optional(),
     }).parse(req.body);
 
-    // Verify client credentials
+    // Verify client credentials. The secret is compared against the encrypted
+    // value stored at registration time; never mint a token on client_id alone.
     const integration = await prisma.integrationConnection.findFirst({
       where: {
-        organizationId: { not: undefined },
         provider: 'oauth',
         config: { path: ['clientId'], equals: client_id },
       },
     });
 
-    if (!integration) {
+    const stored = decryptJson<{ clientSecret?: string }>(
+      typeof integration?.credentials === 'string' ? integration.credentials : null
+    );
+    const supplied = Buffer.from(String(client_secret));
+    const expected = Buffer.from(String(stored?.clientSecret || ''));
+    const secretMatches = !!stored?.clientSecret && supplied.length === expected.length && crypto.timingSafeEqual(supplied, expected);
+
+    if (!integration || !secretMatches) {
       return res.status(401).json({ success: false, message: 'Invalid client credentials' });
     }
 
@@ -233,8 +240,13 @@ router.post('/integrations', authMiddleware, requireRole('OWNER', 'ADMIN'), asyn
 // PUT /api/developer/integrations/:id/disconnect
 router.put('/integrations/:id/disconnect', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
+    const owned = await prisma.integrationConnection.findFirst({
+      where: { id: String(req.params.id), organizationId: req.user!.organizationId! },
+      select: { id: true },
+    });
+    if (!owned) return res.status(404).json({ success: false, message: 'Integration not found' });
     const integration = await prisma.integrationConnection.update({
-      where: { id: String(req.params.id) },
+      where: { id: owned.id },
       data: { status: 'DISCONNECTED' },
     });
     res.json({ success: true, data: integration });

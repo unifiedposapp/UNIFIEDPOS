@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { useCartStore } from '../stores/cartStore';
 import { useAuthStore } from '../stores/authStore';
@@ -8,10 +8,10 @@ import RegisterLockScreen from '../components/RegisterLockScreen';
 import { useRegisterLock } from '../hooks/useRegisterLock';
 import { 
   Search, Plus, Minus, Trash2, CreditCard, Banknote, Smartphone, 
-  User, Pause, ShoppingCart, Percent, MoreHorizontal, Clock,
+  User, Pause, ShoppingCart, Percent, Clock,
   MapPin, Monitor, UserCircle, CheckCircle, Lock, KeyRound,
   Wallet, Zap, QrCode, Landmark, BadgeDollarSign, Bitcoin, Gift,
-  Receipt, FileText, ChevronDown, ChevronUp
+  Receipt, FileText, ChevronDown, ChevronUp, Archive
 } from 'lucide-react';
 import clsx from 'clsx';
 import {
@@ -64,9 +64,10 @@ export default function POSPage() {
   const [storeCreditTotal, setStoreCreditTotal] = useState<number | null>(null);
   const [loadingCredit, setLoadingCredit] = useState(false);
 
-  const { items, addItem, removeItem, updateQuantity, clearCart, getSubtotal, setCustomer, discount, discountType, setDiscount } = useCartStore();
+  const { items, addItem, removeItem, updateQuantity, clearCart, getSubtotal, setCustomer, discount, discountType, setDiscount, restoreCart } = useCartStore();
   const { user, organization, logout } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Drawer ownership for this workstation (§7 / §37): which register is open, the
   // cashier's individual-PIN state, and the idle auto-lock. The screen is covered
@@ -90,6 +91,22 @@ export default function POSPage() {
   useEffect(() => {
     loadData();
   }, [search, selectedCategory]);
+
+  // A suspended cart recalled from the Back Office lands here with its basket
+  // in router state. Restore it once, then clear the state so a refresh does
+  // not resurrect a cart that has already been recalled.
+  useEffect(() => {
+    const parked = (location.state as any)?.suspendedCart;
+    if (!parked) return;
+    const raw = Array.isArray(parked.items)
+      ? parked.items
+      : Array.isArray(parked.items?.items)
+        ? parked.items.items
+        : [];
+    restoreCart(raw, parked.customerId ?? parked.items?.customerId);
+    navigate('/pos', { replace: true, state: null });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function loadData() {
     try {
@@ -157,9 +174,11 @@ export default function POSPage() {
         })),
         customerId: selectedCustomerId || undefined,
         paymentMethod,
-        amountPaid: total,
+        amountPaid: Number(total.toFixed(2)),
         giftCardNumber: giftCard || undefined,
         couponCode: couponApplied?.code || undefined,
+        discount: discount || undefined,
+        discountType: discount ? discountType : undefined,
       });
 
       clearCart();
@@ -273,6 +292,8 @@ export default function POSPage() {
         })),
         customerId: selectedCustomerId || undefined,
         status: 'HELD',
+        discount: discount || undefined,
+        discountType: discount ? discountType : undefined,
       });
 
       clearCart();
@@ -282,6 +303,26 @@ export default function POSPage() {
     } catch (err) {
       console.error('Failed to hold order:', err);
       alert('Failed to hold order');
+    }
+  }
+
+  /** Park the current basket for later recall without turning it into an order. */
+  async function handleParkCart() {
+    if (items.length === 0) return;
+    const suggested = customers.find((c: any) => c.id === selectedCustomerId)?.name || '';
+    const reference = window.prompt('Reference for this cart (customer name or order number):', suggested);
+    if (reference === null) return;
+    if (!reference.trim()) {
+      alert('Enter a reference so the cart can be found later.');
+      return;
+    }
+    try {
+      await api.saveSuspendedCart({ reference: reference.trim(), items, totalAmount: total });
+      clearCart();
+      setSelectedCustomerId('');
+      await loadData();
+    } catch (err: any) {
+      alert(err?.message || 'Failed to park the cart.');
     }
   }
 
@@ -592,10 +633,13 @@ export default function POSPage() {
                 <span className="text-xs">Discount</span>
               </button>
               <button
-                className="flex flex-col items-center gap-1 p-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                onClick={handleParkCart}
+                disabled={items.length === 0}
+                className="flex flex-col items-center gap-1 p-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Park this basket for later recall"
               >
-                <MoreHorizontal size={18} />
-                <span className="text-xs">More</span>
+                <Archive size={18} />
+                <span className="text-xs">Park</span>
               </button>
               <button
                 onClick={() => setCheckoutOpen(true)}

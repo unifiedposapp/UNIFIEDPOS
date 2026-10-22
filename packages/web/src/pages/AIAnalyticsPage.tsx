@@ -1,9 +1,63 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { api } from '../api/client';
 import { TrendingUp, Activity, Users, Sparkles } from 'lucide-react';
 import clsx from 'clsx';
 
 type Tab = 'forecast' | 'anomalies' | 'segments';
+
+// A tiny loading/error/ready state machine shared by the three report tabs. The
+// previous version only ever cleared its "Loading…" sentinel on a resolved
+// request, so a 403/429/500 or a dropped connection left the spinner running
+// forever. Now any rejection surfaces a message with a retry action, and the
+// cross-tenant 403 (a platform operator with no organization) gets a dedicated,
+// explanatory banner instead of hanging.
+interface ResourceState<T> {
+  status: 'loading' | 'ready' | 'error';
+  data: T | null;
+  message: string;
+  requiresTenant: boolean;
+}
+
+function useResource<T>(fetcher: () => Promise<T>, deps: unknown[]): ResourceState<T> & { reload: () => void } {
+  const [nonce, setNonce] = useState(0);
+  const [state, setState] = useState<ResourceState<T>>({ status: 'loading', data: null, message: '', requiresTenant: false });
+
+  useEffect(() => {
+    let alive = true;
+    setState((s) => ({ ...s, status: 'loading' }));
+    fetcher()
+      .then((data) => { if (alive) setState({ status: 'ready', data, message: '', requiresTenant: false }); })
+      .catch((err: any) => {
+        if (!alive) return;
+        const requiresTenant = err?.status === 403 || err?.code === 'ORG_CONTEXT_REQUIRED';
+        setState({
+          status: 'error',
+          data: null,
+          requiresTenant,
+          message: requiresTenant
+            ? 'This report is scoped to a store (tenant). Platform operators have no organization context, so it is not available here — sign in with a merchant account to view it.'
+            : (err?.message || 'Could not load this data.'),
+        });
+      });
+    return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [...deps, nonce]);
+
+  const reload = useCallback(() => setNonce((n) => n + 1), []);
+  return { ...state, reload };
+}
+
+function ErrorPanel({ message, requiresTenant, onRetry }: { message: string; requiresTenant: boolean; onRetry: () => void }) {
+  return (
+    <div className={clsx('rounded-lg border p-4 text-sm', requiresTenant ? 'border-violet-200 bg-violet-50 text-violet-800' : 'border-amber-200 bg-amber-50 text-amber-800')}>
+      <div className="font-medium">{requiresTenant ? 'Store context required' : 'Could not load this view'}</div>
+      <p className="mt-1">{message}</p>
+      {!requiresTenant && (
+        <button onClick={onRetry} className="mt-3 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-500">Try again</button>
+      )}
+    </div>
+  );
+}
 
 export default function AIAnalyticsPage() {
   const [tab, setTab] = useState<Tab>('forecast');
@@ -52,17 +106,16 @@ export default function AIAnalyticsPage() {
 }
 
 function ForecastTab() {
-  const [data, setData] = useState<any>(null);
   const [metric, setMetric] = useState<'revenue' | 'orders'>('revenue');
   const [horizon, setHorizon] = useState(7);
+  const res = useResource<any>(
+    () => api.getAIForecast({ metric, horizon: String(horizon), days: '60' }).then((r) => r.data),
+    [metric, horizon],
+  );
 
-  const load = async () => {
-    const r = await api.getAIForecast({ metric, horizon: String(horizon), days: '60' });
-    setData(r.data);
-  };
-  useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [metric, horizon]);
-
-  if (!data) return <div className="text-gray-500">Loading…</div>;
+  if (res.status === 'loading') return <div className="text-gray-500">Loading…</div>;
+  if (res.status === 'error' || !res.data) return <ErrorPanel message={res.message} requiresTenant={res.requiresTenant} onRetry={res.reload} />;
+  const data = res.data;
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
@@ -103,12 +156,15 @@ function ForecastTab() {
 }
 
 function AnomaliesTab() {
-  const [data, setData] = useState<any>(null);
   const [metric, setMetric] = useState<'revenue' | 'orders'>('revenue');
-  const load = async () => { const r = await api.getAIAnomalies({ metric, days: '60' }); setData(r.data); };
-  useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [metric]);
+  const res = useResource<any>(
+    () => api.getAIAnomalies({ metric, days: '60' }).then((r) => r.data),
+    [metric],
+  );
 
-  if (!data) return <div className="text-gray-500">Loading…</div>;
+  if (res.status === 'loading') return <div className="text-gray-500">Loading…</div>;
+  if (res.status === 'error' || !res.data) return <ErrorPanel message={res.message} requiresTenant={res.requiresTenant} onRetry={res.reload} />;
+  const data = res.data;
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
@@ -148,9 +204,10 @@ const SEGMENT_TONE: Record<string, string> = {
 };
 
 function SegmentsTab() {
-  const [data, setData] = useState<any>(null);
-  useEffect(() => { api.getAISegments({ limit: '500' }).then((r) => setData(r.data)); }, []);
-  if (!data) return <div className="text-gray-500">Loading…</div>;
+  const res = useResource<any>(() => api.getAISegments({ limit: '500' }).then((r) => r.data), []);
+  if (res.status === 'loading') return <div className="text-gray-500">Loading…</div>;
+  if (res.status === 'error' || !res.data) return <ErrorPanel message={res.message} requiresTenant={res.requiresTenant} onRetry={res.reload} />;
+  const data = res.data;
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">

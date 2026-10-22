@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { Gift, CreditCard, Clock, RotateCcw, Plus, DollarSign, Search, Package, Tags, Undo2, X } from 'lucide-react';
 import { PRODUCT_TYPE_LABELS, productTypeLabel, isStockTracked } from '@pos/shared';
@@ -22,6 +23,7 @@ const GIFT_CARD_MAX = 1000;
 
 export default function RetailPage() {
   const [tab, setTab] = useState<Tab>('giftcards');
+  const navigate = useNavigate();
   const [giftCards, setGiftCards] = useState<any[]>([]);
   const [storeCredits, setStoreCredits] = useState<any[]>([]);
   const [layaways, setLayaways] = useState<any[]>([]);
@@ -189,8 +191,14 @@ export default function RetailPage() {
   };
 
   const resumeCart = async (id: string) => {
-    await api.resumeSuspendedCart(id);
-    load();
+    try {
+      const res = await api.resumeSuspendedCart(id);
+      // The server consumes the parked cart and returns its basket; hand it to
+      // the POS, which restores the items into the live sale.
+      navigate('/pos', { state: { suspendedCart: res.data } });
+    } catch (err: any) {
+      alert(err?.message || 'Failed to resume this cart.');
+    }
   };
 
   const deleteCart = async (id: string) => {
@@ -550,7 +558,6 @@ export default function RetailPage() {
             <thead className="bg-gray-50 border-b">
               <tr>
                 <th className="text-start px-4 py-3 text-sm font-medium">Reference</th>
-                <th className="text-start px-4 py-3 text-sm font-medium">Employee</th>
                 <th className="text-end px-4 py-3 text-sm font-medium">Total</th>
                 <th className="text-start px-4 py-3 text-sm font-medium">Notes</th>
                 <th className="text-start px-4 py-3 text-sm font-medium">Created</th>
@@ -561,7 +568,6 @@ export default function RetailPage() {
               {suspendedCarts.map(sc => (
                 <tr key={sc.id} className="border-b hover:bg-gray-50">
                   <td className="px-4 py-3 text-sm font-medium">{sc.reference || '-'}</td>
-                  <td className="px-4 py-3 text-sm">{sc.employee?.name || '-'}</td>
                   <td className="px-4 py-3 text-sm text-end font-mono">${Number(sc.totalAmount).toFixed(2)}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">{sc.notes || '-'}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">{new Date(sc.createdAt).toLocaleString()}</td>
@@ -571,7 +577,7 @@ export default function RetailPage() {
                   </td>
                 </tr>
               ))}
-              {suspendedCarts.length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-500">No suspended carts</td></tr>}
+              {suspendedCarts.length === 0 && <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-500">No suspended carts</td></tr>}
             </tbody>
           </table>
         </div>

@@ -69,6 +69,16 @@ router.post('/transfers', authMiddleware, validateRequest(transferSchema), async
       return res.status(400).json({ success: false, message: 'Cannot transfer to same location' });
     }
 
+    // Both endpoints of the move, and every product on it, must be the org's.
+    const [locations, products] = await Promise.all([
+      prisma.location.count({ where: { id: { in: [fromLocationId, toLocationId] }, organizationId: orgId } }),
+      prisma.product.count({ where: { id: { in: items.map((i: any) => i.productId) }, organizationId: orgId } }),
+    ]);
+    if (locations !== 2) return res.status(404).json({ success: false, message: 'Location not found' });
+    if (products !== new Set(items.map((i: any) => i.productId)).size) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
     const transfer = await prisma.stockTransfer.create({
       data: {
         organizationId: orgId,
@@ -139,8 +149,8 @@ router.post('/transfers/:id/receive', authMiddleware, validateRequest(receiveTra
     const orgId = req.user!.organizationId!;
     const transferId = String(req.params.id);
 
-    const transfer = await prisma.stockTransfer.findUnique({
-      where: { id: transferId },
+    const transfer = await prisma.stockTransfer.findFirst({
+      where: { id: transferId, organizationId: orgId },
       include: { items: true },
     });
 

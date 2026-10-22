@@ -545,7 +545,7 @@ export const api = {
   // ── Device Management (§38) ──────────────────────────────────
   getDevices: () => request<any>('/devices'),
   registerDevice: (data: any) =>
-    request<any>('/devices/register', { method: 'POST', body: JSON.stringify(data) }),
+    request<any>('/devices', { method: 'POST', body: JSON.stringify(data) }),
   getDevice: (id: string) => request<any>(`/devices/${id}`),
   assignDevice: (id: string, data: any) =>
     request<any>(`/devices/${id}/assign`, { method: 'PUT', body: JSON.stringify(data) }),

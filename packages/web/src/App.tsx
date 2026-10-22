@@ -128,7 +128,7 @@ class RouteErrorBoundary extends Component<{ children: ReactNode }, { error: Err
 }
 
 function App() {
-  const { isAuthenticated, loadFromStorage } = useAuthStore();
+  const { isAuthenticated, loadFromStorage, user, organization } = useAuthStore();
   const location = useLocation();
 
   useEffect(() => {
@@ -163,9 +163,34 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/legal/:doc" element={<LegalPage />} />
           <Route path="/login" element={<LoginPage />} />
+          {/* The Platform Console is operator-only: send a signed-out visitor to
+              the operator entrance rather than the merchant sign-in form. */}
+          <Route path="/admin" element={<Navigate to="/platform/login" replace />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Suspense>
+    );
+  }
+
+  // A SUPER_ADMIN who is not attached to an organization has no tenant context
+  // (the API answers 403 ORG_CONTEXT_REQUIRED everywhere else). Land them on the
+  // Platform Console and keep every merchant route out of reach instead of
+  // dropping them on a POS screen that can never load.
+  const isOperatorWithoutOrg = isAuthenticated && user?.role === 'SUPER_ADMIN' && !organization;
+
+  if (isOperatorWithoutOrg) {
+    return (
+      <Layout>
+        <RouteErrorBoundary key={location.pathname}>
+          <Suspense fallback={<RouteFallback />}>
+            <Routes>
+              <Route path="/admin" element={<AdminPortalPage />} />
+              <Route path="/legal/:doc" element={<LegalPage />} />
+              <Route path="*" element={<Navigate to="/admin" replace />} />
+            </Routes>
+          </Suspense>
+        </RouteErrorBoundary>
+      </Layout>
     );
   }
 

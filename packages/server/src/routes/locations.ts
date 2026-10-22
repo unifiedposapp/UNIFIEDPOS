@@ -40,7 +40,9 @@ router.post('/', authMiddleware, requireRole('OWNER', 'ADMIN'), validateRequest(
 // PUT /api/locations/:id
 router.put('/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), validateRequest(locationSchema.partial()), async (req: AuthRequest, res: Response) => {
   try {
-    const location = await prisma.location.update({ where: { id: String(req.params.id) }, data: req.body });
+    const owned = await prisma.location.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! }, select: { id: true } });
+    if (!owned) return res.status(404).json({ success: false, message: 'Location not found' });
+    const location = await prisma.location.update({ where: { id: owned.id }, data: req.body });
     res.json({ success: true, data: location });
   } catch (error) {
     handleError(error, res);
@@ -50,7 +52,9 @@ router.put('/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), validateReques
 // DELETE /api/locations/:id
 router.delete('/:id', authMiddleware, requireRole('OWNER'), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.location.delete({ where: { id: String(req.params.id) } });
+    const owned = await prisma.location.findFirst({ where: { id: String(req.params.id), organizationId: req.user!.organizationId! }, select: { id: true } });
+    if (!owned) return res.status(404).json({ success: false, message: 'Location not found' });
+    await prisma.location.delete({ where: { id: owned.id } });
     res.json({ success: true, message: 'Location deleted' });
   } catch (error) {
     handleError(error, res);
