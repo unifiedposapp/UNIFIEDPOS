@@ -4,33 +4,33 @@ This folder holds the **version-controlled migration history** that makes schema
 changes safe and repeatable in production (the container entrypoint runs
 `prisma migrate deploy` on boot).
 
-The project currently bootstraps the schema with `prisma db push` (dev-only, no
-history). To move to real migrations, **baseline** the existing database once.
+There are ten migrations, from `20260907000000_init` to
+`20261028130000_platform_billing`. They have been applied in order to an empty
+PostgreSQL database and the result diffs empty against `schema.prisma`, so a fresh
+volume reaches the current schema with `migrate deploy` alone — no baseline step,
+no `db push`.
 
-## One-time baseline (existing database created with `db push`)
+`prisma db push` remains a fast local loop, but a database built that way has no
+history and will not match a deployed one. Prefer `db:migrate` in development so
+this folder keeps describing the database.
 
-Run from the repository root. These create an initial migration that matches the
-current schema and mark it as already-applied, so `migrate deploy` is a no-op on
-your existing database but works on fresh ones.
+## Checking for drift
+
+Run from `packages/server`. An empty migration means the migrations and the schema
+agree; anything else is a schema change that was never turned into a migration.
 
 ```powershell
-# 1. Create the initial migration folder + SQL from the current schema
-#    (Prisma writes migration.sql; the folder name is the migration id).
-npx prisma migrate diff `
-  --from-empty `
-  --to-schema-datamodel packages/server/prisma/schema.prisma `
-  --script > packages/server/prisma/migrations/0_init/migration.sql
-
-# 2. Tell Prisma that 0_init is already applied to your existing database.
-npx prisma migrate resolve --applied 0_init `
-  --schema packages/server/prisma/schema.prisma
+npx prisma migrate diff --from-url $env:DATABASE_URL `
+  --to-schema-datamodel prisma/schema.prisma --script
 ```
 
-> On macOS/Linux use `\` line continuations (or a single line) instead of the
-> PowerShell backtick. Create the `0_init` directory first if your shell does not
-> create it from the redirection.
+## Encoding
 
-## Day-to-day workflow (after baselining)
+Migration files **must be UTF-8**. A `migration.sql` saved as UTF-16LE makes
+`migrate deploy` stop with P3015 ("could not find the migration file"), which looks
+like a missing file rather than a bad encoding.
+
+## Day-to-day workflow
 
 ```powershell
 # Change schema.prisma, then create + apply a migration in dev:

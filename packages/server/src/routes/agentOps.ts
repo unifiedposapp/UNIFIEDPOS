@@ -94,6 +94,10 @@ router.post('/replenish', authMiddleware, requireRole('OWNER', 'ADMIN', 'MANAGER
         bySupplier: built.plan.bySupplier,
         items: built.plan.items.filter((i) => i.action === 'ORDER').slice(0, 200),
         watch: built.plan.items.filter((i) => i.action === 'WATCH').slice(0, 25),
+        // Why a plan can be empty, in words. The button used to look dead because
+        // a zero-line draft and a failed request were indistinguishable on screen.
+        diagnostics: built.stats,
+        explanation: built.explanation,
         purchaseOrderIds: ordered?.purchaseOrderIds ?? null,
       },
     });
@@ -250,7 +254,9 @@ router.get('/overview', authMiddleware, async (req: AuthRequest, res: Response) 
   try {
     const organizationId = req.user!.organizationId!;
     const [drafts, ordered, spent, openPos, products] = await Promise.all([
-      prisma.replenishmentRun.aggregate({ where: { organizationId, status: 'DRAFT' }, _count: { _all: true }, _sum: { estimatedCost: true, itemCount: true } }),
+      // Zero-line drafts are a record of "we looked, nothing was needed", not work
+      // waiting on a human — counting them made the tile climb on every click.
+      prisma.replenishmentRun.aggregate({ where: { organizationId, status: 'DRAFT', itemCount: { gt: 0 } }, _count: { _all: true }, _sum: { estimatedCost: true, itemCount: true } }),
       prisma.replenishmentRun.count({ where: { organizationId, status: 'APPROVED' } }),
       prisma.replenishmentRun.aggregate({ where: { organizationId, status: { in: ['APPROVED', 'ORDERED'] } }, _sum: { estimatedCost: true } }),
       prisma.purchaseOrder.count({ where: { organizationId, status: 'DRAFT' } }),

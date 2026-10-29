@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { api } from '../api/client';
-import { Bot, Play, CheckCircle2, XCircle, PackageSearch, TrendingUp } from 'lucide-react';
+import { Bot, Play, CheckCircle2, XCircle, Loader2, PackageSearch, TrendingUp } from 'lucide-react';
 import {
   Badge,
   Card,
@@ -32,7 +32,9 @@ export default function AgentOpsPage() {
   const [lowStock, setLowStock] = useState<any>(null);
   const [forecast, setForecast] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-  const [guardrails, setGuardrails] = useState({ horizonDays: '14', lookbackDays: '90', serviceLevel: '0.975', maxSpend: '', maxLines: '' });
+  const [running, setRunning] = useState(false);
+  const previewRef = useRef<HTMLDivElement | null>(null);
+  const [guardrails, setGuardrails] = useState({ horizonDays: '14', lookbackDays: '90', serviceLevel: '0.95', maxSpend: '', maxLines: '' });
 
   const load = useCallback(async () => {
     const [o, r, l] = await Promise.all([
@@ -50,20 +52,32 @@ export default function AgentOpsPage() {
   }, [load]);
 
   const runPlan = async () => {
-    const data = await call(
-      () =>
-        api.runReplenishment({
-          horizonDays: Number(guardrails.horizonDays) || 14,
-          lookbackDays: Number(guardrails.lookbackDays) || 90,
-          serviceLevel: Number(guardrails.serviceLevel) || 0.975,
-          maxSpend: guardrails.maxSpend ? Number(guardrails.maxSpend) : null,
-          maxLines: guardrails.maxLines ? Number(guardrails.maxLines) : null,
-        }),
-      setError
-    );
-    setPreview(data);
-    load();
+    // The draft renders below the fold, so the click has to prove it did something:
+    // a busy state on the button, then the result scrolled into view.
+    if (running) return;
+    setRunning(true);
+    try {
+      const data = await call(
+        () =>
+          api.runReplenishment({
+            horizonDays: Number(guardrails.horizonDays) || 14,
+            lookbackDays: Number(guardrails.lookbackDays) || 90,
+            serviceLevel: Number(guardrails.serviceLevel) || 0.95,
+            maxSpend: guardrails.maxSpend ? Number(guardrails.maxSpend) : null,
+            maxLines: guardrails.maxLines ? Number(guardrails.maxLines) : null,
+          }),
+        setError
+      );
+      setPreview(data);
+      await load();
+    } finally {
+      setRunning(false);
+    }
   };
+
+  useEffect(() => {
+    if (preview?.runId) previewRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [preview?.runId]);
 
   const approve = async (id: string) => {
     const data = await call(() => api.approveReplenishmentRun(id), setError);
@@ -87,6 +101,12 @@ export default function AgentOpsPage() {
   };
 
   const planItems: any[] = preview?.items || preview?.plan?.items?.filter((i: any) => i.action === 'ORDER') || [];
+  // The server sends its own verdict on why a plan is empty; the fallback covers
+  // runs inspected from history, whose stored plan predates that field.
+  const explanation: string | null =
+    preview?.explanation ||
+    preview?.plan?.explanation ||
+    (preview && planItems.length === 0 ? 'This plan has no order lines — no SKU is below its target stock for these guardrails.' : null);
 
   return (
     <div className="p-6 space-y-6">
@@ -94,8 +114,9 @@ export default function AgentOpsPage() {
         title="Buying Agent"
         subtitle="Demand forecasting, safety stock and draft purchase orders. The agent proposes; only a person disposes — nothing is ordered until it is approved here."
         actions={
-          <button className={primaryButton} onClick={runPlan}>
-            <Play size={15} /> Draft a replenishment plan
+          <button type="button" className={primaryButton} onClick={runPlan} disabled={running} aria-busy={running}>
+            {running ? <Loader2 size={15} className="animate-spin" /> : <Play size={15} />}
+            {running ? 'Drafting…' : 'Draft a replenishment plan'}
           </button>
         }
       />
@@ -144,73 +165,80 @@ export default function AgentOpsPage() {
       </div>
 
       {preview && (
-        <Card
-          title={`Draft plan ${preview.runId?.slice(0, 8) ?? ''}`}
-          icon={<Bot size={18} />}
-          actions={
-            preview.status === 'DRAFT' ? (
-              <>
-                <button className={primaryButton} onClick={() => approve(preview.runId)}><CheckCircle2 size={15} /> Approve into POs</button>
-                <button className={ghostButton} onClick={() => discard(preview.runId)}><XCircle size={15} /> Discard</button>
-              </>
-            ) : (
-              <Badge>{preview.status}</Badge>
-            )
-          }
-        >
-          <p className="text-sm text-gray-600">{preview.summary || preview.plan?.summary}</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 my-4">
-            <Stat label="Lines" value={preview.totals?.lines ?? preview.plan?.totals?.lines ?? planItems.length} />
-            <Stat label="Units" value={preview.totals?.units ?? preview.plan?.totals?.units ?? 0} />
-            <Stat label="Estimated cost" value={<Money value={preview.totals?.cost ?? preview.plan?.totals?.cost} />} />
-            <Stat
-              label="Trimmed by cap"
-              value={(preview.totals?.trimmed ?? preview.plan?.totals?.trimmed) || 0}
-              tone={(preview.totals?.trimmed ?? preview.plan?.totals?.trimmed) ? 'warn' : 'good'}
-              hint={<Money value={preview.totals?.trimmedCost ?? preview.plan?.totals?.trimmedCost ?? 0} />}
-            />
-          </div>
-
-          <Table head={<tr><Th>Product</Th><Th>Supplier</Th><Th>Available</Th><Th>Demand</Th><Th>Safety</Th><Th>Target</Th><Th>Qty</Th><Th>Cost</Th><Th>Cover</Th></tr>}>
-            {planItems.map((i: any) => (
-              <tr key={i.productId}>
-                <Td>
-                  <div className="font-medium">{i.name}</div>
-                  <div className="text-xs text-gray-500">{i.sku}</div>
-                </Td>
-                <Td className="text-gray-600">{i.supplierName || <span className="text-amber-600">no supplier</span>}</Td>
-                <Td className="tabular-nums">{i.available}</Td>
-                <Td className="tabular-nums">{i.demand}</Td>
-                <Td className="tabular-nums">{i.safetyStock}</Td>
-                <Td className="tabular-nums">{i.targetStock}</Td>
-                <Td className="tabular-nums font-medium">{i.quantity}</Td>
-                <Td><Money value={i.cost} /></Td>
-                <Td className="tabular-nums">{i.daysOfCover == null ? '—' : `${i.daysOfCover} d`}</Td>
-              </tr>
-            ))}
-            {planItems.length === 0 && <tr><Td colSpan={9}><Empty>No lines needed on these inputs.</Empty></Td></tr>}
-          </Table>
-
-          {(preview.bySupplier || preview.plan?.bySupplier)?.length > 0 && (
-            <div className="mt-4 text-sm">
-              <div className="text-gray-500 mb-1">Split into {preview.bySupplier?.length ?? preview.plan?.bySupplier?.length} purchase orders:</div>
-              <ul className="space-y-1">
-                {(preview.bySupplier || preview.plan?.bySupplier).map((s: any) => (
-                  <li key={s.supplierId || 'none'} className="flex justify-between border rounded px-2 py-1">
-                    <span>{s.supplierName || 'Unassigned supplier'}</span>
-                    <span className="text-gray-500">{s.lines} lines · {s.units} units · <Money value={s.cost} /></span>
-                  </li>
-                ))}
-              </ul>
+        <div ref={previewRef} className="scroll-mt-4">
+          <Card
+            title={`Draft plan ${preview.runId?.slice(0, 8) ?? ''}`.trim()}
+            icon={<Bot size={18} />}
+            actions={
+              preview.status === 'DRAFT' && planItems.length > 0 ? (
+                <>
+                  <button className={primaryButton} onClick={() => approve(preview.runId)}><CheckCircle2 size={15} /> Approve into POs</button>
+                  <button className={ghostButton} onClick={() => discard(preview.runId)}><XCircle size={15} /> Discard</button>
+                </>
+              ) : (
+                <Badge>{preview.status}</Badge>
+              )
+            }
+          >
+            <p className="text-sm text-gray-600">{preview.summary || preview.plan?.summary}</p>
+            {explanation && (
+              <div role="status" className="mt-2 text-sm bg-amber-50 border border-amber-200 text-amber-800 rounded px-3 py-2">
+                {explanation}
+              </div>
+            )}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 my-4">
+              <Stat label="Lines" value={preview.totals?.lines ?? preview.plan?.totals?.lines ?? planItems.length} />
+              <Stat label="Units" value={preview.totals?.units ?? preview.plan?.totals?.units ?? 0} />
+              <Stat label="Estimated cost" value={<Money value={preview.totals?.cost ?? preview.plan?.totals?.cost} />} />
+              <Stat
+                label="Trimmed by cap"
+                value={(preview.totals?.trimmed ?? preview.plan?.totals?.trimmed) || 0}
+                tone={(preview.totals?.trimmed ?? preview.plan?.totals?.trimmed) ? 'warn' : 'good'}
+                hint={<Money value={preview.totals?.trimmedCost ?? preview.plan?.totals?.trimmedCost ?? 0} />}
+              />
             </div>
-          )}
 
-          {preview.purchaseOrders?.length > 0 && (
-            <div className="mt-3 text-sm text-emerald-700">
-              Created: {preview.purchaseOrders.map((p: any) => `${p.id.slice(0, 8)} (${p.lines} lines, ${Number(p.total).toFixed(2)})`).join(' · ')}
-            </div>
-          )}
-        </Card>
+            <Table head={<tr><Th>Product</Th><Th>Supplier</Th><Th>Available</Th><Th>Demand</Th><Th>Safety</Th><Th>Target</Th><Th>Qty</Th><Th>Cost</Th><Th>Cover</Th></tr>}>
+              {planItems.map((i: any) => (
+                <tr key={i.productId}>
+                  <Td>
+                    <div className="font-medium">{i.name}</div>
+                    <div className="text-xs text-gray-500">{i.sku}</div>
+                  </Td>
+                  <Td className="text-gray-600">{i.supplierName || <span className="text-amber-600">no supplier</span>}</Td>
+                  <Td className="tabular-nums">{i.available}</Td>
+                  <Td className="tabular-nums">{i.demand}</Td>
+                  <Td className="tabular-nums">{i.safetyStock}</Td>
+                  <Td className="tabular-nums">{i.targetStock}</Td>
+                  <Td className="tabular-nums font-medium">{i.quantity}</Td>
+                  <Td><Money value={i.cost} /></Td>
+                  <Td className="tabular-nums">{i.daysOfCover == null ? '—' : `${i.daysOfCover} d`}</Td>
+                </tr>
+              ))}
+              {planItems.length === 0 && <tr><Td colSpan={9}><Empty>No lines needed on these inputs.</Empty></Td></tr>}
+            </Table>
+
+            {(preview.bySupplier || preview.plan?.bySupplier)?.length > 0 && (
+              <div className="mt-4 text-sm">
+                <div className="text-gray-500 mb-1">Split into {preview.bySupplier?.length ?? preview.plan?.bySupplier?.length} purchase orders:</div>
+                <ul className="space-y-1">
+                  {(preview.bySupplier || preview.plan?.bySupplier).map((s: any) => (
+                    <li key={s.supplierId || 'none'} className="flex justify-between border rounded px-2 py-1">
+                      <span>{s.supplierName || 'Unassigned supplier'}</span>
+                      <span className="text-gray-500">{s.lines} lines · {s.units} units · <Money value={s.cost} /></span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {preview.purchaseOrders?.length > 0 && (
+              <div className="mt-3 text-sm text-emerald-700">
+                Created: {preview.purchaseOrders.map((p: any) => `${p.id.slice(0, 8)} (${p.lines} lines, ${Number(p.total).toFixed(2)})`).join(' · ')}
+              </div>
+            )}
+          </Card>
+        </div>
       )}
 
       {forecast && (
@@ -246,11 +274,12 @@ export default function AgentOpsPage() {
               <Td><Badge>{r.status}</Badge></Td>
               <Td className="text-end whitespace-nowrap">
                 <button className={ghostButton} onClick={() => inspect(r.id)}>Inspect</button>
+                {/* A zero-line draft has nothing to approve — offering it only led to a 400. */}
+                {r.status === 'DRAFT' && Number(r.itemCount) > 0 && (
+                  <>{' '}<button className={primaryButton} onClick={() => approve(r.id)}>Approve</button></>
+                )}
                 {r.status === 'DRAFT' && (
-                  <>
-                    {' '}<button className={primaryButton} onClick={() => approve(r.id)}>Approve</button>
-                    {' '}<button className={ghostButton} onClick={() => discard(r.id)}>Discard</button>
-                  </>
+                  <>{' '}<button className={ghostButton} onClick={() => discard(r.id)}>Discard</button></>
                 )}
               </Td>
             </tr>

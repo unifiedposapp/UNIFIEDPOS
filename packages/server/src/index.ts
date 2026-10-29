@@ -63,6 +63,22 @@ import subscriptionRoutes from './routes/subscriptions.js';
 import platformRoutes from './routes/platform.js';
 import ssoRoutes from './routes/sso.js';
 import wellKnownRoutes from './routes/wellKnown.js';
+// ─── Competitor-parity subsystems (recipes, labour, tips, card-present, channel
+// connectors, quotes, field service, kitchen ops, kiosk, report builder) ───
+import recipeRoutes from './routes/recipes.js';
+import laborRoutes from './routes/labor.js';
+import tipRoutes from './routes/tips.js';
+import terminalRoutes from './routes/terminal.js';
+import channelRoutes, { channelWebhookHandler } from './routes/channels.js';
+import quoteRoutes from './routes/quotes.js';
+import serviceOrderRoutes from './routes/serviceOrders.js';
+import kitchenOpsRoutes from './routes/kitchenOps.js';
+import kioskRoutes from './routes/kiosk.js';
+import customReportRoutes from './routes/customReports.js';
+import promotionEngineRoutes from './routes/promotionEngine.js';
+import loyaltyTierRoutes from './routes/loyaltyTiers.js';
+import backorderRoutes from './routes/backorders.js';
+import ageVerificationRoutes from './routes/ageVerifications.js';
 import { requestLogger, errorLogger } from './middleware/logger.js';
 import { apiRateLimiter, paymentRateLimiter } from './middleware/rateLimiter.js';
 import { idempotencyMiddleware } from './middleware/idempotency.js';
@@ -179,6 +195,12 @@ app.post('/api/v1/delivery/webhooks/:provider', express.raw({ type: () => true }
 // exact bytes to verify their signature, so mount them raw before the JSON parser.
 app.post('/api/regional/webhooks/:provider', express.raw({ type: () => true }), regionalWebhookHandler);
 
+// Marketplace/webshop callbacks (Shopify / WooCommerce / BigCommerce) verify an
+// HMAC over the exact body bytes, so the connection id is resolved from the path
+// and the signature checked BEFORE any JSON parsing happens.
+app.post('/api/channels/webhooks/:connectionId', express.raw({ type: () => true }), channelWebhookHandler);
+app.post('/api/v1/channels/webhooks/:connectionId', express.raw({ type: () => true }), channelWebhookHandler);
+
 app.use(express.json({ limit: '12mb' })); // Raised limit: Settings branding stores base64 logo/media uploads
 app.use(express.urlencoded({ extended: false, limit: '2mb' })); // SAML POST-binding ACS sends form-encoded SAMLResponse (§sso)
 app.use(cookieParser()); // Parse cookies so the httpOnly session + CSRF cookies are readable (§37)
@@ -196,8 +218,13 @@ const routeTable: { path: string; stack: any[] }[] = [
   { path: '/auth', stack: [authRoutes] }, // brute-force limiting is applied per credential route inside authRoutes (§37) - not on /me and friends, which every app load calls
   { path: '/inventory', stack: [inventoryRoutes] },
   { path: '/products', stack: [productRoutes] },
+  // Backorders live under /orders/backorders and must be registered before the
+  // order router, whose GET /:id would otherwise swallow the path.
+  { path: '/orders', stack: [backorderRoutes] },
+  { path: '/age-verifications', stack: [ageVerificationRoutes] },
   { path: '/orders', stack: [orderRoutes] },
   { path: '/reports', stack: [reportRoutes] },
+  { path: '/reports', stack: [customReportRoutes] }, // §16 report builder (fall-through)
   { path: '/settings', stack: [settingsRoutes] },
   { path: '/locations', stack: [locationRoutes] },
   { path: '/registers', stack: [registerRoutes] },
@@ -206,6 +233,7 @@ const routeTable: { path: string; stack: any[] }[] = [
   { path: '/receipts', stack: [receiptRoutes] },
   { path: '/webhooks', stack: [webhookRoutes] },
   { path: '/loyalty', stack: [loyaltyRoutes] },
+  { path: '/loyalty', stack: [loyaltyTierRoutes] }, // §8 tiers over the flat program (fall-through)
   { path: '/restaurant', stack: [restaurantRoutes] },
   { path: '/restaurant', stack: [restaurantExtRoutes] }, // §17 QR tokens / catering / food-cost (fall-through)
   { path: '/accounting', stack: [accountingRoutes] },
@@ -219,6 +247,7 @@ const routeTable: { path: string; stack: any[] }[] = [
   { path: '/payments', stack: [paymentRateLimiter, paymentRoutes] }, // stricter limit on payment endpoints (§37)
   { path: '/inventory-ops', stack: [inventoryOpsRoutes] },
   { path: '/marketing', stack: [marketingRoutes] },
+  { path: '/marketing', stack: [promotionEngineRoutes] }, // §19 auto-apply planner (fall-through)
   { path: '/copilot', stack: [copilotRoutes] },
   { path: '/enterprise', stack: [enterpriseRoutes] },
   { path: '/retail', stack: [retailRoutes] },
@@ -252,6 +281,19 @@ const routeTable: { path: string; stack: any[] }[] = [
   { path: '/subscriptions', stack: [subscriptionRoutes] }, // Recurring subscription billing engine
   { path: '/platform', stack: [platformRoutes] }, // SaaS-operator admin console (SUPER_ADMIN only, cross-tenant)
   { path: '/sso', stack: [ssoRoutes] }, // Enterprise SSO (OIDC/SAML) + SCIM provisioning
+  // ── Competitor-parity subsystems ──
+  { path: '/recipes', stack: [recipeRoutes] }, // §17 recipes / BOM costing + ingredient depletion
+  { path: '/labor', stack: [laborRoutes] }, // roster, availability, time off, swaps, payroll export
+  { path: '/tips', stack: [tipRoutes] }, // §10 tip pooling + distributions
+  { path: '/terminal', stack: [paymentRateLimiter, terminalRoutes] }, // Stripe Terminal card-present + tip adjust
+  { path: '/channels', stack: [channelRoutes] }, // Shopify / WooCommerce / BigCommerce connectors (webhooks are raw-mounted above)
+  { path: '/quotes', stack: [quoteRoutes] }, // estimates → order
+  { path: '/service', stack: [serviceOrderRoutes] }, // appointments, work orders, rentals
+  { path: '/kiosk', stack: [kioskRoutes] }, // self-service kiosk + customer display pairing
+  // Kitchen: `restaurantRoutes` already owns /kitchen/*, so register this router
+  // AFTER it. Our paths (stations/tickets/tabs/fire) never overlap, and the
+  // existing ones keep working.
+  { path: '/restaurant', stack: [kitchenOpsRoutes] },
 ];
 for (const r of routeTable) {
   app.use(`/api${r.path}`, ...r.stack);

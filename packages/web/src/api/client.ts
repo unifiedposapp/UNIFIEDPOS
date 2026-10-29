@@ -60,7 +60,11 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
       const onPublicAuthPage =
         path.startsWith('/login') ||
         path.startsWith('/register') ||
-        path.startsWith('/reset-password');
+        path.startsWith('/reset-password') ||
+        // A paired kiosk or pole display has no login by design: a 401 there means
+        // "this device is not paired", not "the operator's session expired", and
+        // must never wipe the till's session.
+        path.startsWith('/device/');
       if (!onPublicAuthPage) {
         redirectingToLogin = true;
         localStorage.removeItem('pos_token');
@@ -85,19 +89,65 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 function statusError(
   status: number,
   data: any,
-): Error & { status?: number; code?: string; data?: any } {
+): Error & { status?: number; code?: string; data?: any; body?: any } {
   const error = new Error(data?.error || data?.message || 'Request failed') as Error & {
     status?: number;
     code?: string;
     data?: any;
+    body?: any;
   };
   error.status = status;
   error.code = data?.code;
   error.data = data?.data;
+  // The whole response body, because some failures carry their detail beside
+  // `data` (e.g. AGE_VERIFICATION_REQUIRED ships `minAge` and `items` at the top
+  // level so the till can open the right prompt without a second round trip).
+  error.body = data;
   return error;
 }
 
 export const api = {
+  /**
+   * Authenticated file download (payroll CSV, report CSV).
+   *
+   * These endpoints answer with bytes, not JSON, and they still require the
+   * Bearer token — so a plain <a href> would arrive unauthenticated. Fetch the
+   * blob and let the caller save it.
+   */
+  downloadFile: async (
+    endpoint: string,
+    options: { method?: string; body?: any } = {},
+  ): Promise<Blob> => {
+    const token = getToken();
+    const method = (options.method || 'GET').toUpperCase();
+    const headers: Record<string, string> = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    if (options.body !== undefined) headers['Content-Type'] = 'application/json';
+    if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
+      const csrf = getCsrfToken();
+      if (csrf) headers['X-CSRF-Token'] = csrf;
+    }
+
+    const response = await fetch(`${API_BASE}${endpoint}`, {
+      method,
+      body: options.body === undefined ? undefined : JSON.stringify(options.body),
+      headers,
+      credentials: 'include',
+    });
+    if (!response.ok) {
+      let data: any = {};
+      try {
+        data = await response.json();
+      } catch {
+        // A failed CSV download is not guaranteed to be JSON; the status is
+        // still enough to describe the failure.
+        data = { message: `Download failed (${response.status})` };
+      }
+      throw statusError(response.status, data);
+    }
+    return response.blob();
+  },
+
   // Auth
   login: (email: string, password: string) =>
     request<any>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
@@ -1309,4 +1359,297 @@ export const api = {
   getPlatformPayments: () => request<any>('/platform/payments'),
   getPlatformRevenue: (months = 12) => request<any>(`/platform/revenue?months=${months}`),
   getPlatformHistory: (limit = 100) => request<any>(`/platform/history?limit=${limit}`),
+
+  // ═══════════════════════════════════════════════════════════
+  //  COMPETITOR-PARITY SURFACE
+  // ═══════════════════════════════════════════════════════════
+
+  // ── Weighed selling / PLU (§6) ──
+  scanCode: (code: string, mode: 'WEIGHT' | 'PRICE' = 'WEIGHT') =>
+    request<any>(`/products/scan/${encodeURIComponent(code)}?mode=${mode}`),
+  lookupPlu: (plu: string) => request<any>(`/products/plu/${encodeURIComponent(plu)}`),
+
+  // ── Age verification (§6) ──
+  getAgePolicy: () => request<any>('/age-verifications/policy'),
+  createAgeVerification: (data: {
+    method?: 'MANUAL_DOB' | 'ID_SCAN' | 'SUPERVISOR_OVERRIDE';
+    birthDate?: string | null;
+    documentType?: string | null;
+    documentLast4?: string | null;
+    customerId?: string | null;
+    orderId?: string | null;
+    deviceId?: string | null;
+    items?: { productId: string; name?: string; ageRestricted?: boolean; minAge?: number | null }[];
+    notes?: string | null;
+  }) => request<any>('/age-verifications', { method: 'POST', body: JSON.stringify(data) }),
+  getAgeVerifications: (params?: Record<string, string>) => {
+    const q = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return request<any>(`/age-verifications${q}`);
+  },
+
+  // ── Recipes / bill of materials (§17) ──
+  getRecipes: () => request<any>('/recipes'),
+  getRecipe: (productId: string) => request<any>(`/recipes/${productId}`),
+  saveRecipe: (productId: string, data: any) =>
+    request<any>(`/recipes/${productId}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteRecipe: (productId: string) => request<any>(`/recipes/${productId}`, { method: 'DELETE' }),
+  previewRecipeDepletion: (productId: string, qty = 1) =>
+    request<any>(`/recipes/${productId}/depletion-preview?qty=${qty}`),
+
+  // ── Labour: roster, availability, time off, swaps, payroll ──
+  getSchedules: (params?: Record<string, string>) => {
+    const q = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return request<any>(`/labor/schedules${q}`);
+  },
+  createSchedule: (data: any) => request<any>('/labor/schedules', { method: 'POST', body: JSON.stringify(data) }),
+  updateSchedule: (id: string, data: any) =>
+    request<any>(`/labor/schedules/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteSchedule: (id: string) => request<any>(`/labor/schedules/${id}`, { method: 'DELETE' }),
+  publishSchedules: (data: { ids?: string[]; from?: string; to?: string; includeAvailabilityWarnings?: boolean }) =>
+    request<any>('/labor/schedules/publish', { method: 'POST', body: JSON.stringify(data) }),
+  getScheduleConflicts: (params?: Record<string, string>) => {
+    const q = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return request<any>(`/labor/conflicts${q}`);
+  },
+  getAvailability: (params?: Record<string, string>) => {
+    const q = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return request<any>(`/labor/availability${q}`);
+  },
+  setAvailability: (employeeId: string, data: { windows: any[] }) =>
+    request<any>(`/labor/availability/${employeeId}`, { method: 'PUT', body: JSON.stringify(data) }),
+  getTimeOff: (params?: Record<string, string>) => {
+    const q = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return request<any>(`/labor/time-off${q}`);
+  },
+  requestTimeOff: (data: any) => request<any>('/labor/time-off', { method: 'POST', body: JSON.stringify(data) }),
+  decideTimeOff: (id: string, data: { status: 'APPROVED' | 'DECLINED'; reason?: string }) =>
+    request<any>(`/labor/time-off/${id}/decision`, { method: 'PUT', body: JSON.stringify(data) }),
+  getShiftSwaps: () => request<any>('/labor/swaps'),
+  requestShiftSwap: (data: any) => request<any>('/labor/swaps', { method: 'POST', body: JSON.stringify(data) }),
+  decideShiftSwap: (id: string, data: { status: 'APPROVED' | 'DECLINED' | 'WITHDRAWN'; toEmployeeId?: string }) =>
+    request<any>(`/labor/swaps/${id}/decision`, { method: 'PUT', body: JSON.stringify(data) }),
+  checkCoverage: (data: any) => request<any>('/labor/coverage/check', { method: 'POST', body: JSON.stringify(data) }),
+  getPayrollPreview: (params?: Record<string, string>) => {
+    const q = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return request<any>(`/labor/payroll/preview${q}`);
+  },
+  runPayroll: (data: { from: string; to: string; currency?: string }) =>
+    request<any>('/labor/payroll/runs', { method: 'POST', body: JSON.stringify(data) }),
+  getPayrollRuns: () => request<any>('/labor/payroll/runs'),
+  getLaborSummary: (params?: Record<string, string>) => {
+    const q = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return request<any>(`/labor/summary${q}`);
+  },
+
+  // ── Tips: pooling rules + distributions ──
+  getTipRules: () => request<any>('/tips/rules'),
+  createTipRule: (data: any) => request<any>('/tips/rules', { method: 'POST', body: JSON.stringify(data) }),
+  updateTipRule: (id: string, data: any) =>
+    request<any>(`/tips/rules/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteTipRule: (id: string) => request<any>(`/tips/rules/${id}`, { method: 'DELETE' }),
+  computeTipPool: (data: any) => request<any>('/tips/compute', { method: 'POST', body: JSON.stringify(data) }),
+  getTipDistributions: (params?: Record<string, string>) => {
+    const q = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return request<any>(`/tips/distributions${q}`);
+  },
+  recordTip: (data: any) => request<any>('/tips', { method: 'POST', body: JSON.stringify(data) }),
+  getTips: (params?: Record<string, string>) => {
+    const q = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return request<any>(`/tips${q}`);
+  },
+  getTipSummary: (params?: Record<string, string>) => {
+    const q = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return request<any>(`/tips/summary${q}`);
+  },
+
+  // ── Card-present terminals (Stripe Terminal) ──
+  getTerminalProvider: () => request<any>('/terminal/provider'),
+  getTerminalConnectionToken: () => request<any>('/terminal/connection-token'),
+  getTerminalReaders: (refresh = false) => request<any>(`/terminal/readers${refresh ? '?refresh=true' : ''}`),
+  registerTerminalReader: (data: any) =>
+    request<any>('/terminal/readers/register', { method: 'POST', body: JSON.stringify(data) }),
+  updateTerminalReader: (id: string, data: any) =>
+    request<any>(`/terminal/readers/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteTerminalReader: (id: string) => request<any>(`/terminal/readers/${id}`, { method: 'DELETE' }),
+  chargeTerminal: (data: any) => request<any>('/terminal/charge', { method: 'POST', body: JSON.stringify(data) }),
+  getPendingTerminalPayments: () => request<any>('/terminal/payments/pending'),
+  captureTerminalPayment: (paymentId: string, data: { tipAmount?: number; amount?: number }) =>
+    request<any>(`/terminal/payments/${paymentId}/capture`, { method: 'POST', body: JSON.stringify(data) }),
+  cancelTerminalPayment: (paymentId: string) =>
+    request<any>(`/terminal/payments/${paymentId}/cancel`, { method: 'POST' }),
+  refundTerminalPayment: (paymentId: string, data: { amount?: number; reason?: string }) =>
+    request<any>(`/terminal/payments/${paymentId}/refund`, { method: 'POST', body: JSON.stringify(data) }),
+
+  // ── Channel connectors (Shopify / WooCommerce / BigCommerce) ──
+  getChannelProviders: () => request<any>('/channels/providers'),
+  getChannelConnections: () => request<any>('/channels'),
+  createChannelConnection: (data: any) =>
+    request<any>('/channels', { method: 'POST', body: JSON.stringify(data) }),
+  updateChannelConnection: (id: string, data: any) =>
+    request<any>(`/channels/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteChannelConnection: (id: string) => request<any>(`/channels/${id}`, { method: 'DELETE' }),
+  testChannelConnection: (id: string) =>
+    request<any>(`/channels/${id}/test`, { method: 'POST' }),
+  syncChannel: (
+    id: string,
+    data: { direction: 'PUSH' | 'PULL'; entity: 'PRODUCTS' | 'ORDERS' | 'INVENTORY'; limit?: number; createMissing?: boolean; productIds?: string[] },
+  ) => request<any>(`/channels/${id}/sync`, { method: 'POST', body: JSON.stringify(data) }),
+  getChannelLogs: (id: string) => request<any>(`/channels/${id}/logs`),
+  getChannelMappings: (channelId?: string) =>
+    request<any>(`/channels/mappings${channelId ? `?channelId=${channelId}` : ''}`),
+  createChannelMapping: (data: any) =>
+    request<any>('/channels/mappings', { method: 'POST', body: JSON.stringify(data) }),
+  deleteChannelMapping: (id: string) =>
+    request<any>(`/channels/mappings/${id}`, { method: 'DELETE' }),
+
+  // ── Quotes / estimates ──
+  getQuotes: (params?: Record<string, string>) => {
+    const q = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return request<any>(`/quotes${q}`);
+  },
+  getQuote: (id: string) => request<any>(`/quotes/${id}`),
+  createQuote: (data: any) => request<any>('/quotes', { method: 'POST', body: JSON.stringify(data) }),
+  updateQuote: (id: string, data: any) =>
+    request<any>(`/quotes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteQuote: (id: string) => request<any>(`/quotes/${id}`, { method: 'DELETE' }),
+  setQuoteStatus: (id: string, data: { status: string; note?: string }) =>
+    request<any>(`/quotes/${id}/status`, { method: 'POST', body: JSON.stringify(data) }),
+  convertQuote: (id: string, data?: any) =>
+    request<any>(`/quotes/${id}/convert`, { method: 'POST', body: JSON.stringify(data || {}) }),
+
+  // ── Field service: appointments, work orders, rentals ──
+  getAppointments: (params?: Record<string, string>) => {
+    const q = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return request<any>(`/service/appointments${q}`);
+  },
+  getAppointmentSlots: (params?: Record<string, string>) => {
+    const q = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return request<any>(`/service/appointments/slots${q}`);
+  },
+  createAppointment: (data: any) =>
+    request<any>('/service/appointments', { method: 'POST', body: JSON.stringify(data) }),
+  updateAppointment: (id: string, data: any) =>
+    request<any>(`/service/appointments/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  setAppointmentStatus: (id: string, data: { status: string; note?: string }) =>
+    request<any>(`/service/appointments/${id}/status`, { method: 'POST', body: JSON.stringify(data) }),
+  getWorkOrders: (params?: Record<string, string>) => {
+    const q = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return request<any>(`/service/work-orders${q}`);
+  },
+  getWorkOrder: (id: string) => request<any>(`/service/work-orders/${id}`),
+  setWorkOrderStatus: (id: string, data: { status: string }) =>
+    request<any>(`/service/work-orders/${id}/status`, { method: 'POST', body: JSON.stringify(data) }),
+  deleteWorkOrderLine: (id: string, lineId: string) =>
+    request<any>(`/service/work-orders/${id}/lines/${lineId}`, { method: 'DELETE' }),
+  createWorkOrder: (data: any) =>
+    request<any>('/service/work-orders', { method: 'POST', body: JSON.stringify(data) }),
+  updateWorkOrder: (id: string, data: any) =>
+    request<any>(`/service/work-orders/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  addWorkOrderLine: (id: string, data: any) =>
+    request<any>(`/service/work-orders/${id}/lines`, { method: 'POST', body: JSON.stringify(data) }),
+  getRentals: (params?: Record<string, string>) => {
+    const q = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return request<any>(`/service/rentals${q}`);
+  },
+  getOverdueRentals: () => request<any>('/service/rentals/overdue'),
+  createRental: (data: any) => request<any>('/service/rentals', { method: 'POST', body: JSON.stringify(data) }),
+  rentOut: (id: string) => request<any>(`/service/rentals/${id}/out`, { method: 'POST' }),
+  returnRental: (id: string, data: any) =>
+    request<any>(`/service/rentals/${id}/return`, { method: 'POST', body: JSON.stringify(data) }),
+  cancelRental: (id: string) => request<any>(`/service/rentals/${id}/cancel`, { method: 'POST' }),
+
+  // ── Kitchen operations: stations, tickets, fire, 86, tabs ──
+  getKitchenStations: () => request<any>('/restaurant/stations'),
+  createKitchenStation: (data: any) =>
+    request<any>('/restaurant/stations', { method: 'POST', body: JSON.stringify(data) }),
+  updateKitchenStation: (id: string, data: any) =>
+    request<any>(`/restaurant/stations/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteKitchenStation: (id: string) => request<any>(`/restaurant/stations/${id}`, { method: 'DELETE' }),
+  createKitchenTicket: (data: any) =>
+    request<any>('/restaurant/tickets', { method: 'POST', body: JSON.stringify(data) }),
+  getKitchenTickets: (params?: Record<string, string>) => {
+    const q = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return request<any>(`/restaurant/tickets${q}`);
+  },
+  fireCourse: (ticketId: string, data: { course?: number }) =>
+    request<any>(`/restaurant/tickets/${ticketId}/fire`, { method: 'POST', body: JSON.stringify(data) }),
+  advanceTicket: (ticketId: string, data: { status?: string }) =>
+    request<any>(`/restaurant/tickets/${ticketId}/advance`, { method: 'POST', body: JSON.stringify(data) }),
+  setTicketItemStatus: (ticketId: string, itemId: string, data: { status: string }) =>
+    request<any>(`/restaurant/tickets/${ticketId}/items/${itemId}`, { method: 'PUT', body: JSON.stringify(data) }),
+  getStationQueue: (stationId: string) => request<any>(`/restaurant/stations/${stationId}/queue`),
+  eightySixItem: (productId: string, data: { available: boolean }) =>
+    request<any>(`/restaurant/menu/${productId}/86`, { method: 'POST', body: JSON.stringify(data) }),
+  getTabs: () => request<any>('/restaurant/tabs'),
+  openTab: (data: any) => request<any>('/restaurant/tabs', { method: 'POST', body: JSON.stringify(data) }),
+  closeTab: (orderId: string, force = false) =>
+    request<any>(`/restaurant/tabs/${orderId}/close${force ? '?force=true' : ''}`, { method: 'POST' }),
+  mergeTables: (tableId: string, data: { fromTableId: string }) =>
+    request<any>(`/restaurant/tables/${tableId}/merge`, { method: 'POST', body: JSON.stringify(data) }),
+  transferTable: (tableId: string, data: { toTableId: string }) =>
+    request<any>(`/restaurant/tables/${tableId}/transfer`, { method: 'POST', body: JSON.stringify(data) }),
+
+  // ── Kiosk + customer display (token-authenticated, no login) ──
+  getKioskSessions: () => request<any>('/kiosk/sessions'),
+  pairKiosk: (data: { label: string; mode: 'KIOSK' | 'CUSTOMER_DISPLAY'; registerId?: string | null }) =>
+    request<any>('/kiosk/sessions', { method: 'POST', body: JSON.stringify(data) }),
+  revokeKiosk: (id: string) => request<any>(`/kiosk/sessions/${id}`, { method: 'DELETE' }),
+  kioskBootstrap: (token: string) => request<any>(`/kiosk/session/${token}/bootstrap`),
+  kioskHeartbeat: (token: string) =>
+    request<any>(`/kiosk/session/${token}/heartbeat`, { method: 'POST' }),
+  kioskSubmitOrder: (token: string, data: any) =>
+    request<any>(`/kiosk/session/${token}/order`, { method: 'POST', body: JSON.stringify(data) }),
+  kioskPushCart: (token: string, data: any) =>
+    request<any>(`/kiosk/session/${token}/cart`, { method: 'PUT', body: JSON.stringify(data) }),
+  kioskGetCart: (token: string) => request<any>(`/kiosk/session/${token}/cart`),
+
+  // ── Custom report builder (§16) ──
+  getReportSources: () => request<any>('/reports/sources'),
+  runReport: (data: any) => request<any>('/reports/run', { method: 'POST', body: JSON.stringify(data) }),
+  getReportDefinitions: () => request<any>('/reports/definitions'),
+  createReportDefinition: (data: any) =>
+    request<any>('/reports/definitions', { method: 'POST', body: JSON.stringify(data) }),
+  updateReportDefinition: (id: string, data: any) =>
+    request<any>(`/reports/definitions/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteReportDefinition: (id: string) =>
+    request<any>(`/reports/definitions/${id}`, { method: 'DELETE' }),
+  runReportDefinition: (id: string, params?: { format?: 'json' | 'csv' }) =>
+    request<any>(`/reports/definitions/${id}/run${params?.format ? `?format=${params.format}` : ''}`, { method: 'POST' }),
+  getReportRuns: () => request<any>('/reports/runs'),
+
+  // ── Promotions engine (§19) ──
+  getActivePromotions: (channel?: string) =>
+    request<any>(`/marketing/promotions/active${channel ? `?channel=${channel}` : ''}`),
+  planPromotions: (data: { lines: any[]; channel?: string; at?: string }) =>
+    request<any>('/marketing/promotions/plan', { method: 'POST', body: JSON.stringify(data) }),
+  applyPromotions: (orderId: string) =>
+    request<any>(`/marketing/promotions/apply/${orderId}`, { method: 'POST' }),
+
+  // ── Loyalty tiers (§8) ──
+  getLoyaltyTiers: (programId?: string) =>
+    request<any>(`/loyalty/tiers${programId ? `?programId=${programId}` : ''}`),
+  createLoyaltyTier: (data: any) =>
+    request<any>('/loyalty/tiers', { method: 'POST', body: JSON.stringify(data) }),
+  updateLoyaltyTier: (id: string, data: any) =>
+    request<any>(`/loyalty/tiers/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteLoyaltyTier: (id: string) => request<any>(`/loyalty/tiers/${id}`, { method: 'DELETE' }),
+  evaluateLoyaltyTiers: (programId?: string) =>
+    request<any>('/loyalty/tiers/evaluate', { method: 'POST', body: JSON.stringify({ programId }) }),
+  getCustomerLoyaltyStatus: (customerId: string) =>
+    request<any>(`/loyalty/customers/${customerId}/status`),
+
+  // ── Backorders / special orders ──
+  getBackorders: (params?: Record<string, string>) => {
+    const q = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return request<any>(`/orders/backorders${q}`);
+  },
+  getBackorderSummary: () => request<any>('/orders/backorders/summary'),
+  createBackorder: (data: any) =>
+    request<any>('/orders/backorders', { method: 'POST', body: JSON.stringify(data) }),
+  fulfillBackorder: (id: string, data: { quantity?: number; notes?: string }) =>
+    request<any>(`/orders/backorders/${id}/fulfill`, { method: 'POST', body: JSON.stringify(data) }),
+  notifyBackorder: (id: string) =>
+    request<any>(`/orders/backorders/${id}/notify`, { method: 'POST' }),
+  cancelBackorder: (id: string, data?: { notes?: string }) =>
+    request<any>(`/orders/backorders/${id}/cancel`, { method: 'POST', body: JSON.stringify(data || {}) }),
 };

@@ -5,6 +5,7 @@ import { AuthRequest, authMiddleware, requireRole } from '../middleware/auth.js'
 import { validateRequest, handleError, HttpError } from '../middleware/error.js';
 import { buildLabel, scannedCodeCandidates } from '../services/barcodes.js';
 import { round2 } from '../services/moneyMath.js';
+import { UOMS, decodeScaleBarcode, formatQuantity, isUom, normalizeQuantity } from '../services/units.js';
 
 const router = Router();
 
@@ -21,6 +22,13 @@ const productSchema = z.object({
   taxRuleId: z.string().optional(),
   imageUrl: z.string().optional(),
   isActive: z.boolean().optional(),
+  // ── Weighted selling + scale PLU (§6 grocery/deli parity) ──
+  unitOfMeasure: z.enum(UOMS as unknown as [string, ...string[]]).optional(),
+  isWeighed: z.boolean().optional(),
+  plu: z.string().regex(/^\d{1,5}$/, 'A PLU is 1–5 digits').nullable().optional(),
+  // ── Age-restricted lines (alcohol, tobacco, pharmacy) ──
+  ageRestricted: z.boolean().optional(),
+  minAge: z.number().int().min(0).max(21).nullable().optional(),
 });
 
 // GET /api/products
@@ -116,11 +124,56 @@ router.delete('/:id', authMiddleware, requireRole('OWNER', 'ADMIN'), async (req:
   }
 });
 
+/**
+ * Resolve a retailer-assigned (scale) EAN-13.
+ *
+ * A weighed item has no barcode row of its own: the label embeds a 5-digit PLU
+ * plus either the weight in grams or the price in cents. So a scale scan is a
+ * product lookup AND a quantity, returned together — the POS must not ask the
+ * cashier to key the weight the scale already printed.
+ */
+async function resolveScaleCode(organizationId: string, code: string, mode: 'WEIGHT' | 'PRICE') {
+  const decoded = decodeScaleBarcode(code, mode);
+  if (!decoded) return null;
+
+  const product = await prisma.product.findFirst({
+    where: { organizationId, plu: decoded.plu, isActive: true },
+    include: { inventory: { select: { quantity: true, reserved: true } }, category: { select: { name: true } } },
+  });
+  if (!product) return null;
+
+  const uom = isUom(product.unitOfMeasure) ? product.unitOfMeasure : 'KG';
+  const rate = Number(product.price) || 0;
+  // A PRICE-mode label carries the amount, so the quantity is derived from it.
+  const rawQty = decoded.mode === 'WEIGHT' ? Number(decoded.weightKg) : rate > 0 ? Number(decoded.price) / rate : 0;
+  const verdict = normalizeQuantity(rawQty, uom, product.isWeighed);
+  if (!verdict.ok) return null;
+
+  return {
+    ...product,
+    stock: product.inventory.reduce((s, i) => s + Number(i.quantity) - Number(i.reserved), 0),
+    scan: decoded,
+    quantity: verdict.quantity,
+    uom,
+    weighed: Boolean(product.isWeighed),
+    quantityLabel: formatQuantity(verdict.quantity, uom),
+    lineTotal: round2(rate * verdict.quantity),
+  };
+}
+
 // GET /api/products/scan/:code - resolve a scanned barcode (UPC/EAN tolerant)
 // A scanner may report the code with dashes, or as a 12-digit UPC-A while the
-// catalog stores the 13-digit EAN form, so every equivalent is tried.
+// catalog stores the 13-digit EAN form, so every equivalent is tried. A scale
+// label is tried first because it can never collide with a catalog code (it is
+// always a valid EAN-13 beginning with 2).
 router.get('/scan/:code', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
+    const mode = String(req.query.mode ?? 'WEIGHT').toUpperCase() === 'PRICE' ? 'PRICE' : 'WEIGHT';
+    const scaled = await resolveScaleCode(req.user!.organizationId!, String(req.params.code), mode);
+    if (scaled) {
+      return res.json({ success: true, data: scaled, source: 'SCALE' });
+    }
+
     const candidates = scannedCodeCandidates(String(req.params.code));
     if (!candidates.length) throw new HttpError(400, 'Nothing was scanned');
     const product = await prisma.product.findFirst({
@@ -136,6 +189,35 @@ router.get('/scan/:code', authMiddleware, async (req: AuthRequest, res: Response
       data: {
         ...product,
         stock: product.inventory.reduce((s, i) => s + i.quantity - i.reserved, 0),
+      },
+    });
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
+// GET /api/products/plu/:plu - keypad lookup for a deli/bulk item
+router.get('/plu/:plu', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const plu = String(req.params.plu).replace(/\D/g, '');
+    if (!plu) return res.status(400).json({ success: false, message: 'Enter a PLU code' });
+
+    const product = await prisma.product.findFirst({
+      where: { organizationId: req.user!.organizationId!, plu, isActive: true },
+      include: { category: { select: { name: true } }, inventory: { select: { quantity: true, reserved: true } } },
+    });
+    if (!product) return res.status(404).json({ success: false, message: `No product is assigned PLU ${plu}` });
+
+    const uom = isUom(product.unitOfMeasure) ? product.unitOfMeasure : 'EACH';
+    res.json({
+      success: true,
+      data: {
+        ...product,
+        stock: product.inventory.reduce((s, i) => s + Number(i.quantity) - Number(i.reserved), 0),
+        uom,
+        weighed: Boolean(product.isWeighed),
+        // The keypad must know whether to ask for a decimal amount.
+        requiresQuantityEntry: Boolean(product.isWeighed) || uom !== 'EACH' && uom !== 'PACK',
       },
     });
   } catch (error) {

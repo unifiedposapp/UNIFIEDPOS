@@ -77,6 +77,17 @@ export const en = {
   'nav.analytics': 'Predictive Analytics',
   'nav.media': 'Media',
   'nav.fraud': 'Fraud',
+  // Competitor-parity surfaces
+  'nav.quotes': 'Quotes & Estimates',
+  'nav.backorders': 'Backorders',
+  'nav.service': 'Service & Rentals',
+  'nav.terminal': 'Card Terminals',
+  'nav.loyaltyTiers': 'Loyalty Tiers',
+  'nav.labor': 'Labour & Rota',
+  'nav.tips': 'Tip Pooling',
+  'nav.kiosks': 'Kiosks & Displays',
+  'nav.reportBuilder': 'Report Builder',
+  'nav.channels': 'Channel Sync',
 
   // Global-expansion subsystems
   'nav.group.global': 'Global',
@@ -213,6 +224,17 @@ export const es: Dictionary = {
   'login.createOne': 'Crea una',
   'login.errorDefault': 'Error al iniciar sesión',
   'login.mfaErrorDefault': 'Error de verificación',
+  // Competitor-parity surfaces
+  'nav.quotes': 'Presupuestos y estimaciones',
+  'nav.backorders': 'Pedidos pendientes',
+  'nav.service': 'Servicio y alquileres',
+  'nav.terminal': 'Terminales de tarjeta',
+  'nav.loyaltyTiers': 'Niveles de fidelidad',
+  'nav.labor': 'Personal y turnos',
+  'nav.tips': 'Reparto de propinas',
+  'nav.kiosks': 'Kioscos y pantallas',
+  'nav.reportBuilder': 'Constructor de informes',
+  'nav.channels': 'Sincronización de canales',
 };
 
 export const fr: Dictionary = {
@@ -306,6 +328,17 @@ export const fr: Dictionary = {
   'login.createOne': 'Créez-en un',
   'login.errorDefault': 'Échec de la connexion',
   'login.mfaErrorDefault': 'Échec de la vérification',
+  // Competitor-parity surfaces
+  'nav.quotes': 'Devis et estimations',
+  'nav.backorders': 'Commandes en souffrance',
+  'nav.service': 'Service et locations',
+  'nav.terminal': 'Terminaux de carte',
+  'nav.loyaltyTiers': 'Niveaux de fidélité',
+  'nav.labor': 'Personnel et planning',
+  'nav.tips': 'Répartition des pourboires',
+  'nav.kiosks': 'Bornes et écrans',
+  'nav.reportBuilder': 'Créateur de rapports',
+  'nav.channels': 'Synchronisation des canaux',
 };
 
 export const de: Dictionary = {
@@ -399,9 +432,31 @@ export const de: Dictionary = {
   'login.createOne': 'Konto erstellen',
   'login.errorDefault': 'Anmeldung fehlgeschlagen',
   'login.mfaErrorDefault': 'Überprüfung fehlgeschlagen',
+  // Competitor-parity surfaces
+  'nav.quotes': 'Angebote und Kostenvoranschläge',
+  'nav.backorders': 'Rückständige Bestellungen',
+  'nav.service': 'Service und Vermietung',
+  'nav.terminal': 'Kartenterminals',
+  'nav.loyaltyTiers': 'Treuestufen',
+  'nav.labor': 'Personal und Dienstplan',
+  'nav.tips': 'Trinkgeldverteilung',
+  'nav.kiosks': 'Kioske und Displays',
+  'nav.reportBuilder': 'Berichtsgenerator',
+  'nav.channels': 'Kanal-Synchronisierung',
 };
 
 export const pt: Dictionary = {
+  // Competitor-parity surfaces
+  'nav.quotes': 'Orçamentos e estimativas',
+  'nav.backorders': 'Pedidos em atraso',
+  'nav.service': 'Serviço e alugueres',
+  'nav.terminal': 'Terminais de cartão',
+  'nav.loyaltyTiers': 'Níveis de fidelidade',
+  'nav.labor': 'Equipa e turnos',
+  'nav.tips': 'Divisão de gorjetas',
+  'nav.kiosks': 'Quiosques e ecrãs',
+  'nav.reportBuilder': 'Construtor de relatórios',
+  'nav.channels': 'Sincronização de canais',
   'nav.group.global': 'Global',
   'nav.fiscalization': 'Fiscalização',
   'nav.rails': 'Canais de pagamento',
@@ -497,6 +552,17 @@ export const pt: Dictionary = {
 // Arabic — the first RTL locale; every string is fully translated so the shell
 // never leaks LTR English into an RTL layout.
 export const ar: Dictionary = {
+  // Competitor-parity surfaces
+  'nav.quotes': 'عروض الأسعار والتقديرات',
+  'nav.backorders': 'الطلبات المتأخرة',
+  'nav.service': 'الخدمة والتأجير',
+  'nav.terminal': 'أجهزة قراءة البطاقات',
+  'nav.loyaltyTiers': 'مستويات الولاء',
+  'nav.labor': 'الموظفون والجدول',
+  'nav.tips': 'توزيع الإكراميات',
+  'nav.kiosks': 'الأكشاك والشاشات',
+  'nav.reportBuilder': 'منشئ التقارير',
+  'nav.channels': 'مزامنة القنوات',
   'common.loading': 'جارٍ التحميل…',
   'a11y.skip': 'الانتقال إلى المحتوى الرئيسي',
   'a11y.mainNav': 'التنقل الرئيسي',
@@ -590,6 +656,17 @@ export const ar: Dictionary = {
 
 // Simplified Chinese.
 export const zh: Dictionary = {
+  // Competitor-parity surfaces
+  'nav.quotes': '报价与估价',
+  'nav.backorders': '缺货订单',
+  'nav.service': '服务与租赁',
+  'nav.terminal': '刷卡终端',
+  'nav.loyaltyTiers': '会员等级',
+  'nav.labor': '员工与排班',
+  'nav.tips': '小费分配',
+  'nav.kiosks': '自助终端与显示屏',
+  'nav.reportBuilder': '报表生成器',
+  'nav.channels': '渠道同步',
   'common.loading': '加载中…',
   'a11y.skip': '跳至主要内容',
   'a11y.mainNav': '主导航',
@@ -683,6 +760,17 @@ export const zh: Dictionary = {
 
 // Hindi.
 export const hi: Dictionary = {
+  // Competitor-parity surfaces
+  'nav.quotes': 'कोटेशन और अनुमान',
+  'nav.backorders': 'बैकऑर्डर',
+  'nav.service': 'सेवा और किराया',
+  'nav.terminal': 'कार्ड टर्मिनल',
+  'nav.loyaltyTiers': 'लॉयल्टी स्तर',
+  'nav.labor': 'कर्मचारी और शिफ्ट',
+  'nav.tips': 'टिप वितरण',
+  'nav.kiosks': 'कियोस्क और डिस्प्ले',
+  'nav.reportBuilder': 'रिपोर्ट बिल्डर',
+  'nav.channels': 'चैनल सिंक',
   'common.loading': 'लोड हो रहा है…',
   'a11y.skip': 'मुख्य सामग्री पर जाएँ',
   'a11y.mainNav': 'मुख्य नेविगेशन',
@@ -869,6 +957,17 @@ export const tr: Dictionary = {
   'login.ssoFailed': 'Tek oturum açma başarısız oldu. Lütfen tekrar deneyin veya şifrenizle giriş yapın.',
   'login.errorDefault': 'Giriş başarısız',
   'login.mfaErrorDefault': 'Doğrulama başarısız',
+  // Competitor-parity surfaces
+  'nav.quotes': 'Teklifler ve Tahminler',
+  'nav.backorders': 'Bekleyen Siparişler',
+  'nav.service': 'Servis ve Kiralama',
+  'nav.terminal': 'Kart Terminalleri',
+  'nav.loyaltyTiers': 'Sadakat Kademeleri',
+  'nav.labor': 'Personel ve Vardiya',
+  'nav.tips': 'Bahşiş Paylaşımı',
+  'nav.kiosks': 'Kiosk ve Ekranlar',
+  'nav.reportBuilder': 'Rapor Oluşturucu',
+  'nav.channels': 'Kanal Senkronizasyonu',
 };
 
 export const ja: Dictionary = {
@@ -961,6 +1060,17 @@ export const ja: Dictionary = {
   'login.ssoFailed': 'シングルサインオンに失敗しました。もう一度お試しいただくか、パスワードでサインインしてください。',
   'login.errorDefault': 'ログインに失敗しました',
   'login.mfaErrorDefault': '確認に失敗しました',
+  // Competitor-parity surfaces
+  'nav.quotes': '見積と概算',
+  'nav.backorders': '取り寄せ注文',
+  'nav.service': 'サービスとレンタル',
+  'nav.terminal': 'カード端末',
+  'nav.loyaltyTiers': 'ロイヤルティ階層',
+  'nav.labor': '従業員とシフト',
+  'nav.tips': 'チップ配分',
+  'nav.kiosks': 'キオスクとディスプレイ',
+  'nav.reportBuilder': 'レポートビルダー',
+  'nav.channels': 'チャネル同期',
 };
 
 export const ko: Dictionary = {
@@ -1053,6 +1163,17 @@ export const ko: Dictionary = {
   'login.ssoFailed': '단일 로그인이 실패했습니다. 다시 시도하거나 비밀번호로 로그인하세요.',
   'login.errorDefault': '로그인 실패',
   'login.mfaErrorDefault': '확인 실패',
+  // Competitor-parity surfaces
+  'nav.quotes': '견적 및 예상',
+  'nav.backorders': '미납 주문',
+  'nav.service': '서비스 및 대여',
+  'nav.terminal': '카드 단말기',
+  'nav.loyaltyTiers': '로열티 등급',
+  'nav.labor': '직원 및 근무표',
+  'nav.tips': '팁 분배',
+  'nav.kiosks': '키오스크 및 디스플레이',
+  'nav.reportBuilder': '보고서 빌더',
+  'nav.channels': '채널 동기화',
 };
 
 export const vi: Dictionary = {
@@ -1145,6 +1266,17 @@ export const vi: Dictionary = {
   'login.ssoFailed': 'Đăng nhập một lần thất bại. Vui lòng thử lại hoặc đăng nhập bằng mật khẩu.',
   'login.errorDefault': 'Đăng nhập thất bại',
   'login.mfaErrorDefault': 'Xác minh thất bại',
+  // Competitor-parity surfaces
+  'nav.quotes': 'Báo giá và ước tính',
+  'nav.backorders': 'Đơn hàng chờ',
+  'nav.service': 'Dịch vụ và cho thuê',
+  'nav.terminal': 'Máy quẹt thẻ',
+  'nav.loyaltyTiers': 'Hạng khách hàng thân thiết',
+  'nav.labor': 'Nhân sự và ca làm',
+  'nav.tips': 'Chia tiền boa',
+  'nav.kiosks': 'Kiosk và màn hình',
+  'nav.reportBuilder': 'Trình tạo báo cáo',
+  'nav.channels': 'Đồng bộ kênh',
 };
 
 export const id: Dictionary = {
@@ -1237,6 +1369,17 @@ export const id: Dictionary = {
   'login.ssoFailed': 'Single sign-on gagal. Silakan coba lagi, atau masuk dengan kata sandi Anda.',
   'login.errorDefault': 'Gagal masuk',
   'login.mfaErrorDefault': 'Verifikasi gagal',
+  // Competitor-parity surfaces
+  'nav.quotes': 'Penawaran & Estimasi',
+  'nav.backorders': 'Pesanan Tertunda',
+  'nav.service': 'Layanan & Sewa',
+  'nav.terminal': 'Terminal Kartu',
+  'nav.loyaltyTiers': 'Tingkat Loyalitas',
+  'nav.labor': 'Staf & Jadwal',
+  'nav.tips': 'Pembagian Tip',
+  'nav.kiosks': 'Kios & Layar',
+  'nav.reportBuilder': 'Pembuat Laporan',
+  'nav.channels': 'Sinkronisasi Saluran',
 };
 
 export const th: Dictionary = {
@@ -1329,6 +1472,17 @@ export const th: Dictionary = {
   'login.ssoFailed': 'การเข้าสู่ระบบครั้งเดียวล้มเหลว กรุณาลองอีกครั้ง หรือเข้าสู่ระบบด้วยรหัสผ่านของคุณ',
   'login.errorDefault': 'เข้าสู่ระบบล้มเหลว',
   'login.mfaErrorDefault': 'การยืนยันล้มเหลว',
+  // Competitor-parity surfaces
+  'nav.quotes': 'ใบเสนอราคาและประมาณการ',
+  'nav.backorders': 'คำสั่งซื้อค้างส่ง',
+  'nav.service': 'บริการและให้เช่า',
+  'nav.terminal': 'เครื่องรูดบัตร',
+  'nav.loyaltyTiers': 'ระดับสมาชิก',
+  'nav.labor': 'พนักงานและตารางกะ',
+  'nav.tips': 'การแบ่งทิป',
+  'nav.kiosks': 'ตู้บริการและจอแสดงผล',
+  'nav.reportBuilder': 'เครื่องมือสร้างรายงาน',
+  'nav.channels': 'การซิงค์ช่องทาง',
 };
 
 export const sw: Dictionary = {
@@ -1421,6 +1575,17 @@ export const sw: Dictionary = {
   'login.ssoFailed': 'Kuingia mara moja kumesindikana. Tafadhali jaribu tena, au ingia kwa nenosiri lako.',
   'login.errorDefault': 'Kuingia kumeshindikana',
   'login.mfaErrorDefault': 'Uthibitishaji umeshindikana',
+  // Competitor-parity surfaces
+  'nav.quotes': 'Nukuu na Makadirio',
+  'nav.backorders': 'Oda Zilizosubiri',
+  'nav.service': 'Huduma na Upangishaji',
+  'nav.terminal': 'Vifaa vya Kadi',
+  'nav.loyaltyTiers': 'Ngazi za Uaminifu',
+  'nav.labor': 'Wafanyakazi na Vipindi',
+  'nav.tips': 'Ugawaji wa Bakshishi',
+  'nav.kiosks': 'Kioski na Skrini',
+  'nav.reportBuilder': 'Kijenzi cha Ripoti',
+  'nav.channels': 'Usawazishaji wa Njia',
 };
 
 export const he: Dictionary = {
@@ -1513,6 +1678,17 @@ export const he: Dictionary = {
   'login.ssoFailed': 'התחברות יחידה נכשלה. נסה שוב, או היכנס עם הסיסמה שלך.',
   'login.errorDefault': 'ההתחברות נכשלה',
   'login.mfaErrorDefault': 'האימות נכשל',
+  // Competitor-parity surfaces
+  'nav.quotes': 'הצעות מחיר ואומדנים',
+  'nav.backorders': 'הזמנות ממתינות',
+  'nav.service': 'שירות והשכרה',
+  'nav.terminal': 'מסופי כרטיסים',
+  'nav.loyaltyTiers': 'דרגות נאמנות',
+  'nav.labor': 'עובדים ומשמרות',
+  'nav.tips': 'חלוקת טיפים',
+  'nav.kiosks': 'קיוסקים ומסכים',
+  'nav.reportBuilder': 'בונה הדוחות',
+  'nav.channels': 'סנכרון ערוצים',
 };
 
 export const fa: Dictionary = {
@@ -1605,6 +1781,17 @@ export const fa: Dictionary = {
   'login.ssoFailed': 'ورود یکپارچه ناموفق بود. لطفاً دوباره تلاش کنید یا با رمز عبور وارد شوید.',
   'login.errorDefault': 'ورود ناموفق بود',
   'login.mfaErrorDefault': 'تأیید ناموفق بود',
+  // Competitor-parity surfaces
+  'nav.quotes': 'پیشنهادها و برآوردها',
+  'nav.backorders': 'سفارش‌های در انتظار',
+  'nav.service': 'خدمات و اجاره',
+  'nav.terminal': 'پایانه‌های کارت',
+  'nav.loyaltyTiers': 'سطوح وفاداری',
+  'nav.labor': 'کارکنان و شیفت',
+  'nav.tips': 'تقسیم انعام',
+  'nav.kiosks': 'کیوسک‌ها و نمایشگرها',
+  'nav.reportBuilder': 'سازنده گزارش',
+  'nav.channels': 'همگام‌سازی کانال',
 };
 
 export const dictionaries: Record<Locale, Dictionary> = { en, es, fr, de, pt, ar, zh, hi, tr, ja, ko, vi, id, th, sw, he, fa };

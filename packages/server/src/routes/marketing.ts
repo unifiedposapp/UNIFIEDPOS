@@ -6,14 +6,43 @@ import { validateRequest, handleError } from '../middleware/error.js';
 
 const router = Router();
 
+/**
+ * The type-specific rule body. `services/promotions.ts` reads exactly these keys:
+ * BOGO / MIX_AND_MATCH use buyQty+getQty, BUNDLE uses bundlePrice + the declared
+ * group, and QTY_BREAK uses the descending `tiers` ladder. Accepting them here is
+ * what makes those promotion types usable — without it zod strips the rule and the
+ * engine sees a promotion with no terms.
+ */
+const promotionRuleSchema = z.object({
+  buyQty: z.number().int().min(1).max(100).optional(),
+  getQty: z.number().int().min(1).max(100).optional(),
+  bundlePrice: z.number().min(0).optional(),
+  groupProductIds: z.array(z.string().min(1)).max(500).optional(),
+  groupCategoryIds: z.array(z.string().min(1)).max(200).optional(),
+  tiers: z
+    .array(z.object({ minQty: z.number().int().min(1).max(10_000), percent: z.number().min(0).max(100) }))
+    .max(10)
+    .optional(),
+});
+
 const promotionSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
-  type: z.string(), // PERCENTAGE, FIXED, BOGO, BUNDLE
+  // PERCENTAGE, FIXED, BOGO, BUNDLE, MIX_AND_MATCH, QTY_BREAK, DAYPART
+  type: z.string(),
   value: z.number().min(0),
   minPurchase: z.number().min(0).optional(),
   maxDiscount: z.number().min(0).optional(),
   applicableProducts: z.array(z.string()).optional(),
+  // ── Rule-engine depth (§19): auto-apply, stacking, weekday and daypart windows ──
+  rule: promotionRuleSchema.nullable().optional(),
+  autoApply: z.boolean().optional(),
+  priority: z.number().int().min(0).max(1000).optional(),
+  stackable: z.boolean().optional(),
+  daysOfWeek: z.array(z.number().int().min(0).max(6)).max(7).optional(),
+  startMinute: z.number().int().min(0).max(1439).nullable().optional(),
+  endMinute: z.number().int().min(0).max(1439).nullable().optional(),
+  channels: z.array(z.string().min(1)).max(20).optional(),
   startDate: z.string(),
   endDate: z.string().optional(),
 });

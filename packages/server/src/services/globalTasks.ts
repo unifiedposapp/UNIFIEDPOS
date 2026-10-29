@@ -115,11 +115,39 @@ async function loadSupplyProfile(organizationId: string): Promise<{ byProduct: M
   return { byProduct, leadTimeBySupplier };
 }
 
+export interface PlanStats {
+  /** Active, stocked SKUs the planner looked at. */
+  productsConsidered: number;
+  /** SKUs that had enough signal (sales history or a cost price) to be plotted. */
+  evaluated: number;
+  /** SKUs dropped because they had neither sales history nor a cost price. */
+  skippedNoHistory: number;
+  orderLines: number;
+  watchLines: number;
+}
+
 export interface OrganizationPlan {
   inputs: ReplenishInput[];
   plan: PlanResult;
   horizonDays: number;
   lookbackDays: number;
+  stats: PlanStats;
+  /**
+   * Plain-language verdict when a plan comes back empty. A zero-line draft with
+   * no explanation reads as a broken button to the person who pressed it, so the
+   * plan carries its own reason.
+   */
+  explanation: string | null;
+}
+
+function emptyPlanExplanation(stats: PlanStats, horizonDays: number): string | null {
+  if (stats.orderLines > 0) return null;
+  if (stats.productsConsidered === 0) return 'No active stocked SKUs on this tenant yet, so there is nothing to forecast.';
+  if (stats.evaluated === 0) {
+    return `Nothing could be forecast: all ${stats.productsConsidered} stocked SKUs have no sales in the history window and no cost price, so neither demand nor spend is known.`;
+  }
+  const watch = stats.watchLines ? ` (${stats.watchLines} line(s) flagged to watch)` : '';
+  return `Nothing to order: all ${stats.evaluated} stocked SKUs already cover the next ${horizonDays} days of demand plus safety stock at this service level${watch}.`;
 }
 
 /**
@@ -177,12 +205,18 @@ export async function buildReplenishmentPlan(organizationId: string, options: Pl
   }
 
   const inputs: ReplenishInput[] = [];
+  let productsConsidered = 0;
+  let skippedNoHistory = 0;
   for (const product of products) {
     const type = String(product.type || 'PHYSICAL').toUpperCase();
     if (NON_STOCKED_TYPES.has(type)) continue;
+    productsConsidered += 1;
     const series = buildSeriesFromQuantities(buckets.get(product.id) || [], lookbackDays, horizonDays);
     const unitCost = Number(product.costPrice) || 0;
-    if (series.total <= 0 && unitCost <= 0) continue; // never sold, never bought: nothing to plan
+    if (series.total <= 0 && unitCost <= 0) {
+      skippedNoHistory += 1; // never sold, never bought: nothing to plan
+      continue;
+    }
     const linked = supply.byProduct.get(product.id) || null;
     inputs.push({
       productId: product.id,
@@ -201,7 +235,15 @@ export async function buildReplenishmentPlan(organizationId: string, options: Pl
     });
   }
 
-  return { inputs, plan: planReplenishment(inputs, options), horizonDays, lookbackDays };
+  const plan = planReplenishment(inputs, options);
+  const stats: PlanStats = {
+    productsConsidered,
+    evaluated: inputs.length,
+    skippedNoHistory,
+    orderLines: plan.items.filter((i) => i.action === 'ORDER').length,
+    watchLines: plan.items.filter((i) => i.action === 'WATCH').length,
+  };
+  return { inputs, plan, horizonDays, lookbackDays, stats, explanation: emptyPlanExplanation(stats, horizonDays) };
 }
 
 /** Persist a plan as a DRAFT run the merchant can approve. */
@@ -220,7 +262,9 @@ export async function saveReplenishmentRun(
       supplierCount: built.plan.bySupplier.filter((s) => s.lines > 0).length,
       estimatedCost: round2(built.plan.totals.cost),
       status: 'DRAFT',
-      plan: toJson(built.plan),
+      // Stats and verdict ride along with the stored plan so an inspected run can
+      // still explain itself long after the request that created it is gone.
+      plan: toJson({ ...built.plan, stats: built.stats, explanation: built.explanation }),
       guardrails: jsonOrNull(options.guardrails),
       approvedBy: options.actorId ?? null,
     },

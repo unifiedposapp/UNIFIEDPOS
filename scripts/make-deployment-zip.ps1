@@ -23,7 +23,18 @@ param(
   [string]$Source = (Split-Path -Parent $PSScriptRoot),
   [string]$Destination = "$env:USERPROFILE\Desktop\Unified POS Deployment.zip",
   [switch]$ExcludeNodeModules,
-  [switch]$NoBackup
+  [switch]$NoBackup,
+  # Name of the single top-level folder inside the archive. Defaults to the
+  # source folder name, so existing snapshots keep unzipping as they did.
+  [string]$RootName,
+  # Directories dropped from the snapshot: dependency trees, build output and
+  # VCS metadata are regenerable and are not part of the shipped source.
+  #   "node_modules"  drops any directory with that name at any depth
+  #   "packages/web/dist" drops that exact subtree
+  [string[]]$ExcludeDir = @(),
+  # Files dropped by name or relative path (wildcards allowed). Used to keep
+  # machine-local secrets and older snapshots out of an artifact that travels.
+  [string[]]$ExcludeFile = @()
 )
 
 $ErrorActionPreference = 'Stop'
@@ -32,7 +43,8 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 if (-not (Test-Path -LiteralPath $Source)) { throw "Source folder not found: $Source" }
 $Source = (Resolve-Path -LiteralPath $Source).Path
-$rootName = Split-Path -Leaf $Source
+# Variable names are case-insensitive, so this must not clobber an explicit -RootName.
+if (-not $RootName) { $RootName = Split-Path -Leaf $Source }
 
 # ── Protect any previous snapshot ────────────────────────────────────────────
 $backupPath = $null
@@ -49,11 +61,36 @@ if ((-not $NoBackup) -and (Test-Path -LiteralPath $Destination)) {
 }
 
 # ── Collect files ────────────────────────────────────────────────────────────
-$files = Get-ChildItem -LiteralPath $Source -Recurse -File -Force
-if ($ExcludeNodeModules) {
-  $files = $files | Where-Object { $_.FullName -notmatch '\\node_modules\\' }
+if ($ExcludeNodeModules) { $ExcludeDir += 'node_modules' }
+
+$allFiles = Get-ChildItem -LiteralPath $Source -Recurse -File -Force
+$dropped = New-Object System.Collections.ArrayList
+$files = $allFiles | Where-Object {
+  $rel = ($_.FullName.Substring($Source.Length).TrimStart('\', '/')) -replace '\\', '/'
+  $dirs = @()
+  if ($rel.Contains('/')) { $dirs = $rel.Substring(0, $rel.LastIndexOf('/')) -split '/' }
+
+  $drop = $false
+  foreach ($d in $ExcludeDir) {
+    $dd = $d -replace '\\', '/'
+    if ($dd.Contains('/')) { if ($rel.StartsWith($dd + '/')) { $drop = $true; break } }
+    elseif ($dirs -contains $dd) { $drop = $true; break }
+  }
+  if (-not $drop) {
+    foreach ($f in $ExcludeFile) {
+      if ($rel -eq $f -or $_.Name -like $f -or $rel -like $f) { $drop = $true; break }
+    }
+  }
+  if ($drop) { [void]$dropped.Add($rel) }
+  -not $drop
 }
-Write-Host "Packaging $($files.Count) files from $Source"
+$files = @($files)
+Write-Host "Packaging $($files.Count) files from $Source (root folder: $RootName)"
+if ($dropped.Count -gt 0) {
+  Write-Host "Excluded with the filters above: $($dropped.Count) file(s)"
+  $dropped | Select-Object -First 15 | ForEach-Object { Write-Host "  - $_" }
+  if ($dropped.Count -gt 15) { Write-Host "  ... and $($dropped.Count - 15) more (node_modules, dist, .git, secrets, old snapshots)" }
+}
 
 # ── Archive ──────────────────────────────────────────────────────────────────
 $tmpZip = "$Destination.tmp"
@@ -65,7 +102,7 @@ try {
   $archive = New-Object System.IO.Compression.ZipArchive($fs, [System.IO.Compression.ZipArchiveMode]::Create)
   foreach ($file in $files) {
     $relative = $file.FullName.Substring($Source.Length).TrimStart('\', '/')
-    $entryName = ($rootName + '/' + ($relative -replace '\\', '/'))
+    $entryName = ($RootName + '/' + ($relative -replace '\\', '/'))
     try {
       $entry = $archive.CreateEntry($entryName, [System.IO.Compression.CompressionLevel]::Optimal)
       $stream = $entry.Open()
@@ -100,14 +137,22 @@ if ($skipped.Count -gt 0) {
 $verify = [System.IO.Compression.ZipFile]::OpenRead($Destination)
 try {
   $critical = @(
-    "$rootName/packages/server/src/services/registerAccess.ts",
-    "$rootName/packages/server/src/middleware/registerAccess.ts",
-    "$rootName/packages/server/src/routes/registers.ts",
-    "$rootName/packages/server/prisma/schema.prisma",
-    "$rootName/packages/web/src/components/RegisterLockScreen.tsx",
-    "$rootName/packages/web/src/hooks/useRegisterLock.ts",
-    "$rootName/docker-compose.yml",
-    "$rootName/Dockerfile"
+    "$RootName/packages/server/src/services/registerAccess.ts",
+    "$RootName/packages/server/src/middleware/registerAccess.ts",
+    "$RootName/packages/server/src/routes/registers.ts",
+    "$RootName/packages/server/src/routes/agentOps.ts",
+    "$RootName/packages/server/src/routes/quotes.ts",
+    "$RootName/packages/server/src/services/globalTasks.ts",
+    "$RootName/packages/server/prisma/schema.prisma",
+    "$RootName/packages/web/src/components/RegisterLockScreen.tsx",
+    "$RootName/packages/web/src/hooks/useRegisterLock.ts",
+    "$RootName/packages/web/src/pages/AgentOpsPage.tsx",
+    "$RootName/packages/web/public/User-Manual.pdf",
+    "$RootName/docs/User-Manual.md",
+    "$RootName/package-lock.json",
+    "$RootName/package.json",
+    "$RootName/docker-compose.yml",
+    "$RootName/Dockerfile"
   )
   $names = $verify.Entries | ForEach-Object { $_.FullName }
   $missing = $critical | Where-Object { $names -notcontains $_ }

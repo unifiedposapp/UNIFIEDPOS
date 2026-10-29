@@ -8,16 +8,23 @@ import { createAuditEvent } from '../utils/audit.js';
 import { normalizePaymentMethod, isGatewayMethod } from '../data/paymentMethods.js';
 import { refundCharge } from '../services/paymentProvider.js';
 import { computeOrderTotals, planGiftCardDeduction, planStoreCreditDeduction, round2 } from '../services/moneyMath.js';
+import { normalizeQuantity } from '../services/units.js';
+import { planPromotions, type PromotionLike } from '../services/promotions.js';
+import { depleteForOrder } from '../services/depletion.js';
 
 const router = Router();
 
 const orderItemSchema = z.object({
   productId: z.string(),
   variantId: z.string().optional(),
-  quantity: z.number().int().positive(),
+  // Fractional on purpose: 0.375 kg of bananas is one sale, not zero. The unit
+  // of the product decides whether a decimal is legitimate (services/units.ts).
+  quantity: z.number().positive().max(1_000_000),
   unitPrice: z.number(),
   discountAmt: z.number().optional(),
   notes: z.string().optional(),
+  uom: z.string().optional(),
+  weighed: z.boolean().optional(),
 });
 
 const createOrderSchema = z.object({
@@ -40,6 +47,10 @@ const createOrderSchema = z.object({
   fulfillmentType: z.string().optional(),
   tipAmount: z.number().optional(),
   serviceCharge: z.number().optional(),
+  // Auto-apply promotions at the till unless the register explicitly opted out.
+  applyPromotions: z.boolean().optional(),
+  // Age-restricted baskets settle only against a recorded verification.
+  ageVerificationId: z.string().optional(),
 });
 
 // Roles that may see (and pull back) tickets held on somebody else's drawer.
@@ -164,7 +175,7 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
 // (see middleware/registerAccess.ts).
 router.post('/', authMiddleware, requireUnlockedRegister, validateRequest(createOrderSchema), async (req: RegisterRequest, res: Response) => {
   try {
-    const { items, customerId, paymentMethod, amountPaid, giftCardNumber, payments, notes, status, couponCode, discount, discountType, channel, fulfillmentType, tipAmount, serviceCharge } = req.body;
+    const { items, customerId, paymentMethod, amountPaid, giftCardNumber, payments, notes, status, couponCode, discount, discountType, channel, fulfillmentType, tipAmount, serviceCharge, applyPromotions, ageVerificationId } = req.body;
     
     // Get default location for organization
     const location = await prisma.location.findFirst({
@@ -225,10 +236,147 @@ router.post('/', authMiddleware, requireUnlockedRegister, validateRequest(create
     }
     
     const productMap = new Map(products.map(p => [p.id, p]));
-    orderItems.forEach((oi: any) => {
-      const product = productMap.get(oi.productId);
-      if (product) oi.productName = product.name;
+
+    // A weighed line is legal only on a product that sells by a fractional
+    // amount. An each-only product carrying 0.375 is a mis-keyed scale, not a
+    // sale, so the same rule the cart enforces is applied again at commit time.
+    for (const oi of orderItems as any[]) {
+      const product = productMap.get(oi.productId)!;
+      const uom = String(product.unitOfMeasure ?? 'EACH');
+      const verdict = normalizeQuantity(oi.quantity, uom as any, product.isWeighed);
+      if (!verdict.ok) {
+        return res.status(400).json({
+          success: false,
+          code: verdict.reason,
+          productId: product.id,
+          message: `${product.name}: invalid quantity (${verdict.reason})`,
+        });
+      }
+      oi.quantity = verdict.quantity;
+      oi.uom = uom;
+      oi.weighed = Boolean(product.isWeighed);
+      oi.productName = product.name;
+      oi.totalAmount = round2(oi.unitPrice * verdict.quantity - oi.discountAmt);
+    }
+
+    // ── Age gate (alcohol, tobacco, pharmacy) ──
+    // Product-level restriction is authoritative: the store setting only supplies
+    // the default age. A basket that needs a check cannot be rung without one.
+    const shopSettings = await prisma.storeSettings.findUnique({
+      where: { organizationId: req.user!.organizationId! },
+      select: { ageVerificationEnabled: true, ageVerificationMinAge: true },
     });
+    const ageRestrictedProducts = products.filter((p) => p.ageRestricted);
+    const requiredMinAge = ageRestrictedProducts.length
+      ? Math.max(...ageRestrictedProducts.map((p) => Number(p.minAge ?? shopSettings?.ageVerificationMinAge ?? 18)))
+      : 0;
+
+    if (ageRestrictedProducts.length > 0) {
+      if (!ageVerificationId) {
+        return res.status(403).json({
+          success: false,
+          code: 'AGE_VERIFICATION_REQUIRED',
+          minAge: requiredMinAge,
+          items: ageRestrictedProducts.map((p) => ({ id: p.id, name: p.name, minAge: Number(p.minAge ?? requiredMinAge) })),
+          message: `This basket contains an age-restricted item (${requiredMinAge}+). Check ID and record the verification.`,
+        });
+      }
+
+      const verification = await prisma.ageVerification.findFirst({
+        where: { id: ageVerificationId, organizationId: req.user!.organizationId! },
+      });
+      if (!verification) return res.status(404).json({ success: false, message: 'Age verification not found' });
+      if (!verification.passed) {
+        return res.status(403).json({ success: false, code: 'AGE_CHECK_FAILED', message: 'The recorded verification did not pass' });
+      }
+      if (verification.minAge < requiredMinAge) {
+        return res.status(403).json({
+          success: false,
+          code: 'AGE_CHECK_INSUFFICIENT',
+          message: `The recorded verification covers ${verification.minAge}+ but this basket requires ${requiredMinAge}+`,
+        });
+      }
+    }
+
+    // ── Auto-apply promotions (§19) ──
+    // Runs before tax so the discount sits inside the taxable amount, which is
+    // how a retail discount is taxed everywhere. The allocation lands on the
+    // lines as `discountAmt` so the receipt and the order agree to the cent.
+    let appliedPromotions: { applied: unknown[]; perLine: Record<string, number> } | null = null;
+    let promoTotal = 0;
+    if (applyPromotions !== false) {
+      const rows = await prisma.promotion.findMany({
+        where: { organizationId: req.user!.organizationId!, isActive: true, autoApply: true },
+        orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }],
+        take: 200,
+      });
+
+      if (rows.length > 0) {
+        const promotions: PromotionLike[] = rows.map((row) => ({
+          id: row.id,
+          name: row.name,
+          type: row.type,
+          value: Number(row.value),
+          rule: (row.rule ?? null) as PromotionLike['rule'],
+          minPurchase: row.minPurchase === null ? null : Number(row.minPurchase),
+          maxDiscount: row.maxDiscount === null ? null : Number(row.maxDiscount),
+          applicableProducts: row.applicableProducts ?? [],
+          autoApply: row.autoApply,
+          priority: row.priority,
+          stackable: row.stackable,
+          daysOfWeek: row.daysOfWeek ?? [],
+          startMinute: row.startMinute,
+          endMinute: row.endMinute,
+          channels: row.channels ?? [],
+          startDate: row.startDate,
+          endDate: row.endDate,
+          isActive: row.isActive,
+        }));
+
+        const plan = planPromotions(
+          promotions,
+          (orderItems as any[]).map((oi) => ({
+            productId: oi.productId,
+            categoryId: productMap.get(oi.productId)?.categoryId ?? null,
+            quantity: oi.quantity,
+            unitPrice: oi.unitPrice,
+          })),
+          { now: new Date(), channel: String(channel ?? 'IN_STORE').toUpperCase() },
+        );
+
+        if (plan.applied.length > 0) {
+          // `perLine` is per product, so two lines of the same SKU share the pool
+          // instead of each claiming the full allocation.
+          const remaining: Record<string, number> = { ...plan.perLine };
+          for (const oi of orderItems as any[]) {
+            const available = remaining[oi.productId] ?? 0;
+            if (available <= 0) continue;
+            const lineValue = round2(oi.unitPrice * oi.quantity - oi.discountAmt);
+            const extra = round2(Math.min(available, Math.max(0, lineValue)));
+            if (extra <= 0) continue;
+            oi.discountAmt = round2(oi.discountAmt + extra);
+            oi.totalAmount = round2(oi.unitPrice * oi.quantity - oi.discountAmt);
+            remaining[oi.productId] = round2(available - extra);
+          }
+          promoTotal = round2(plan.totalDiscount);
+          appliedPromotions = { applied: plan.applied, perLine: plan.perLine };
+        }
+      }
+    }
+
+    // A composed product (one with a recipe) does not decrement its own balance:
+    // its ingredients leave the shelf instead. Depleting both would halve stock on
+    // every plate sold.
+    const composedRecipes = await prisma.recipe.findMany({
+      where: {
+        organizationId: req.user!.organizationId!,
+        isActive: true,
+        productId: { in: [...new Set((orderItems as any[]).map((o) => o.productId))] },
+      },
+      select: { productId: true },
+    });
+    const composedIds = new Set(composedRecipes.map((r) => r.productId));
+    const isPaidOrder = status === 'PAID' || Boolean(payments?.length) || Boolean(paymentMethod);
     
     // Calculate tax
     const org = await prisma.organization.findUnique({
@@ -239,7 +387,7 @@ router.post('/', authMiddleware, requireUnlockedRegister, validateRequest(create
     // An order-level discount (the POS "Discount" action) reduces the taxable
     // subtotal exactly as the register displays it, and is persisted so the
     // receipt and the payment can never disagree.
-    const { subtotal } = computeOrderTotals(items, taxRate);
+    const { subtotal } = computeOrderTotals(orderItems as any[], taxRate);
     const requestedDiscount = Number(discount) || 0;
     const orderDiscount = discountType === 'PERCENTAGE'
       ? round2(subtotal * (Math.min(100, requestedDiscount) / 100))
@@ -291,6 +439,11 @@ router.post('/', authMiddleware, requireUnlockedRegister, validateRequest(create
         channel: channel || 'IN_STORE',
         couponCode: couponCode || null,
         fulfillmentType: fulfillmentType || 'PICKUP',
+        // Audit trail: which promotions priced this basket, and that the age gate
+        // was passed at the moment of sale (not on a later reconciliation).
+        appliedPromotions: (appliedPromotions ?? undefined) as any,
+        ageVerifiedAt: ageRestrictedProducts.length > 0 ? new Date() : null,
+        ageVerifiedBy: ageRestrictedProducts.length > 0 ? req.user!.employeeId ?? null : null,
         items: { create: orderItems },
       },
       include: { items: true, payments: true, customer: true },
@@ -439,9 +592,11 @@ router.post('/', authMiddleware, requireUnlockedRegister, validateRequest(create
       });
     }
     
-    // Update inventory (only if order was paid)
+    // Update inventory (only if order was paid). A composed product is skipped:
+    // `depleteForOrder` below draws its ingredients instead.
     if (status === 'PAID' || payments || paymentMethod) {
-      for (const item of items) {
+      for (const item of orderItems as any[]) {
+        if (composedIds.has(item.productId)) continue;
         const inventory = await prisma.inventoryBalance.findUnique({
           where: {
             productId_locationId: {
@@ -496,12 +651,27 @@ router.post('/', authMiddleware, requireUnlockedRegister, validateRequest(create
         action: 'ORDER_CREATED',
         resourceType: 'ORDER',
         resourceId: order.id,
-        newValue: { orderId: order.id, total: totalAmount, items: items.length },
+        newValue: { orderId: order.id, total: totalAmount, items: items.length, promotionDiscount: promoTotal, ageVerified: ageRestrictedProducts.length > 0 },
       });
     }
     
     return order.id;
     }, { timeout: 15000, maxWait: 5000 });
+
+    // Recipe depletion runs after the sale is committed: a kitchen that has not
+    // finished entering recipes must still be able to sell the dish.
+    if (isPaidOrder && composedIds.size > 0) {
+      const soldLines = (orderItems as any[])
+        .filter((oi) => composedIds.has(oi.productId))
+        .map((oi) => ({ productId: oi.productId, quantity: Number(oi.quantity) }));
+      await depleteForOrder(
+        req.user!.organizationId!,
+        activeLocationId,
+        soldLines,
+        orderNumber,
+        req.user!.employeeId ?? null,
+      ).catch(() => undefined);
+    }
 
     const result = await prisma.order.findUnique({
       where: { id: orderId },

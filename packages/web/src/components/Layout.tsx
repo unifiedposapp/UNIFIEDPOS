@@ -58,6 +58,17 @@ import {
   Tags,
   Navigation,
   Sparkles,
+  // Competitor-parity surfaces
+  FileSignature,
+  Hourglass,
+  Crown,
+  Nfc,
+  Share2,
+  HandCoins,
+  CalendarClock,
+  Wrench,
+  Table2,
+  ScanLine,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
@@ -76,11 +87,15 @@ const navGroups: { labelKey: TranslationKey; items: { to: string; labelKey: Tran
     items: [
       { to: '/pos', labelKey: 'nav.pos', icon: ShoppingCart },
       { to: '/orders', labelKey: 'nav.orders', icon: ClipboardList },
+      { to: '/quotes', labelKey: 'nav.quotes', icon: FileSignature },
+      { to: '/backorders', labelKey: 'nav.backorders', icon: Hourglass },
+      { to: '/service', labelKey: 'nav.service', icon: Wrench },
       { to: '/restaurant', labelKey: 'nav.restaurant', icon: Armchair },
       { to: '/restaurant-ops', labelKey: 'nav.restaurantOps', icon: UtensilsCrossed },
       { to: '/retail', labelKey: 'nav.retail', icon: Gift },
       { to: '/commerce', labelKey: 'nav.commerce', icon: Globe },
       { to: '/payments', labelKey: 'nav.payments', icon: CreditCard },
+      { to: '/terminal', labelKey: 'nav.terminal', icon: Nfc },
       { to: '/payment-links', labelKey: 'nav.paymentLinks', icon: Link2 },
       { to: '/storefront', labelKey: 'nav.storefront', icon: Store },
       { to: '/delivery', labelKey: 'nav.delivery', icon: Navigation },
@@ -103,6 +118,7 @@ const navGroups: { labelKey: TranslationKey; items: { to: string; labelKey: Tran
     items: [
       { to: '/customers', labelKey: 'nav.customers', icon: Users },
       { to: '/loyalty', labelKey: 'nav.loyalty', icon: Star },
+      { to: '/loyalty-tiers', labelKey: 'nav.loyaltyTiers', icon: Crown },
       { to: '/marketing', labelKey: 'nav.marketing', icon: Megaphone },
       { to: '/ai', labelKey: 'nav.ai', icon: Brain },
       { to: '/analytics', labelKey: 'nav.analytics', icon: LineChart },
@@ -113,9 +129,12 @@ const navGroups: { labelKey: TranslationKey; items: { to: string; labelKey: Tran
     labelKey: 'nav.group.workforce',
     items: [
       { to: '/employees', labelKey: 'nav.employees', icon: UserCog },
+      { to: '/labor', labelKey: 'nav.labor', icon: CalendarClock },
+      { to: '/tips', labelKey: 'nav.tips', icon: HandCoins },
       { to: '/permissions', labelKey: 'nav.permissions', icon: Shield },
       { to: '/registers', labelKey: 'nav.registers', icon: SquareStack },
       { to: '/devices', labelKey: 'nav.devices', icon: Monitor },
+      { to: '/kiosks', labelKey: 'nav.kiosks', icon: ScanLine },
       { to: '/hardware', labelKey: 'nav.hardware', icon: Printer },
     ],
   },
@@ -124,6 +143,7 @@ const navGroups: { labelKey: TranslationKey; items: { to: string; labelKey: Tran
     items: [
       { to: '/accounting', labelKey: 'nav.accounting', icon: DollarSign },
       { to: '/reports', labelKey: 'nav.reports', icon: BarChart3 },
+      { to: '/report-builder', labelKey: 'nav.reportBuilder', icon: Table2 },
     ],
   },
   {
@@ -134,6 +154,7 @@ const navGroups: { labelKey: TranslationKey; items: { to: string; labelKey: Tran
       { to: '/enterprise', labelKey: 'nav.enterprise', icon: Building2 },
       { to: '/system', labelKey: 'nav.system', icon: Activity },
       { to: '/sync', labelKey: 'nav.sync', icon: RefreshCw },
+      { to: '/channels', labelKey: 'nav.channels', icon: Share2 },
     ],
   },
   {

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../db/client.js';
+import { getJwtSecret } from '../services/crypto.js';
 
 /**
  * Idempotency middleware (§36 Idempotency)
@@ -55,7 +56,10 @@ export function idempotencyMiddleware(options?: { ttlSeconds?: number }) {
       let scope: string | null = null;
       if (authHeader) {
         try {
-          const decoded = jwt.verify(authHeader, process.env.JWT_SECRET || 'fallback-secret') as any;
+          // Same secret the auth middleware verifies with. A literal fallback here
+          // would not match the dev secret, so every token would fail to decode and
+          // the dedupe would silently switch itself off outside production.
+          const decoded = jwt.verify(authHeader, getJwtSecret()) as any;
           if (decoded?.organizationId) {
             scope = `${decoded.organizationId}:${decoded.id || 'anon'}`;
           }

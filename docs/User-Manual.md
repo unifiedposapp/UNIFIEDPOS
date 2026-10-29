@@ -40,7 +40,7 @@ Unified POS is a complete Business Operating System for retail, restaurant and o
 
 ### Try before you buy
 
-Unified POS is a subscription service. The **Pricing** page in the footer lists every plan (Starter, Growth, Scale, Enterprise) with its monthly price, trial length and included features, and every plan starts with a free trial - no card is required to open a store. When the trial ends, your tenant moves to a short grace window before it is suspended; a single recorded payment restores it and extends the paid-through date. Section 34 describes how the platform team manages that lifecycle on your behalf.
+Unified POS is a subscription service. The **Pricing** page in the footer lists every plan (Starter, Growth, Scale, Enterprise) with its monthly price, trial length and included features, and every plan starts with a free trial - no card is required to open a store. When the trial ends, your tenant moves to a short grace window before it is suspended; a single recorded payment restores it and extends the paid-through date. Section 35 describes how the platform team manages that lifecycle on your behalf.
 
 > Security: For your protection the password reset link is only ever sent by email. It is never displayed on screen in a production deployment.
 
@@ -588,13 +588,14 @@ Unified POS ships 38 country regimes - TSE in Germany, SdI in Italy, ZATCA Phase
 
 ### 32.3 Agentic back-office
 
-**Where: Agent Ops.**
+**Where: Global > Buying Agent.**
 
 The planner forecasts demand per item, then works out the reorder point from lead time, review period and a chosen service level, with safety stock, pack sizes and supplier minimums respected.
 
 - Guardrails are yours: a maximum spend, a maximum number of lines, and suppliers you have blocked. The plan trims the least urgent lines to fit and tells you what was deferred.
 - Urgency is scored, so the line that runs dry first is at the top of the list.
 - Approved lines become draft purchase orders. **Nothing is sent to a supplier until a human approves it** - the agent drafts, you decide.
+- **Draft a replenishment plan** shows its progress on the button and then brings the resulting draft into view. When the answer is "nothing to order", the draft says so in plain words - how many SKUs were checked and why none of them needed buying - instead of leaving you with an empty table. A draft with no lines has nothing to approve, so only **Discard** is offered, and it is not counted as work waiting for you.
 
 ### 32.4 Vertical solutions
 
@@ -757,9 +758,123 @@ Two reports that turn raw history into decisions.
 - **Reports > Trading patterns** renders a Monday-first day-by-hour heatmap computed in each store's own time zone, with the busiest and quietest slots, revenue per slot and a trade-concentration figure — the evidence for rota and stock decisions.
 - **Reports > Dead stock** flags lines that have not sold, grades them SLOW / DEAD / FROZEN, estimates months of cover, ranks them by the cash actually tied up, and suggests an action (promote, discount, transfer or write off).
 
-## 34. Platform Administration (Super Admin)
+## 34. Quotes, Backorders, Service Work and Team Operations
 
-Everything in the previous thirty-three sections is what a merchant sees inside their own store. This section is what the **Unified POS platform team** sees across every store - the SaaS-operator surface that runs the service itself. It lives at **/admin** (Admin Portal in the sidebar), is visible only to a **SUPER_ADMIN** account, and every action it takes is written to the tenant's audit log.
+Everything before this chapter assumed the goods were on the shelf and the sale was the end of the story. This chapter covers the rest of a working shop: priced promises nobody has paid for yet, units that have not arrived yet, work that has not been done yet, and the people whose hours decide whether any of it happens. Every screen here has its totals computed on the server from the lines you entered, so what you quote is what you will charge.
+
+### 34.1 Quotes and estimates
+
+**Where: Sell > Quotes & Estimates.**
+
+A quote is a priced, expiring promise. It never moves stock and never posts revenue - it becomes a sale only when you convert it.
+
+1. Choose **New quote**, pick the customer (optional), a valid-until date and any notes, then add lines: product, quantity and unit price. Leave the price blank to accept the catalog price.
+2. Subtotal, tax and total are calculated by the server from those lines; the screen never adds anything up itself.
+3. Move the quote along with the row actions: **Send** when it leaves your desk, **Accept** or **Decline** when the customer answers, and **Convert to order** once it is accepted. Conversion copies the lines into a real order and leaves the quote marked as converted, pointing at what it became.
+4. Filter by status to see what is outstanding: draft, sent, accepted, declined, expired or converted.
+
+### 34.2 Backorders and special orders
+
+**Where: Sell > Backorders.**
+
+The shelf is empty but the customer still wants the item, so the sale becomes a promise to deliver.
+
+- Record what is owed: product, customer, quantity, unit price, the deposit you took and an expected date. The summary at the top totals the open promises and the deposits you are holding.
+- Rows move from open, to partially fulfilled as units trickle in, to fulfilled when the customer has everything - or to cancelled with a reason. A promise past its expected date is flagged as overdue.
+- **Stock only moves at fulfilment.** Until then the unit does not exist on your shelf, and the deposit is a liability rather than revenue.
+
+### 34.3 Appointments, work orders and rentals
+
+**Where: Sell > Service & Rentals.**
+
+One page with three tabs, because they share a shape: work booked against a customer and an employee, priced from lines.
+
+- **Appointments** - a slot with a start and end, an assigned employee and the service requested, moving through booked, confirmed, in progress, completed, cancelled or no-show.
+- **Work orders** - the paperwork for a repair, service or install: the device, the reported problem, the diagnosis, labour and parts totals, an optional warranty date, and a status that includes waiting for parts.
+- **Rentals** - an agreement with a start, a due date and a return date, a deposit, a rate, and lines for what went out. Returning everything closes it; coming back late leaves the late fee on the record.
+
+Because every total is recomputed server-side, an appointment deposit and the invoice for the same job cannot drift apart.
+
+### 34.4 Labour and the rota
+
+**Where: Workforce > Labour & Rota.**
+
+The weekly view is the unit of work.
+
+- Build the roster as a **draft**, add shifts per employee, and let the page show the conflicts the server would refuse to publish - double bookings, people outside their availability, and coverage gaps.
+- Publish when the week is settled. Time-off requests and shift-swap requests come in from staff and are approved or refused here, alongside each employee's availability.
+- Close a period into a **payroll run**. Hours are taken from the clock where people punched in and from the published roster where they did not, and the table marks which figure is which - an estimate is never presented as a measured hour.
+- Overtime is split by the payroll service from the rules you configured, not by a flat multiplier, so the figure can be defended line by line.
+
+### 34.5 Tip pooling
+
+**Where: Workforce > Tip Pooling.**
+
+- Create a pool rule: the split method (**by hours worked, by sales rung, by role points, or equally**), the roles that take part, the points each role is worth, whether cash and card tips both join the pool, and a minimum hours threshold for a shift to count.
+- Compute a distribution for a date. Shares are allocated with largest-remainder rounding, so they always add back up to the pool to the cent - no missing penny at the end of the night.
+- Distributions are shown per employee and kept for payroll.
+
+### 34.6 Loyalty tiers
+
+**Where: Growth > Loyalty Tiers.**
+
+A flat earn rate makes "gold members earn double" impossible. Tiers are a ladder keyed on **lifetime** points - lifetime, not balance - so redeeming a reward never demotes a customer for spending points they earned.
+
+- Add tiers with a name, a minimum lifetime points threshold, a points multiplier and the perks that come with them.
+- **Evaluate** a customer to see the tier they currently qualify for and what the next rung needs.
+
+### 34.7 Report builder
+
+**Where: Finance > Report Builder.**
+
+Instead of a fixed list of reports, assemble your own - safely.
+
+- Pick a **source** (sales, orders, products, inventory, payments, labour, tips, customers or loyalty), then the columns you want. The server publishes the closed vocabulary of sources and columns, so an invalid column is refused with a clear message rather than quietly returning an empty table.
+- Add filters, a group-by and a sort, then **Run** to see the result. Nothing is queried straight from the browser; the definition is validated first.
+- **Save** a definition to reuse it, and **export** any run to CSV for a spreadsheet or an accountant.
+
+### 34.8 Card terminals
+
+**Where: Sell > Card Terminals.**
+
+Every other charge in this product is tokenised, which is right for the web and useless at a counter where the guest taps a physical card.
+
+- The page first tells you whether a card-present provider is configured. When it is, pair a reader with its registration code and pick the device type; paired readers show online, offline or disabled, with the last time each was seen.
+- Start a charge against an order, or type an order id to send the guest to a reader this workstation cannot drive directly. For restaurants, capture at the tipped total once the guest has written it down.
+- Pending payments can be cancelled before they settle, and a settled charge can be refunded. Card data never reaches your servers - the reader talks to the provider directly.
+
+### 34.9 Channel sync
+
+**Where: Platform > Channel Sync.**
+
+This is a connector, not a directory: Shopify, WooCommerce and BigCommerce.
+
+- Add a connection with the shop domain and an access token (plus a webhook secret where the provider uses one). Credentials are encrypted at rest and never shown again - leaving the field blank keeps the stored value.
+- **Import** pulls products and orders in; because imports are idempotent, running one twice does not duplicate anything. **Export** pushes your catalog out.
+- Map an outside product to one of yours when the names do not match, and read the sync log when something fails: it says why, instead of turning a green tick into a lie.
+
+### 34.10 Kiosks and customer displays
+
+**Where: Workforce > Kiosks & Displays.**
+
+A paired device authenticates with a token, not a login.
+
+- Create a pairing in **Kiosk** mode for self-service ordering, or **Customer display** mode to mirror the live basket on a pole display or second screen, attached to a register.
+- The token is shown **once**, at pairing time, together with the device URL (`/device/<token>`) to open on the tablet. Afterwards the list shows only a short preview of the token: a stolen tablet is then a support ticket you revoke, not a credential leak.
+- **Revoke** a pairing to cut that device off immediately.
+
+### 34.11 Weighed items and age-restricted sales
+
+Two guard rails at the till that exist because shelf-edge reality is not always a barcode and a unit price.
+
+- **Weighed goods.** A product sold by weight carries a unit of measure and a PLU. Ring it by scanning the scale label or opening the scale entry and typing the PLU, then enter the weight the register asks for; the line keeps its unit of measure all the way to the receipt and the stock ledger.
+- **Age-restricted goods.** A product with a minimum age stops the sale with an ID check before payment. Record the customer's date of birth and the document (driving licence, passport or national ID) with its last four characters. Where no document is produced, a supervisor can tick the override instead - it is recorded against the sale and the supervisor's name, and only a manager may use it. **Cancel sale** closes the check without taking payment.
+
+Both records travel with the order, so an inspection can see exactly what was verified, for which age limit, and by whom.
+
+## 35. Platform Administration (Super Admin)
+
+Everything in the previous thirty-four sections is what a merchant sees inside their own store. This section is what the **Unified POS platform team** sees across every store - the SaaS-operator surface that runs the service itself. It lives at **/admin** (Admin Portal in the sidebar), is visible only to a **SUPER_ADMIN** account, and every action it takes is written to the tenant's audit log.
 
 The entrance is a dedicated sign-in page at **/platform/login**, reachable from a small **Platform Console** link in the legal footer of every screen. It uses the same credential check as the regular Sign In but refuses any account that is not SUPER_ADMIN, so a tenant employee who wanders into the wrong door is bounced with a clear message rather than being signed in under a session they cannot use. Once an operator is through, the browser is redirected to **/admin**.
 
@@ -832,7 +947,7 @@ The account is bootstrapped automatically at every server start (`ensurePlatform
 
 The seed script creates the same account plus the four default Platform Plans in a fresh database, so a first-time install and a live upgrade end up in the same place.
 
-## 35. Getting Help
+## 36. Getting Help
 
 - Use this manual at any time from the footer link: User Manual (PDF).
 - Review the legal and policy documents from the footer and the Compliance Center.

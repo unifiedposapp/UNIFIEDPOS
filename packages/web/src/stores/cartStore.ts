@@ -12,10 +12,28 @@ interface CartItem {
   name: string;
   variantName?: string;
   price: number;
+  /** Decimal on a weighed line: 0.375 kg is a quantity, not a rounding error. */
   quantity: number;
   discount: number;
   modifiers?: Modifier[];
   notes?: string;
+  // ── Weighed selling + age restriction (§6) ──
+  uom?: string;
+  weighed?: boolean;
+  ageRestricted?: boolean;
+  minAge?: number | null;
+}
+
+interface AddableProduct {
+  id: string;
+  name: string;
+  price: number;
+  variantId?: string;
+  variantName?: string;
+  unitOfMeasure?: string;
+  isWeighed?: boolean;
+  ageRestricted?: boolean;
+  minAge?: number | null;
 }
 
 interface CartState {
@@ -25,7 +43,7 @@ interface CartState {
   discountType?: 'PERCENTAGE' | 'FIXED';
   tip: number;
   notes?: string;
-  addItem: (product: { id: string; name: string; price: number; variantId?: string; variantName?: string }) => void;
+  addItem: (product: AddableProduct, quantity?: number) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   updateDiscount: (productId: string, discount: number) => void;
@@ -47,14 +65,19 @@ export const useCartStore = create<CartState>((set, get) => ({
   tip: 0,
   notes: undefined,
 
-  addItem: (product) => {
+  addItem: (product: AddableProduct, quantity?: number) => {
+    // A weighed line arrives with an exact amount from the scale; an each line
+    // increments by one. Both are "add", but only one of them is countable.
+    const isWeighed = Boolean(product.isWeighed);
+    const amount = isWeighed ? Math.round((Number(quantity) || 0) * 1000) / 1000 : Math.max(1, Math.round(Number(quantity) || 1));
+
     set((state) => {
       const existing = state.items.find((i) => i.productId === product.id && i.variantId === product.variantId);
       if (existing) {
         return {
           items: state.items.map((i) =>
             i.productId === product.id && i.variantId === product.variantId
-              ? { ...i, quantity: i.quantity + 1 }
+              ? { ...i, quantity: Math.round((Number(i.quantity) + amount) * 1000) / 1000 }
               : i
           ),
         };
@@ -68,10 +91,14 @@ export const useCartStore = create<CartState>((set, get) => ({
             name: product.name,
             variantName: product.variantName,
             price: product.price,
-            quantity: 1,
+            quantity: amount,
             discount: 0,
             modifiers: [],
             notes: '',
+            uom: product.unitOfMeasure || (isWeighed ? 'KG' : 'EACH'),
+            weighed: isWeighed,
+            ageRestricted: Boolean(product.ageRestricted),
+            minAge: product.minAge ?? null,
           },
         ],
       };
@@ -118,10 +145,15 @@ export const useCartStore = create<CartState>((set, get) => ({
           name: String(i.name || 'Item'),
           variantName: i.variantName,
           price: Number(i.price) || 0,
-          quantity: Math.max(1, Number(i.quantity) || 1),
+          // A parked weighed line keeps its decimals; an each line stays whole.
+          quantity: i.weighed ? Number(i.quantity) || 0.001 : Math.max(1, Number(i.quantity) || 1),
           discount: Number(i.discount) || 0,
           modifiers: Array.isArray(i.modifiers) ? i.modifiers : [],
           notes: i.notes || '',
+          uom: i.uom,
+          weighed: i.weighed,
+          ageRestricted: i.ageRestricted,
+          minAge: i.minAge ?? null,
         })),
       customerId,
       discount: 0,

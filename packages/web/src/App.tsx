@@ -81,6 +81,21 @@ const FxPage = lazy(() => import('./pages/FxPage'));
 const SubscriptionsPage = lazy(() => import('./pages/SubscriptionsPage'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
 const AdminPortalPage = lazy(() => import('./pages/AdminPortalPage'));
+// Competitor-parity surfaces: quoted selling, owed stock, tiered loyalty,
+// card-present terminals, channel connectors, tip pools, labour, field service,
+// custom reporting and self-service devices.
+const QuotesPage = lazy(() => import('./pages/QuotesPage'));
+const BackordersPage = lazy(() => import('./pages/BackordersPage'));
+const LoyaltyTiersPage = lazy(() => import('./pages/LoyaltyTiersPage'));
+const TerminalPage = lazy(() => import('./pages/TerminalPage'));
+const ChannelsPage = lazy(() => import('./pages/ChannelsPage'));
+const TipsPage = lazy(() => import('./pages/TipsPage'));
+const LaborPage = lazy(() => import('./pages/LaborPage'));
+const ServiceOrdersPage = lazy(() => import('./pages/ServiceOrdersPage'));
+const ReportBuilderPage = lazy(() => import('./pages/ReportBuilderPage'));
+const KioskPage = lazy(() => import('./pages/KioskPage'));
+// The paired kiosk / customer-display surface — no login, token in the URL.
+const DevicePage = lazy(() => import('./pages/DevicePage'));
 
 /** Centered spinner shown while a lazy route chunk is being fetched. */
 function RouteFallback() {
@@ -136,12 +151,13 @@ function App() {
   }, [loadFromStorage]);
 
   // Public guest surfaces (§9 payment-link checkout, §17 scan-to-order, online
-  // storefront shop) render regardless of auth state and never mount the
-  // authenticated shell — a customer scanning a QR code or browsing the web shop
-  // has no account in this system. /platform/* is the operator entrance: it also
-  // renders without the tenant Layout, and its own component decides whether to
-  // sign out a stale tenant session or bounce a genuine Super Admin forward.
-  if (/^\/(pay|order|shop|platform)\//.test(location.pathname)) {
+  // storefront shop, paired kiosk/display) render regardless of auth state and
+  // never mount the authenticated shell — a customer scanning a QR code, browsing
+  // the web shop or tapping a self-service kiosk has no account in this system.
+  // /platform/* is the operator entrance: it also renders without the tenant
+  // Layout, and its own component decides whether to sign out a stale tenant
+  // session or bounce a genuine Super Admin forward.
+  if (/^\/(pay|order|shop|platform|device)\//.test(location.pathname)) {
     return (
       <Suspense fallback={<RouteFallback />}>
         <Routes>
@@ -150,6 +166,7 @@ function App() {
           <Route path="/shop/:slug" element={<ShopPage />} />
           <Route path="/shop/:slug/status/:token" element={<ShopPage />} />
           <Route path="/platform/login" element={<PlatformLoginPage />} />
+          <Route path="/device/:token" element={<DevicePage />} />
         </Routes>
       </Suspense>
     );
@@ -201,23 +218,30 @@ function App() {
         <Routes>
           <Route path="/pos" element={<POSPage />} />
           <Route path="/orders" element={<OrdersPage />} />
+          <Route path="/quotes" element={<QuotesPage />} />
+          <Route path="/backorders" element={<BackordersPage />} />
           <Route path="/inventory" element={<InventoryPage />} />
           <Route path="/customers" element={<CustomersPage />} />
           <Route path="/registers" element={<RegistersPage />} />
           <Route path="/restaurant" element={<RestaurantPage />} />
           <Route path="/restaurant-ops" element={<RestaurantOpsPage />} />
           <Route path="/employees" element={<EmployeesPage />} />
+          <Route path="/labor" element={<LaborPage />} />
+          <Route path="/tips" element={<TipsPage />} />
+          <Route path="/service" element={<ServiceOrdersPage />} />
           <Route path="/suppliers" element={<SuppliersPage />} />
           <Route path="/purchasing" element={<PurchasingPage />} />
           <Route path="/storefront" element={<StorefrontPage />} />
           <Route path="/labels" element={<LabelsPage />} />
           <Route path="/delivery" element={<DeliveryPage />} />
           <Route path="/loyalty" element={<LoyaltyPage />} />
+          <Route path="/loyalty-tiers" element={<LoyaltyTiersPage />} />
           <Route path="/accounting" element={<AccountingPage />} />
           <Route path="/webhooks" element={<WebhooksPage />} />
           <Route path="/ai" element={<AIInsightsPage />} />
           <Route path="/analytics" element={<AIAnalyticsPage />} />
           <Route path="/payments" element={<PaymentsPage />} />
+          <Route path="/terminal" element={<TerminalPage />} />
           <Route path="/payment-links" element={<PaymentLinksPage />} />
           <Route path="/fraud" element={<FraudPage />} />
           <Route path="/media" element={<MediaPage />} />
@@ -225,16 +249,19 @@ function App() {
           <Route path="/copilot" element={<CopilotPage />} />
           <Route path="/transfers" element={<TransfersPage />} />
           <Route path="/devices" element={<DevicesPage />} />
+          <Route path="/kiosks" element={<KioskPage />} />
           <Route path="/hardware" element={<HardwarePage />} />
           <Route path="/permissions" element={<PermissionsPage />} />
           <Route path="/retail" element={<RetailPage />} />
           <Route path="/commerce" element={<CommercePage />} />
+          <Route path="/channels" element={<ChannelsPage />} />
           <Route path="/catalog" element={<CatalogPage />} />
           <Route path="/sync" element={<SyncPage />} />
           <Route path="/enterprise" element={<EnterprisePage />} />
           <Route path="/developer" element={<DeveloperPage />} />
           <Route path="/system" element={<SystemPage />} />
           <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/report-builder" element={<ReportBuilderPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/audit" element={<AuditLogPage />} />
           <Route path="/receipt/:orderId" element={<ReceiptPage />} />

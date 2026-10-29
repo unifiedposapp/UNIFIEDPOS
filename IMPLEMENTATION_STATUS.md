@@ -1,19 +1,22 @@
 # Unified POS System — Implementation Status
 
-> Last verified: full `npm run build` (shared + server + web) exits 0; server and
-> web `tsc --noEmit` exit 0; `vitest run` = **470 passed / 5 DB-gated skipped**
-> across 26 suites; coverage gate clears (86% stmts, 72% branch, 92% funcs, 88% lines).
+> Last verified: full `npm run build` (shared + server + web) exits 0; `vitest run`
+> = **745 passed / 19 DB-gated skipped** across 44 suites; `prisma migrate deploy`
+> applies all ten migrations to an empty database and `migrate diff` then reports
+> no drift. Coverage is opt-in (`npm run test:coverage`) with a 70/60/70/70 gate on
+> the money-critical modules.
 
 ## Executive Summary
 
 The Unified POS System is a comprehensive **Business Operating System** built to
 the 54-segment specification "The Ultimate Architecture". All five development
 phases (§48) plus the cross-cutting platform, intelligence, compliance and
-depth/hardening work are implemented end to end: **121 Prisma models**, **54
-server route modules**, **54 web pages**, a dependency-free background job
-scheduler (16 registered jobs), real-time SSE + Web Push, statistical AI
+depth/hardening work are implemented end to end: **156 Prisma models**, **75
+server route modules**, **74 web pages**, a dependency-free background job
+scheduler (18 registered jobs), real-time SSE + Web Push, statistical AI
 (forecasting / anomaly / RFM), an env-gated S3 media adapter, an env-gated Stripe
-PSP, and fraud detection — all multi-tenant, event-driven and offline-first.
+PSP, and fraud detection — all multi-tenant and event-driven, with the register's
+offline sale queue wired end to end (see *Corrections* below).
 
 On top of the specification, **ten market-dominance subsystems** are implemented
 and wired into navigation, API and database: per-country fiscalisation, local
@@ -25,6 +28,44 @@ benchmarking.
 
 Only **§24 Hardware** (physical device drivers) and the spec-deferred
 **client SDKs** remain out of scope by design.
+
+### Corrections to earlier revisions of this document
+
+Three claims in the previous revision were wrong. They are corrected here rather
+than quietly edited, because each described a gap a buyer would have hit in the
+first week:
+
+1. **"Offline-first" was an overstatement.** `offlineService` (IndexedDB queue +
+   `SyncTransaction` ledger + idempotent `/sync` ingest) existed and worked, but
+   the register never called it — a network blip during payment lost the sale.
+   The POS now writes every sale to a local queue **before** the POST
+   (`web/src/services/posOffline.ts`), replays it with the client order id as an
+   `Idempotency-Key`, keeps the sale on a transport failure or 401, and parks a
+   server rejection for a human instead of retrying it forever.
+2. **The tip model was dead weight.** `Payment.tipAmount` was stored and shown on
+   the receipt, but nothing pooled, split or exported it. Tip pooling now exists
+   (EQUAL / HOURS / SALES / POINTS weights, largest-remainder cent allocation so
+   the distributed total equals the pool exactly), along with tip-out splits,
+   persisted distributions and payroll export (`services/tipPooling.ts`, `/tips`).
+3. **The "~137 providers" catalogue was a directory, not integrations.** The
+   catalog lists providers a merchant may ask for; no request was ever made.
+   Real REST connectors now exist for Shopify, WooCommerce and BigCommerce
+   (`services/channels.ts`, `/channels`) with provider-specific auth, pagination,
+   order/product mappers and HMAC webhook verification — and
+   `POST /commerce/integrations/:id/sync` no longer flips a status flag without
+   calling anyone. Card-present is real too: Stripe Terminal reader registration,
+   connection tokens, card-present PaymentIntents, capture, refund and tip adjust
+   (`services/terminal.ts`, `/terminal`).
+4. **The migration chain could not be applied.** `prisma migrate deploy` — the
+   first command the container entrypoint runs — aborted at
+   `20260922000000_global_hardening`, whose `migration.sql` had been saved as
+   UTF-16LE and so read as "file not found" (P3015). Two model groups also had no
+   migration at all: this build-out's 27 models, and the platform-billing tables
+   the operator console reads. Every migration is now UTF-8,
+   `20261028120000_competitor_parity` and `20261028130000_platform_billing` close
+   the gaps, and the whole chain has been applied to an empty PostgreSQL database
+   with `migrate diff` reporting no drift afterwards. The local database had been
+   built with `db push`, which is why the drift was invisible in development.
 
 ## Architecture Overview
 
@@ -41,6 +82,7 @@ Only **§24 Hardware** (physical device drivers) and the spec-deferred
 ### Phase 1 — POS Foundation ✅
 - **§4 Tenant model** — Platform → Organization → Location → Register → Device.
 - **§6/§7 POS** — catalog, cart, variants/modifiers, discounts, taxes, tips, hold/recall, customer assignment; payment methods CASH, CARD, TAP, CHIP, APPLE_PAY, GOOGLE_PAY, GIFT_CARD, STORE_CREDIT, ACH, QR.
+- **§6 competitor parity on the same order path** — weighed selling (UoM, 3-decimal quantities, scale-barcode and PLU entry), **age-restricted sales** (birth-date arithmetic, ID-required policy, supervisor override, auditable `AgeVerification`), recipe-driven ingredient depletion, automatic promotion application (BOGO / mix-and-match / quantity breaks / dayparts / bundles) and the offline sale queue. Card-present payments run through Stripe Terminal readers with tip adjust.
 - **§7/§37 Cashier drawer isolation** — one register = one cashier at a time, with an
   **individual re-entry PIN** per cashier: occupancy is enforced at open time, held
   tickets are private to their owner, and a locked drawer (manual or idle auto-lock)
@@ -54,11 +96,12 @@ Only **§24 Hardware** (physical device drivers) and the spec-deferred
 
 ### Phase 2 — Business Operations ✅
 - Loyalty & stored value, purchasing/suppliers, multi-location enterprise, accounting integration.
-- **§25/§26 Offline-first** — `offlineService` (IndexedDB, deviceId/sequence/enqueue/flush) + `SyncTransaction` ledger + idempotent batch ingest (`/sync`).
+- **§25/§26 Offline-first** — `offlineService` (IndexedDB, deviceId/sequence/enqueue/flush) + `SyncTransaction` ledger + idempotent batch ingest (`/sync`), **plus the register-level sale queue** (`web/src/services/posOffline.ts`): a sale is persisted before the request is attempted, replayed under its `Idempotency-Key`, retained on a transport or 401 failure, and parked for review on a permanent 4xx.
 - **§5 Notifications** — Notification/NotificationPreference models, `notifyFromEvent` rules, bell badge, NotificationsPage.
 
 ### Phase 3 — Commerce Hub ✅
-- Sales channels, online ordering, fulfillment (pickup/delivery), marketplace integrations, omnichannel inventory (`commerce.ts` + CommercePage).
+- Sales channels, online ordering, fulfillment (pickup/delivery), marketplace connections, omnichannel inventory (`commerce.ts` + CommercePage).
+- **Channel connectors** — Shopify / WooCommerce / BigCommerce REST clients with per-provider auth headers, pagination, product and order mappers, inventory push, connection tests and HMAC webhook verification (`services/channels.ts`, `/channels`, Channels page).
 
 ### Phase 4 — Intelligence ✅
 - **AI insights** (`/ai/insights`), **statistical depth** (`/ai` fall-through): least-squares **forecasting** with learned day-of-week seasonality + confidence bands, **z-score anomaly detection**, **RFM segmentation**.
@@ -66,7 +109,7 @@ Only **§24 Hardware** (physical device drivers) and the spec-deferred
 - Automated marketing, labor optimization.
 
 ### Phase 5 — Platform ✅
-- **Developer portal** with catalog-driven marketplace (~137 providers / 20 categories), API keys, OAuth, sandbox, **webhooks with retry/backoff**.
+- **Developer portal** with a catalog-driven provider directory (~137 providers / 20 categories — a *directory*, i.e. what a merchant may connect, not 137 shipped clients), API keys, OAuth, sandbox, **webhooks with retry/backoff**. The implemented connectors are the three channel adapters and the Stripe/Terminal card-present path.
 - **Observability/NFR** — env-gated Sentry (dynamic import), Prometheus-style `/api/metrics`, health/readiness.
 - **Enterprise** — UN M49 global-region coverage, global provisioning.
 
@@ -131,33 +174,83 @@ by the `globalJobs.ts` scheduler additions.
   a published privacy ledger (cohort size, k, ε, noise, participation) so a
   suppressed cell reads as the model working.
 
+### Competitor-parity build-out ✅
+
+Benchmarked against Square, Shopify POS, Toast, Lightspeed Retail, Erply, Clover,
+Revel, Oracle MICROS, ZOHO POS and Aloha. Each item below is a pure (unit-tested)
+service plus a route module plus a screen; the gap-by-gap mapping lives in
+`docs/COMPETITOR-PARITY.md`.
+
+- **Weighed selling & PLU** (`units.ts`, POS keypad, `/products` barcode lookup) —
+  3-decimal quantities for KG/G/L/ML/M, integer enforcement for EACH/PACK, metric
+  conversion, EAN-13/UPC-A check digits and GS1-style store scale barcodes
+  (leading `2`, PLU in digits 2–6, grams-or-cents value in 7–11).
+- **Recipes & depletion** (`recipes.ts`, `depletion.ts`, `/recipes`) — BOM roll-up
+  with sub-recipes, waste uplift before costing, yield division, cycle guard and
+  depth cap; a sale writes ingredient draws as inventory movements.
+- **Promotion engine** (`promotions.ts`, `/marketing` fall-through) — percentage,
+  fixed, BOGO, mix-and-match, bundle, quantity-break and daypart mechanics with
+  priority-ordered automatic application, a non-stackable short-circuit, and
+  proportional per-line allocation reconciled to the cent.
+- **Loyalty tiers** (`/loyalty-tiers`, Loyalty Tiers page) — earn rates, tier
+  thresholds and audited manual adjustments over the points ledger.
+- **Labour** (`labor.ts`, `/labor`, Labor page) — shift hours with unpaid breaks,
+  daily-then-weekly overtime, cost at the multiplier, overlap / insufficient-rest
+  / over-long / inverted-shift detection, availability violations, coverage gaps,
+  SPLH and labour-%, time-off and shift-swap requests, frozen payroll runs + CSV.
+- **Tips** (`tipPooling.ts`, `/tips`, Tips page) — per-role pool rules, four
+  weighting methods, cent-exact distribution, tip-out to support staff.
+- **Quotes & backorders** (`/quotes`, `/backorders`) — estimate-to-order
+  conversion, and partial fulfilment that keeps the outstanding quantity visible.
+- **Field service** (`/service`, Service Orders page) — appointments with clash
+  detection and free-slot search, work orders with labour/part/fee lines and a
+  guarded status flow, rentals at hourly/daily/weekly rates with per-line returns,
+  condition and a merchant-set late fee.
+- **KDS routing** (`kds.ts`, `/restaurant` fall-through) — modifier-then-category
+  station routing, per-station grouping, course-at-a-time firing that never
+  re-fires a sent item, and ON_TIME / AT_RISK / LATE service levels.
+- **Self-service devices** (`/kiosk`, Kiosk page, public `/device/:token`) —
+  manager-only pairing with a show-once token, customer-display cart mirroring,
+  and a kiosk checkout that reprices server-side and reports the age-check flag.
+- **Card-present** (`terminal.ts`, `/terminal`, Terminal page) — reader
+  registration and listing, connection tokens, card-present PaymentIntents,
+  capture, cancel, refund and tip adjust bounded by the authorised amount.
+- **Report builder** (`reportBuilder.ts`, `/reports` fall-through) — a closed
+  vocabulary of sources and columns (no string SQL anywhere), `FilterSet`
+  operators, grouping with sums, RFC 4180 CSV and cron-scheduled definitions.
+- **Channel connectors** — Shopify / WooCommerce / BigCommerce, see Phase 3.
+
 ### Out of scope (by design)
 - **§24 Hardware** — physical device drivers.
 - **Client SDKs** (JavaScript/Python) — spec-deferred; the REST API + developer catalog are complete.
 
 ## Data Model
 
-**121 Prisma models.** Groups: Tenant (Organization, Location, Register, Device, Region, Warehouse), Identity (User, Employee, Role, Permission, EmployeeLocation, TimeEntry), Customer & Loyalty, Catalog (Product, Variant, Category, Brand, ModifierGroup, Modifier, TaxRule), Inventory (Balance, Movement, Batch, SerialNumber, Supplier), Orders (Order, OrderItem, OrderDiscount, OrderTax, OrderFulfillment), Payments (Payment, Refund, Dispute, Payout, Settlement, GiftCard, StoreCredit, **PaymentLink**), Restaurant (Table, Course, **QrToken**, **CateringOrder**), Commerce, Accounting, Notifications, Platform (Webhook, ApiKey, Integration, **JobRun**, **PushSubscription**, **MediaAsset**), Security (AuditEvent, IdempotencyKey, RateLimitCounter, SyncTransaction, **FraudAlert**), Compliance, and the new **Global Expansion** group: FiscalDevice, FiscalDocument, RailAccount, SettlementBatch, SettlementLine, ReplenishmentRun, VerticalInstallation, CreditFacility, LoanRepayment, AgentMandate, MeshFence, FranchiseAgreement, RoyaltyAccrual, AppInstallation, CustomFieldDefinition, CustomFieldValue, BenchmarkSnapshot.
+**156 Prisma models.** Groups: Tenant (Organization, Location, Register, Device, Region, Warehouse), Identity (User, Employee, Role, Permission, EmployeeLocation, TimeEntry), Customer & Loyalty, Catalog (Product, Variant, Category, Brand, ModifierGroup, Modifier, TaxRule), Inventory (Balance, Movement, Batch, SerialNumber, Supplier), Orders (Order, OrderItem, OrderDiscount, OrderTax, OrderFulfillment), Payments (Payment, Refund, Dispute, Payout, Settlement, GiftCard, StoreCredit, **PaymentLink**), Restaurant (Table, Course, **QrToken**, **CateringOrder**), Commerce, Accounting, Notifications, Platform (Webhook, ApiKey, Integration, **JobRun**, **PushSubscription**, **MediaAsset**), Security (AuditEvent, IdempotencyKey, RateLimitCounter, SyncTransaction, **FraudAlert**), Compliance, and the new **Global Expansion** group: FiscalDevice, FiscalDocument, RailAccount, SettlementBatch, SettlementLine, ReplenishmentRun, VerticalInstallation, CreditFacility, LoanRepayment, AgentMandate, MeshFence, FranchiseAgreement, RoyaltyAccrual, AppInstallation, CustomFieldDefinition, CustomFieldValue, BenchmarkSnapshot.
 
-The new models are deliberately relation-free (they carry `organizationId` but no Prisma relations), so they migrate cleanly onto a live database and are joined in memory.
+A **Competitor-parity** group adds 27 models: Recipe, RecipeLine, AgeVerification, ShiftSchedule, ShiftSwapRequest, EmployeeAvailability, TimeOffRequest, TipPoolRule, TipDistribution, PayrollRun, TerminalReader, ChannelConnection, ExternalProductMapping, ChannelSyncLog, Quote, QuoteLine, KitchenStation, LoyaltyTier, ReportDefinition, ReportRun, Appointment, WorkOrder, WorkOrderLine, RentalAgreement, RentalLine, KioskSession and Backorder.
 
-A baseline migration lives in `packages/server/prisma/migrations/` (applied by the Docker entrypoint via `migrate deploy`); the expansion ships as `20260921120000_global_expansion`.
+Ten migrations live in `packages/server/prisma/migrations/` and are applied by the Docker entrypoint via `migrate deploy` — the baseline `20260907000000_init`, the expansion `20260921120000_global_expansion`, the hardening and storefront steps, then `20261028120000_competitor_parity` (the 27 models above plus the weighed-item, PLU and age-gate columns) and `20261028130000_platform_billing`. The chain applies clean to an empty database, and `prisma migrate diff --from-url <db> --to-schema-datamodel packages/server/prisma/schema.prisma` then prints an empty migration, so the schema and the migrations cannot drift apart unnoticed.
 
 ## Server Routes (dual-mounted at `/api` and `/api/v1`)
 
-`auth, inventory, inventory-ops, products, catalog, orders, reports, settings, locations, registers, customers, audit, receipts, webhooks, loyalty, restaurant (+ restaurant-ext: QR/catering/food-cost), accounting, employees, suppliers, purchasing, ai (+ ai-analytics: forecast/anomalies/segments), developer, system, payments, marketing, copilot, enterprise, retail, permissions, devices, commerce, sync, notifications, compliance, fraud, payment-links, public (guest QR ordering), realtime (SSE), push (VAPID), media, **fiscal, rails, agent (replenishment), verticals, finance, agents (agentic commerce), mesh, franchise, apps, benchmark**`.
+`auth, inventory, inventory-ops, products, catalog, orders, reports, settings, locations, registers, customers, audit, receipts, webhooks, loyalty, restaurant (+ restaurant-ext: QR/catering/food-cost), accounting, employees, suppliers, purchasing, ai (+ ai-analytics: forecast/anomalies/segments), developer, system, payments, marketing, copilot, enterprise, retail, permissions, devices, commerce, sync, notifications, compliance, fraud, payment-links, public (guest QR ordering), realtime (SSE), push (VAPID), media, **fiscal, rails, agent (replenishment), verticals, finance, agents (agentic commerce), mesh, franchise, apps, benchmark**, and the competitor-parity set **quotes, backorders (mounted on `/orders`), service (appointments/work orders/rentals), labor, tips, terminal, channels, recipes, age-verifications, plus `/reports` (custom builder), `/loyalty` (tiers), `/marketing` (promotion engine) and `/restaurant` (kitchen ops) as fall-throughs**`.
 
-Public (no-auth) surfaces: `/api/payment-links/public/:token` (+ `/pay`), `/api/public/*` guest QR ordering, `/api/agents/public/*` (machine-readable catalogue, mandate verification, order status), `/api/realtime/stream` (token-authenticated), Stripe webhook at `/api/webhooks/stripe`, and the RFC 8615 discovery documents at `/.well-known/unifiedpos` and `/.well-known/unifiedpos/{merchantId}`.
+Public (no-auth) surfaces: `/api/payment-links/public/:token` (+ `/pay`), `/api/public/*` guest QR ordering, `/api/agents/public/*` (machine-readable catalogue, mandate verification, order status), `/api/kiosk/*` device bootstrap / heartbeat / cart read (token in the path, scoped per session), `/api/channels/webhooks/:connectionId` (raw body, HMAC-verified), `/api/realtime/stream` (token-authenticated), Stripe webhook at `/api/webhooks/stripe`, and the RFC 8615 discovery documents at `/.well-known/unifiedpos` and `/.well-known/unifiedpos/{merchantId}`.
 
-## Frontend Pages (54)
+## Frontend Pages (74)
 
-Auth/public shell: Login, Register, Reset Password, Legal, **PayLink (`/pay/:token`)**, **GuestOrder (`/order/:token`)** — the two guest pages render outside the auth gate.
+Auth/public shell: Login, Register, Reset Password, Legal, **PayLink (`/pay/:token`)**, **GuestOrder (`/order/:token`)**, **Shop (`/shop/:slug`, plus its `/status/:token` view)**, **Platform Login (`/platform/login`)**, **Device (`/device/:token`)** — these render without the merchant Layout, because a customer scanning a QR code, browsing the web shop or tapping a kiosk has no account here; `/admin` sends a signed-out visitor to the operator entrance rather than the merchant form.
 
-Authenticated app: POS, Orders, Inventory, Catalog, **Media**, Transfers, Purchasing, Suppliers, Customers, Loyalty, Marketing, AI Insights, **Predictive Analytics**, Copilot, Employees, Permissions, Registers, Devices, Hardware, Accounting, Reports, Developer, Webhooks, Enterprise, System, Sync, Notifications, Audit, **Fraud**, Compliance, Settings, Restaurant, **Restaurant Ops (QR/catering/food-cost)**, Retail, Commerce, Payments, **Payment Links**, Receipt.
+Authenticated app: POS, Orders, Inventory, Catalog, **Media**, Labels, Transfers, Purchasing, Suppliers, Customers, Loyalty, Marketing, AI Insights, **Predictive Analytics**, Copilot, Employees, Permissions, Registers, Devices, Hardware, Accounting, Reports, Developer, Webhooks, Enterprise, System, Sync, Notifications, Audit, **Fraud**, Compliance, Settings, Restaurant, **Restaurant Ops (QR/catering/food-cost)**, Retail, Commerce, **Storefront builder (`/storefront`)**, **Delivery (`/delivery`)**, Payments, **Payment Links**, **FX (`/fx`)**, **Subscriptions (`/subscriptions`)**, **Pricing (`/pricing`)**, Receipt.
 
-Market-dominance screens: **Fiscalization (`/fiscalization`), Rails (`/rails`), AgentOps (`/agent-ops`), Verticals (`/verticals`), Finance (`/finance`), AgentStorefront (`/agents`), Mesh (`/mesh`), Franchise (`/franchise`), Apps (`/apps`), Benchmark (`/benchmark`)** — each lazy-loaded, grouped in navigation, and localised in all five languages.
+Competitor-parity screens (11 new): **Quotes (`/quotes`), Backorders (`/backorders`), Loyalty Tiers (`/loyalty-tiers`), Terminal (`/terminal`), Channels (`/channels`), Tips (`/tips`), Labor (`/labor`), Service Orders (`/service`), Report Builder (`/report-builder`), Kiosks (`/kiosks`), Device (`/device/:token`)** — lazy-loaded, grouped in navigation, and translated in every locale.
 
-Navigation is grouped into luxury "collections" and fully i18n-localised (en master + es/fr/de/pt) via `t(labelKey)`.
+Operator console: **Admin Portal (`/admin`)** — cross-tenant organizations and users, the plans tenants buy, a recorded-payments ledger, a 12-month platform revenue trend and account lifecycle history; SUPER_ADMIN only, and a SUPER_ADMIN with no organization lands here instead of on a POS screen that could never load.
+
+Market-dominance screens: **Fiscalization (`/fiscalization`), Rails (`/rails`), AgentOps (`/agent-ops`), Verticals (`/verticals`), Finance (`/finance`), AgentStorefront (`/agents`), Mesh (`/mesh`), Franchise (`/franchise`), Apps (`/apps`), Benchmark (`/benchmark`)** — each lazy-loaded, grouped in navigation, and localised in all 17 locales.
+
+Navigation is grouped into luxury "collections" and fully i18n-localised via `t(labelKey)`: **17 locales** (en master + es, fr, de, pt, ar, zh, hi, tr, ja, ko, vi, id, th, sw, he, fa), including the RTL pair ar/he. `packages/web/test/i18n.test.ts` enforces complete parity — no missing, blank, untagged or whitespace-padded value, and no orphan key — in every one of them.
 
 ## Security & Compliance
 
@@ -197,6 +290,7 @@ Navigation is grouped into luxury "collections" and fully i18n-localised (en mas
 - `vitest` suites in each package's `test/` folder (excluded from the production `tsc` build).
 - **Pure unit coverage**: moneyMath (FIFO gift-card/store-credit), currencies, crypto (AES-GCM), payment provider + Stripe webhook signature, email, payment methods, escpos, i18n parity, product types, **aiEngine** (regression/forecast/anomaly/RFM), **fraud** (`scoreFraud` verdicts + thresholds), **scheduler** (registry, overlap guard, success/failure capture), **registerAccess** (PIN strength, hash/verify, freeze arithmetic, idle window, occupancy verdicts, sales gate).
 - **Market-dominance unit coverage** (10 further suites, all pure, no database): `fiscalization` (canonical payload → seal → chain breakage, sequence gaps, TLV, retention, back-off, bridge env matrix), `paymentRails` (IBAN/ABA/CLABE/CPF/CNPJ/NUBAN/IFSC/VPA/BSB vectors, rail choice), `settlement` (variance classification, tolerance, duplicates, batch health), `replenishment` (z-scores, safety stock, EOQ, pack rounding, guardrail trimming, supplier roll-up), `embeddedFinance` (annuity + amortisation to the cent, underwriting decline codes, term-sheet monotonicity, sweep allocation), `mesh` (election determinism, quorum, fencing, lease takeover, conflict merge), `franchise` (banded royalty with auditable steps, exclusions, transfer pricing, consolidation eliminations), `benchmark` (percentiles, clipping, injected Laplace draw, k-suppression, participation), `agenticCommerce` (canonical JSON, sign/verify/tamper, every rejection code, JSON-LD shape), `customFields` (slug/definition validation, per-type coercion, scope closure, token issue/verify).
+- **Competitor-parity unit coverage** — `packages/server/test/parityServices.test.ts` (100 tests) pins the money- and stock-critical pure services: quantity normalisation and UoM conversion, weighed pricing, GTIN/EAN-13/UPC-A and store scale-barcode decoding, tip allocation to the cent (largest remainder, zero drift), promotion planning with non-stackable short-circuit and proportional discount allocation, recipe roll-up (depth cap, cycle guard, waste uplift, sub-recipe precedence), depletion draws, margin, age-gate verdicts, KDS station routing / course fire / SLA, daily-then-weekly overtime, shift conflicts, availability, coverage, and report-builder validation / grouping / RFC 4180 CSV. `packages/web/test/posOffline.test.ts` (10 tests) pins the register's offline queue: write-before-send, `Idempotency-Key`, transport/5xx/401/4xx handling, oldest-first replay and the no-resurrection rule.
 - **Live route smoke** — `npm run smoke:global` (`scripts/smoke-global.mjs`) registers a throwaway tenant against a running server and walks all ten subsystems end to end: fiscal device + seal + `chain/verify`, rail validation + settlement reconciliation, a replenishment run, a vertical pack through its 428 confirmation gate, underwriting + quote, app install + token verify + custom field values, a signed mandate verified (and a tampered one rejected 401) on the public surface, mesh claim/heartbeat/commit with an invented-epoch write fenced off at 409, a franchise agreement + accrual + consolidation, and the benchmark cohort endpoints. It paces itself on 429s, so a run takes a few minutes.
 - **DB-gated integration**: `moneyPath.integration.test.ts` exercises the payment-link charge → PAID transition and gift-card deduction against a real DB. Skipped unless `RUN_DB_TESTS=1` with a disposable `DATABASE_URL`.
 - Coverage gate (opt-in via `npm run test:coverage`) scoped to money-critical pure modules; thresholds 70/60/70/70.

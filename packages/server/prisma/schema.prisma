@@ -10,92 +10,92 @@ datasource db {
 // ─── TENANT & ORGANIZATION ────────────────────────────────────
 
 model Organization {
-  id        String   @id @default(uuid())
-  name      String
-  industry  String   @default("RETAIL") // RETAIL, RESTAURANT, SERVICES
-  currency  String   @default("USD")
-  taxRate   Decimal  @default(0) @db.Decimal(5, 2)
-  phone     String?
-  email     String?
-  address   String?
-  country   String?  // full country name (e.g. "Nigeria")
-  countryCode String? // ISO 3166-1 alpha-2 (e.g. "NG")
-  isActive  Boolean  @default(true)
+  id               String    @id @default(uuid())
+  name             String
+  industry         String    @default("RETAIL") // RETAIL, RESTAURANT, SERVICES
+  currency         String    @default("USD")
+  taxRate          Decimal   @default(0) @db.Decimal(5, 2)
+  phone            String?
+  email            String?
+  address          String?
+  country          String? // full country name (e.g. "Nigeria")
+  countryCode      String? // ISO 3166-1 alpha-2 (e.g. "NG")
+  isActive         Boolean   @default(true)
   // ── Platform (SaaS-operator) lifecycle ─────────────────────────
   // A tenant is itself an account that pays UnifiedPOS. `status` is the
   // operator-controlled lifecycle state; `currentPeriodEnd` is the paid-through
   // date and `trialEnd` the free-trial expiry. The billing job suspends tenants
   // whose coverage lapses; recording a payment restores them. This is distinct
   // from the per-tenant Subscription engine (a merchant billing ITS customers).
-  status          String   @default("ACTIVE") // ACTIVE, TRIALING, SUSPENDED, CANCELLED, ARCHIVED
-  platformPlanId  String?
-  trialEnd        DateTime?
+  status           String    @default("ACTIVE") // ACTIVE, TRIALING, SUSPENDED, CANCELLED, ARCHIVED
+  platformPlanId   String?
+  trialEnd         DateTime?
   currentPeriodEnd DateTime?
-  suspendedAt     DateTime?
-  canceledAt      DateTime?
-  archivedAt      DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  suspendedAt      DateTime?
+  canceledAt       DateTime?
+  archivedAt       DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
-  platformPlan    PlatformPlan?  @relation(fields: [platformPlanId], references: [id])
+  platformPlan     PlatformPlan?     @relation(fields: [platformPlanId], references: [id])
   platformPayments PlatformPayment[]
 
-  locations       Location[]
-  regions         Region[]
-  warehouses      Warehouse[]
-  employees       Employee[]
-  customers       Customer[]
-  products        Product[]
-  categories      Category[]
-  brands          Brand[]
-  suppliers       Supplier[]
-  taxRules        TaxRule[]
-  registers       Register[]
-  devices         Device[]
-  orders          Order[]
-  auditEvents     AuditEvent[]
-  webhooks        Webhook[]
-  businessEvents  BusinessEvent[]
-  accountingEntries AccountingEntry[]
-  loyaltyPrograms LoyaltyProgram[]
-  loyaltyTransactions LoyaltyTransaction[]
-  tables          RestaurantTable[]
-  promotions      Promotion[]
-  coupons         Coupon[]
-  campaigns       Campaign[]
-  invoices        Invoice[]
-  expenses        Expense[]
-  stockTransfers  StockTransfer[]
-  stockCounts     StockCount[]
-  refunds         Refund[]
-  payouts         Payout[]
-  priceLists      PriceList[]
-  shifts          Shift[]
-  tips            Tip[]
-  commissions     Commission[]
-  purchaseOrders  PurchaseOrder[]
-  storefronts     Storefront[]
-  giftCards       GiftCard[]
-  storeCredits    StoreCredit[]
-  layaways        Layaway[]
-  roles           Role[]
-  integrations    IntegrationConnection[]
-  customerEvents  CustomerEvent[]
-  customerProfiles CustomerProfile[]
-  customerPreferences CustomerPreference[]
-  marketingEvents MarketingEvent[]
-  rewards         Reward[]
-  bundles         Bundle[]
-  kits            Kit[]
-  compositeProducts CompositeProduct[]
-  paymentTransactions PaymentTransaction[]
-  salesChannels   SalesChannel[]
-  deliveryZones   DeliveryZone[]
-  syncTransactions SyncTransaction[]
-  notifications   Notification[]
+  locations               Location[]
+  regions                 Region[]
+  warehouses              Warehouse[]
+  employees               Employee[]
+  customers               Customer[]
+  products                Product[]
+  categories              Category[]
+  brands                  Brand[]
+  suppliers               Supplier[]
+  taxRules                TaxRule[]
+  registers               Register[]
+  devices                 Device[]
+  orders                  Order[]
+  auditEvents             AuditEvent[]
+  webhooks                Webhook[]
+  businessEvents          BusinessEvent[]
+  accountingEntries       AccountingEntry[]
+  loyaltyPrograms         LoyaltyProgram[]
+  loyaltyTransactions     LoyaltyTransaction[]
+  tables                  RestaurantTable[]
+  promotions              Promotion[]
+  coupons                 Coupon[]
+  campaigns               Campaign[]
+  invoices                Invoice[]
+  expenses                Expense[]
+  stockTransfers          StockTransfer[]
+  stockCounts             StockCount[]
+  refunds                 Refund[]
+  payouts                 Payout[]
+  priceLists              PriceList[]
+  shifts                  Shift[]
+  tips                    Tip[]
+  commissions             Commission[]
+  purchaseOrders          PurchaseOrder[]
+  storefronts             Storefront[]
+  giftCards               GiftCard[]
+  storeCredits            StoreCredit[]
+  layaways                Layaway[]
+  roles                   Role[]
+  integrations            IntegrationConnection[]
+  customerEvents          CustomerEvent[]
+  customerProfiles        CustomerProfile[]
+  customerPreferences     CustomerPreference[]
+  marketingEvents         MarketingEvent[]
+  rewards                 Reward[]
+  bundles                 Bundle[]
+  kits                    Kit[]
+  compositeProducts       CompositeProduct[]
+  paymentTransactions     PaymentTransaction[]
+  salesChannels           SalesChannel[]
+  deliveryZones           DeliveryZone[]
+  syncTransactions        SyncTransaction[]
+  notifications           Notification[]
   notificationPreferences NotificationPreference[]
-  inventoryBatches InventoryBatch[]
-  serialNumbers   SerialNumber[]
+  inventoryBatches        InventoryBatch[]
+  serialNumbers           SerialNumber[]
 
   @@map("organizations")
 }
@@ -140,41 +140,41 @@ model PlatformPayment {
 }
 
 model Location {
-  id              String   @id @default(uuid())
-  organizationId  String
-  regionId        String?
-  name            String
-  address         String?
-  phone           String?
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(uuid())
+  organizationId String
+  regionId       String?
+  name           String
+  address        String?
+  phone          String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  organization Organization @relation(fields: [organizationId], references: [id])
-  region       Region?       @relation(fields: [regionId], references: [id])
-  registers    Register[]
-  employees    EmployeeLocation[]
-  inventory    InventoryBalance[]
-  orders       Order[]
-  deliveryZones DeliveryZone[]
-  batches       InventoryBatch[]
-  storefronts   Storefront[]
+  organization   Organization       @relation(fields: [organizationId], references: [id])
+  region         Region?            @relation(fields: [regionId], references: [id])
+  registers      Register[]
+  employees      EmployeeLocation[]
+  inventory      InventoryBalance[]
+  orders         Order[]
+  deliveryZones  DeliveryZone[]
+  batches        InventoryBatch[]
+  storefronts    Storefront[]
   purchaseOrders PurchaseOrder[]
 
   @@map("locations")
 }
 
 model Register {
-  id          String   @id @default(uuid())
+  id             String   @id @default(uuid())
   organizationId String
-  locationId  String
-  name        String
-  status      String   @default("CLOSED") // CLOSED, OPENING, OPEN, SUSPENDED, CLOSING
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  locationId     String
+  name           String
+  status         String   @default("CLOSED") // CLOSED, OPENING, OPEN, SUSPENDED, CLOSING
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  organization Organization @relation(fields: [organizationId], references: [id])
-  location     Location     @relation(fields: [locationId], references: [id])
+  organization Organization      @relation(fields: [organizationId], references: [id])
+  location     Location          @relation(fields: [locationId], references: [id])
   sessions     RegisterSession[]
   orders       Order[]
 
@@ -182,23 +182,23 @@ model Register {
 }
 
 model RegisterSession {
-  id            String    @id @default(uuid())
-  registerId    String
-  employeeId    String
-  openingCash   Decimal   @default(0) @db.Decimal(10, 2)
-  closingCash   Decimal?  @db.Decimal(10, 2)
-  expectedCash  Decimal?  @db.Decimal(10, 2)
-  variance      Decimal?  @db.Decimal(10, 2)
-  status        String    @default("OPEN") // OPEN, CLOSING, CLOSED
-  openedAt      DateTime  @default(now())
-  closedAt      DateTime?
-  notes         String?
+  id           String    @id @default(uuid())
+  registerId   String
+  employeeId   String
+  openingCash  Decimal   @default(0) @db.Decimal(10, 2)
+  closingCash  Decimal?  @db.Decimal(10, 2)
+  expectedCash Decimal?  @db.Decimal(10, 2)
+  variance     Decimal?  @db.Decimal(10, 2)
+  status       String    @default("OPEN") // OPEN, CLOSING, CLOSED
+  openedAt     DateTime  @default(now())
+  closedAt     DateTime?
+  notes        String?
   // Drawer handover lock: while `locked` is true the session's cashier must
   // re-authenticate with their own PIN before the register accepts any sale.
-  locked        Boolean   @default(false)
-  lockedAt      DateTime?
-  lockReason    String?   // MANUAL (cashier walked away) | IDLE (auto-lock)
-  lockedCount   Int       @default(0) // how many times this session was locked (ops signal)
+  locked       Boolean   @default(false)
+  lockedAt     DateTime?
+  lockReason   String? // MANUAL (cashier walked away) | IDLE (auto-lock)
+  lockedCount  Int       @default(0) // how many times this session was locked (ops signal)
 
   register Register @relation(fields: [registerId], references: [id])
   employee Employee @relation(fields: [employeeId], references: [id])
@@ -209,20 +209,20 @@ model RegisterSession {
 }
 
 model Device {
-  id              String   @id @default(uuid())
-  organizationId  String
-  locationId      String?
-  registerId      String?
-  name            String
-  type            String   @default("POS_TERMINAL") // POS_TERMINAL, MOBILE, KIOSK, KITCHEN_DISPLAY
-  status          String   @default("ONLINE") // ONLINE, OFFLINE, MAINTENANCE, RETIRED
+  id               String    @id @default(uuid())
+  organizationId   String
+  locationId       String?
+  registerId       String?
+  name             String
+  type             String    @default("POS_TERMINAL") // POS_TERMINAL, MOBILE, KIOSK, KITCHEN_DISPLAY
+  status           String    @default("ONLINE") // ONLINE, OFFLINE, MAINTENANCE, RETIRED
   deviceCredential String? // encrypted device auth token
-  lastSyncAt      DateTime?
-  lastHeartbeatAt DateTime?
-  softwareVersion String?
-  configVersion   String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  lastSyncAt       DateTime?
+  lastHeartbeatAt  DateTime?
+  softwareVersion  String?
+  configVersion    String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -232,69 +232,69 @@ model Device {
 // ─── IDENTITY & AUTH ──────────────────────────────────────────
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
-  role      String   @default("CASHIER") // OWNER, ADMIN, MANAGER, CASHIER
-  isActive  Boolean  @default(true)
-  resetToken String? // hashed password-reset token (§37 secrets never stored in plain text)
-  resetTokenExpires DateTime?
-  mfaSecret         String?   // base32 TOTP secret (§37 MFA); never returned once enabled
-  mfaEnabled        Boolean   @default(false)
-  failedLoginAttempts Int     @default(0)  // §37 account-lockout counter
-  lockedUntil       DateTime?              // §37 temporary lockout expiry
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                  String    @id @default(uuid())
+  email               String    @unique
+  password            String
+  name                String
+  role                String    @default("CASHIER") // OWNER, ADMIN, MANAGER, CASHIER
+  isActive            Boolean   @default(true)
+  resetToken          String? // hashed password-reset token (§37 secrets never stored in plain text)
+  resetTokenExpires   DateTime?
+  mfaSecret           String? // base32 TOTP secret (§37 MFA); never returned once enabled
+  mfaEnabled          Boolean   @default(false)
+  failedLoginAttempts Int       @default(0) // §37 account-lockout counter
+  lockedUntil         DateTime? // §37 temporary lockout expiry
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
-  employee  Employee?
+  employee Employee?
 
   @@map("users")
 }
 
 model BreachIncident {
-  id                  String    @id @default(uuid())
-  organizationId      String
-  title               String
-  description         String?
-  severity            String    @default("MEDIUM")   // LOW, MEDIUM, HIGH, CRITICAL
-  status              String    @default("DETECTED") // DETECTED, ASSESSED, NOTIFIED, CLOSED
-  affectedRecords     Int       @default(0)
-  detectedAt          DateTime  @default(now())
-  assessedAt          DateTime?
-  regulatorNotifiedAt DateTime?
+  id                    String    @id @default(uuid())
+  organizationId        String
+  title                 String
+  description           String?
+  severity              String    @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  status                String    @default("DETECTED") // DETECTED, ASSESSED, NOTIFIED, CLOSED
+  affectedRecords       Int       @default(0)
+  detectedAt            DateTime  @default(now())
+  assessedAt            DateTime?
+  regulatorNotifiedAt   DateTime?
   individualsNotifiedAt DateTime?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   @@index([organizationId, status])
   @@map("breach_incidents")
 }
 
 model Employee {
-  id              String   @id @default(uuid())
-  organizationId  String
-  userId          String   @unique
-  roleId          String?
-  employeeNumber  String?
-  department      String?
-  position        String?
-  hourlyRate      Decimal? @db.Decimal(10, 2)
-  commissionRate  Decimal? @db.Decimal(5, 2)
-  isActive        Boolean  @default(true)
+  id                String    @id @default(uuid())
+  organizationId    String
+  userId            String    @unique
+  roleId            String?
+  employeeNumber    String?
+  department        String?
+  position          String?
+  hourlyRate        Decimal?  @db.Decimal(10, 2)
+  commissionRate    Decimal?  @db.Decimal(5, 2)
+  isActive          Boolean   @default(true)
   // Individual register PIN (bcrypt hash — never stored or returned in plain
   // text). Each cashier owns one, so a locked drawer can only be reopened by the
   // cashier who locked it.
-  registerPin         String?
-  pinUpdatedAt        DateTime?
-  pinFailedAttempts   Int       @default(0)
-  pinLockedUntil      DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  registerPin       String?
+  pinUpdatedAt      DateTime?
+  pinFailedAttempts Int       @default(0)
+  pinLockedUntil    DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  organization Organization     @relation(fields: [organizationId], references: [id])
-  user         User              @relation(fields: [userId], references: [id])
-  role         Role?             @relation(fields: [roleId], references: [id])
+  organization Organization       @relation(fields: [organizationId], references: [id])
+  user         User               @relation(fields: [userId], references: [id])
+  role         Role?              @relation(fields: [roleId], references: [id])
   locations    EmployeeLocation[]
   sessions     RegisterSession[]
   orders       Order[]
@@ -322,37 +322,37 @@ model EmployeeLocation {
 // ─── CUSTOMERS ────────────────────────────────────────────────
 
 model Customer {
-  id              String   @id @default(uuid())
-  organizationId  String
-  name            String
-  email           String?
-  phone           String?
-  address         String?
-  totalSpent      Decimal  @default(0) @db.Decimal(12, 2)
-  totalOrders     Int      @default(0)
-  averageOrderValue Decimal @default(0) @db.Decimal(10, 2)
-  visitFrequency   Decimal  @default(0) @db.Decimal(5, 2)
-  loyaltyPoints   Int      @default(0)
-  lastVisitAt     DateTime?
+  id                  String    @id @default(uuid())
+  organizationId      String
+  name                String
+  email               String?
+  phone               String?
+  address             String?
+  totalSpent          Decimal   @default(0) @db.Decimal(12, 2)
+  totalOrders         Int       @default(0)
+  averageOrderValue   Decimal   @default(0) @db.Decimal(10, 2)
+  visitFrequency      Decimal   @default(0) @db.Decimal(5, 2)
+  loyaltyPoints       Int       @default(0)
+  lastVisitAt         DateTime?
   preferredLocationId String?
-  birthday        DateTime?
-  marketingOptIn  Boolean  @default(false)
-  tags            String[]
-  notes           String?
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  birthday            DateTime?
+  marketingOptIn      Boolean   @default(false)
+  tags                String[]
+  notes               String?
+  isActive            Boolean   @default(true)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
-  organization   Organization         @relation(fields: [organizationId], references: [id])
-  orders         Order[]
+  organization        Organization         @relation(fields: [organizationId], references: [id])
+  orders              Order[]
   loyaltyTransactions LoyaltyTransaction[]
-  refunds        Refund[]
-  invoices       Invoice[]
-  profiles       CustomerProfile[]
-  preferences    CustomerPreference[]
-  events         CustomerEvent[]
-  giftCards      GiftCard[]
-  storeCredits   StoreCredit[]
+  refunds             Refund[]
+  invoices            Invoice[]
+  profiles            CustomerProfile[]
+  preferences         CustomerPreference[]
+  events              CustomerEvent[]
+  giftCards           GiftCard[]
+  storeCredits        StoreCredit[]
 
   @@map("customers")
 }
@@ -360,28 +360,28 @@ model Customer {
 // ─── PRODUCT CATALOG ──────────────────────────────────────────
 
 model Category {
-  id              String   @id @default(uuid())
-  organizationId  String
-  name            String
-  description     String?
-  color           String?
-  sortOrder       Int      @default(0)
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  description    String?
+  color          String?
+  sortOrder      Int      @default(0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
-  products       Product[]
+  products     Product[]
 
   @@map("categories")
 }
 
 model Brand {
-  id              String   @id @default(uuid())
-  organizationId  String
-  name            String
-  description     String?
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  description    String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
   products     Product[]
@@ -390,27 +390,38 @@ model Brand {
 }
 
 model Product {
-  id              String   @id @default(uuid())
-  organizationId  String
-  name            String
-  sku             String
-  barcode         String?
-  description     String?
-  type            String   @default("PHYSICAL")
-  price           Decimal  @db.Decimal(10, 2)
-  costPrice       Decimal  @db.Decimal(10, 2)
-  categoryId      String?
-  brandId         String?
-  taxRuleId       String?
-  imageUrl        String?
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  sku            String
+  barcode        String?
+  description    String?
+  type           String   @default("PHYSICAL")
+  price          Decimal  @db.Decimal(10, 2)
+  costPrice      Decimal  @db.Decimal(10, 2)
+  categoryId     String?
+  brandId        String?
+  taxRuleId      String?
+  imageUrl       String?
+  isActive       Boolean  @default(true)
+  // ── Units of measure & weighted retail ──
+  // `EACH` products sell in whole units; `KG`/`G`/`L`/`ML`/`M` sell by a
+  // decimal quantity entered on a scale keypad or decoded from a scale barcode.
+  unitOfMeasure  String   @default("EACH") // EACH, KG, G, L, ML, M, PACK
+  isWeighed      Boolean  @default(false)
+  // Price is per `unitOfMeasure` (so a KG product priced 12.50 sells 0.375kg
+  // for 4.69). Never per base unit — the POS multiplies by the entered qty.
+  plu            String? // numeric scale/PLU code (1-5 digits, grocery deli/bulk)
+  // ── Age-restricted sales (alcohol, tobacco, pharmacy, knives, aerosols) ──
+  ageRestricted  Boolean  @default(false)
+  minAge         Int? // override the store default (usually 18 or 21)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   organization Organization       @relation(fields: [organizationId], references: [id])
-  category     Category?           @relation(fields: [categoryId], references: [id])
-  brand        Brand?              @relation(fields: [brandId], references: [id])
-  taxRule      TaxRule?            @relation(fields: [taxRuleId], references: [id])
+  category     Category?          @relation(fields: [categoryId], references: [id])
+  brand        Brand?             @relation(fields: [brandId], references: [id])
+  taxRule      TaxRule?           @relation(fields: [taxRuleId], references: [id])
   variants     ProductVariant[]
   inventory    InventoryBalance[]
   orderItems   OrderItem[]
@@ -423,13 +434,13 @@ model Product {
 }
 
 model ProductVariant {
-  id          String  @id @default(uuid())
-  productId   String
-  name        String  // e.g. "Size", "Color"
-  value       String  // e.g. "Large", "Red"
-  priceAdj    Decimal @default(0) @db.Decimal(10, 2)
-  sku         String?
-  barcode     String?
+  id        String  @id @default(uuid())
+  productId String
+  name      String // e.g. "Size", "Color"
+  value     String // e.g. "Large", "Red"
+  priceAdj  Decimal @default(0) @db.Decimal(10, 2)
+  sku       String?
+  barcode   String?
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
@@ -461,11 +472,11 @@ model Modifier {
 }
 
 model TaxRule {
-  id              String   @id @default(uuid())
-  organizationId  String
-  name            String
-  rate            Decimal  @db.Decimal(5, 2)
-  isActive        Boolean  @default(true)
+  id             String  @id @default(uuid())
+  organizationId String
+  name           String
+  rate           Decimal @db.Decimal(5, 2)
+  isActive       Boolean @default(true)
 
   organization Organization @relation(fields: [organizationId], references: [id])
   products     Product[]
@@ -476,16 +487,20 @@ model TaxRule {
 // ─── INVENTORY ENGINE ─────────────────────────────────────────
 
 model InventoryBalance {
-  id          String @id @default(uuid())
-  productId   String
-  locationId  String
-  quantity    Int    @default(0)
-  reserved    Int    @default(0)
-  damaged     Int    @default(0)
-  reorderPoint Int   @default(0)
+  id           String  @id @default(uuid())
+  productId    String
+  locationId   String
+  // Float(12,3-ish): stock must hold fractional amounts (0.150 kg of cheese, so
+  // a recipe draw is not rounded to zero), and it must land in TypeScript as a
+  // plain `number` — every existing inventory reader does arithmetic on it.
+  // MONEY stays Decimal(10,2) everywhere; only quantities float.
+  quantity     Float @default(0)
+  reserved     Float @default(0)
+  damaged      Float @default(0)
+  reorderPoint Float @default(0)
 
-  product  Product  @relation(fields: [productId], references: [id])
-  location Location @relation(fields: [locationId], references: [id])
+  product   Product             @relation(fields: [productId], references: [id])
+  location  Location            @relation(fields: [locationId], references: [id])
   movements InventoryMovement[]
 
   @@unique([productId, locationId])
@@ -495,9 +510,9 @@ model InventoryBalance {
 model InventoryMovement {
   id          String   @id @default(uuid())
   balanceId   String
-  type        String   // SALE, PURCHASE, TRANSFER_IN, TRANSFER_OUT, ADJUSTMENT, RETURN, DAMAGED, COUNT
-  quantity    Int
-  reference   String?  // order_id, po_id, etc.
+  type        String // SALE, PURCHASE, TRANSFER_IN, TRANSFER_OUT, ADJUSTMENT, RETURN, DAMAGED, COUNT
+  quantity    Float    @default(0)
+  reference   String? // order_id, po_id, etc.
   notes       String?
   performedBy String?
   createdAt   DateTime @default(now())
@@ -511,13 +526,13 @@ model InventoryMovement {
 model Notification {
   id             String    @id @default(uuid())
   organizationId String
-  userId         String?   // null = org-wide broadcast
-  type           String    // LOW_STOCK, OUT_OF_STOCK, PAYMENT_FAILED, CHARGEBACK, DISPUTE, DEVICE_OFFLINE, SYNC_CONFLICT, ORDER_COMPLETED, SYSTEM, MARKETING
+  userId         String? // null = org-wide broadcast
+  type           String // LOW_STOCK, OUT_OF_STOCK, PAYMENT_FAILED, CHARGEBACK, DISPUTE, DEVICE_OFFLINE, SYNC_CONFLICT, ORDER_COMPLETED, SYSTEM, MARKETING
   severity       String    @default("INFO") // INFO, WARNING, CRITICAL
   title          String
   message        String
   data           Json?
-  sourceEvent    String?   // originating §27 business event name
+  sourceEvent    String? // originating §27 business event name
   isRead         Boolean   @default(false)
   readAt         DateTime?
   createdAt      DateTime  @default(now())
@@ -553,7 +568,7 @@ model InventoryBatch {
   organizationId String
   productId      String
   locationId     String
-  batchNumber    String    // lot / batch identifier
+  batchNumber    String // lot / batch identifier
   expirationDate DateTime? // perishables (§12 expiration dates)
   quantity       Int       @default(0)
   remaining      Int       @default(0)
@@ -575,16 +590,16 @@ model InventoryBatch {
 }
 
 model SerialNumber {
-  id              String    @id @default(uuid())
+  id              String   @id @default(uuid())
   organizationId  String
   productId       String
   batchId         String?
   serial          String
-  status          String    @default("IN_STOCK") // IN_STOCK, RESERVED, SOLD, RETURNED, DEFECTIVE, IN_REPAIR
+  status          String   @default("IN_STOCK") // IN_STOCK, RESERVED, SOLD, RETURNED, DEFECTIVE, IN_REPAIR
   locationId      String?
   soldOrderItemId String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   organization Organization    @relation(fields: [organizationId], references: [id])
   product      Product         @relation(fields: [productId], references: [id])
@@ -596,15 +611,15 @@ model SerialNumber {
 }
 
 model Supplier {
-  id              String   @id @default(uuid())
-  organizationId  String
-  name            String
-  contactName     String?
-  email           String?
-  phone           String?
-  address         String?
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  contactName    String?
+  email          String?
+  phone          String?
+  address        String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -614,36 +629,48 @@ model Supplier {
 // ─── ORDER MANAGEMENT ─────────────────────────────────────────
 
 model Order {
-  id              String   @id @default(uuid())
-  orderNumber     String   @unique
-  organizationId  String
-  locationId      String?
-  registerId      String?
-  sessionId       String?
-  employeeId      String?
-  customerId      String?
-  channel         String   @default("IN_STORE") // IN_STORE, WEBSITE, MOBILE_APP, PHONE, SOCIAL, MARKETPLACE, POP_UP
-  storefrontToken String?  @unique // set when the order was placed through a public online storefront (§Epos-Now multi-channel)
-  status          String   @default("DRAFT")    // DRAFT, HELD, CONFIRMED, PAID, PROCESSING, FULFILLED, COMPLETED, CANCELLED, REFUNDED, PARTIALLY_REFUNDED
-  currency        String   @default("USD")
-  subtotal        Decimal  @default(0) @db.Decimal(10, 2)
-  discountAmount  Decimal  @default(0) @db.Decimal(10, 2)
-  taxAmount       Decimal  @default(0) @db.Decimal(10, 2)
-  totalAmount     Decimal  @default(0) @db.Decimal(10, 2)
-  tipAmount       Decimal  @default(0) @db.Decimal(10, 2)
-  serviceCharge   Decimal  @default(0) @db.Decimal(10, 2)
-  couponCode      String?
-  fulfillmentType String   @default("TAKEOUT") // DINE_IN, TAKEOUT, DELIVERY, PICKUP, SHIP, CURBSIDE
-  notes           String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  completedAt     DateTime?
+  id                String    @id @default(uuid())
+  orderNumber       String    @unique
+  organizationId    String
+  locationId        String?
+  registerId        String?
+  sessionId         String?
+  employeeId        String?
+  customerId        String?
+  channel           String    @default("IN_STORE") // IN_STORE, WEBSITE, MOBILE_APP, PHONE, SOCIAL, MARKETPLACE, POP_UP
+  storefrontToken   String?   @unique // set when the order was placed through a public online storefront (§Epos-Now multi-channel)
+  status            String    @default("DRAFT") // DRAFT, HELD, CONFIRMED, PAID, PROCESSING, FULFILLED, COMPLETED, CANCELLED, REFUNDED, PARTIALLY_REFUNDED
+  currency          String    @default("USD")
+  subtotal          Decimal   @default(0) @db.Decimal(10, 2)
+  discountAmount    Decimal   @default(0) @db.Decimal(10, 2)
+  taxAmount         Decimal   @default(0) @db.Decimal(10, 2)
+  totalAmount       Decimal   @default(0) @db.Decimal(10, 2)
+  tipAmount         Decimal   @default(0) @db.Decimal(10, 2)
+  serviceCharge     Decimal   @default(0) @db.Decimal(10, 2)
+  couponCode        String?
+  // Open a tab: the basket stays live and a card pre-authorisation covers it
+  // until the guest closes out.
+  isTab             Boolean   @default(false)
+  tabClosedAt       DateTime?
+  // Age gate audit: set by a successful verification (services/ageGate.ts).
+  ageVerifiedAt     DateTime?
+  ageVerifiedBy     String? // employeeId that accepted the verification
+  // Promotions applied by the engine, for receipt + audit replay.
+  appliedPromotions Json?
+  fulfillmentType   String    @default("TAKEOUT") // DINE_IN, TAKEOUT, DELIVERY, PICKUP, SHIP, CURBSIDE
+  // The restaurant table this basket belongs to. Tabs and table merges need the
+  // bill anchored to a table, not only the kitchen ticket.
+  tableId           String?
+  notes             String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  completedAt       DateTime?
 
-  organization Organization  @relation(fields: [organizationId], references: [id])
-  location     Location?     @relation(fields: [locationId], references: [id])
-  register     Register?     @relation(fields: [registerId], references: [id])
-  employee     Employee?     @relation(fields: [employeeId], references: [id])
-  customer     Customer?     @relation(fields: [customerId], references: [id])
+  organization Organization       @relation(fields: [organizationId], references: [id])
+  location     Location?          @relation(fields: [locationId], references: [id])
+  register     Register?          @relation(fields: [registerId], references: [id])
+  employee     Employee?          @relation(fields: [employeeId], references: [id])
+  customer     Customer?          @relation(fields: [customerId], references: [id])
   items        OrderItem[]
   discounts    OrderDiscount[]
   taxes        OrderTax[]
@@ -652,22 +679,29 @@ model Order {
   refunds      Refund[]
   invoices     Invoice[]
 
+  @@index([organizationId, tableId])
   @@map("orders")
 }
 
 model OrderItem {
-  id           String  @id @default(uuid())
-  orderId      String
-  productId    String
-  variantId    String?
-  productName  String
-  variantName  String?
-  quantity     Int
-  unitPrice    Decimal @db.Decimal(10, 2)
-  discountAmt  Decimal @default(0) @db.Decimal(10, 2)
-  taxAmt       Decimal @default(0) @db.Decimal(10, 2)
-  totalAmount  Decimal @db.Decimal(10, 2)
-  notes        String?
+  id          String  @id @default(uuid())
+  orderId     String
+  productId   String
+  variantId   String?
+  productName String
+  variantName String?
+  // Float: whole units keep integer values; weighed lines carry up to three
+  // decimals of a kilogram/litre/metre. A fractional qty is rejected on a
+  // non-weighed product at the edge (see services/units.ts). Money on the line
+  // stays Decimal — only the quantity is floating point.
+  quantity    Float   @default(1)
+  uom         String  @default("EACH")
+  weighed     Boolean @default(false)
+  unitPrice   Decimal @db.Decimal(10, 2)
+  discountAmt Decimal @default(0) @db.Decimal(10, 2)
+  taxAmt      Decimal @default(0) @db.Decimal(10, 2)
+  totalAmount Decimal @db.Decimal(10, 2)
+  notes       String?
 
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id])
@@ -676,11 +710,11 @@ model OrderItem {
 }
 
 model OrderDiscount {
-  id        String  @id @default(uuid())
-  orderId   String
-  type      String  // PERCENTAGE, FIXED, COUPON
-  value     Decimal @db.Decimal(10, 2)
-  reason    String?
+  id      String  @id @default(uuid())
+  orderId String
+  type    String // PERCENTAGE, FIXED, COUPON
+  value   Decimal @db.Decimal(10, 2)
+  reason  String?
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
@@ -700,11 +734,11 @@ model OrderTax {
 }
 
 model OrderFulfillment {
-  id          String    @id @default(uuid())
-  orderId     String
-  type        String    // PICKUP, DELIVERY, SHIP, DINE_IN, TAKEOUT, CURBSIDE
-  status      String    @default("PENDING") // PENDING, PREPARING, READY, OUT_FOR_DELIVERY, SHIPPED, DELIVERED, COMPLETED, CANCELLED, FAILED
-  notes       String?
+  id             String    @id @default(uuid())
+  orderId        String
+  type           String // PICKUP, DELIVERY, SHIP, DINE_IN, TAKEOUT, CURBSIDE
+  status         String    @default("PENDING") // PENDING, PREPARING, READY, OUT_FOR_DELIVERY, SHIPPED, DELIVERED, COMPLETED, CANCELLED, FAILED
+  notes          String?
   // ── Commerce Hub fulfillment details (§13 Omnichannel) ──
   scheduledAt    DateTime?
   readyAt        DateTime?
@@ -718,14 +752,14 @@ model OrderFulfillment {
   postalCode     String?
   country        String?
   phoneNumber    String?
-  courier        String?  // local courier / driver name
-  carrier        String?  // UPS, FedEx, USPS (shipping)
+  courier        String? // local courier / driver name
+  carrier        String? // UPS, FedEx, USPS (shipping)
   trackingNumber String?
   deliveryFee    Decimal   @default(0) @db.Decimal(10, 2)
   distanceMiles  Decimal?  @db.Decimal(6, 2)
   etaMinutes     Int?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
@@ -735,21 +769,26 @@ model OrderFulfillment {
 // ─── PAYMENT SYSTEM ───────────────────────────────────────────
 
 model Payment {
-  id              String   @id @default(uuid())
-  orderId         String
-  method          String   // CASH, CARD, TAP, CHIP, APPLE_PAY, GOOGLE_PAY, GIFT_CARD, STORE_CREDIT, ACH, QR, BNPL, OTHER
-  provider        String?  // stripe, square, etc.
-  amount          Decimal  @db.Decimal(10, 2)
-  currency        String   @default("USD")
-  status          String   @default("COMPLETED") // AUTHORIZED, CAPTURED, SETTLED, RECONCILED, COMPLETED, DECLINED, VOIDED, REFUNDED, PARTIALLY_REFUNDED, CHARGEBACK, DISPUTED, FAILED, REVERSED
-  reference       String?  // processor transaction id
-  idempotencyKey  String?  @unique
-  authorizationId String?
-  metadata        Json?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id               String   @id @default(uuid())
+  orderId          String
+  method           String // CASH, CARD, TAP, CHIP, APPLE_PAY, GOOGLE_PAY, GIFT_CARD, STORE_CREDIT, ACH, QR, BNPL, OTHER
+  provider         String? // stripe, square, etc.
+  amount           Decimal  @db.Decimal(10, 2)
+  currency         String   @default("USD")
+  status           String   @default("COMPLETED") // AUTHORIZED, CAPTURED, SETTLED, RECONCILED, COMPLETED, DECLINED, VOIDED, REFUNDED, PARTIALLY_REFUNDED, CHARGEBACK, DISPUTED, FAILED, REVERSED
+  reference        String? // processor transaction id
+  idempotencyKey   String?  @unique
+  authorizationId  String?
+  // Card-present settlement: tip adjusted after the fact (restaurant/bar) and
+  // the reader that took the payment.
+  tipAmount        Decimal  @default(0) @db.Decimal(10, 2)
+  captureMethod    String? // automatic | manual
+  terminalReaderId String?
+  metadata         Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  order        Order              @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order        Order                @relation(fields: [orderId], references: [id], onDelete: Cascade)
   refunds      Refund[]
   payouts      Payout[]
   transactions PaymentTransaction[]
@@ -776,17 +815,17 @@ model TimeEntry {
 // ─── AUDIT SYSTEM ─────────────────────────────────────────────
 
 model AuditEvent {
-  id              String   @id @default(uuid())
-  organizationId  String
-  actorId         String?  // employee who performed action
-  deviceId        String?
-  action          String   // REFUND_CREATED, DISCOUNT_APPLIED, PRICE_CHANGED, etc.
-  resourceType    String   // ORDER, PRODUCT, INVENTORY, EMPLOYEE, etc.
-  resourceId      String?
-  previousValue   Json?
-  newValue        Json?
-  metadata        Json?
-  createdAt       DateTime @default(now())
+  id             String   @id @default(uuid())
+  organizationId String
+  actorId        String? // employee who performed action
+  deviceId       String?
+  action         String // REFUND_CREATED, DISCOUNT_APPLIED, PRICE_CHANGED, etc.
+  resourceType   String // ORDER, PRODUCT, INVENTORY, EMPLOYEE, etc.
+  resourceId     String?
+  previousValue  Json?
+  newValue       Json?
+  metadata       Json?
+  createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
   actor        Employee?    @relation(fields: [actorId], references: [id])
@@ -804,43 +843,50 @@ model StoreSettings {
   storeName            String
   address              String?
   phone                String?
-  phoneDialCode        String?   // international dial code (e.g. "+234")
+  phoneDialCode        String? // international dial code (e.g. "+234")
   email                String?
   receiptFooter        String?
   lowStockAlertEnabled Boolean @default(true)
 
   // ── Branding & business customization ──
-  tagline              String?   // short brand slogan
-  businessDescription  String?   // about the business
-  website              String?   // public website URL
-  logoUrl              String?   // base64 data URL or hosted path
-  faviconUrl           String?   // base64 data URL or hosted path
-  coverUrl             String?   // banner / cover graphic
-  brandPrimaryColor    String?   @default("#2563eb")
-  brandSecondaryColor  String?
-  socialLinks          Json?     // { facebook, instagram, x, linkedin, youtube, tiktok }
-  media                Json?     // [{ id, name, type, dataUrl, size, uploadedAt }]
+  tagline             String? // short brand slogan
+  businessDescription String? // about the business
+  website             String? // public website URL
+  logoUrl             String? // base64 data URL or hosted path
+  faviconUrl          String? // base64 data URL or hosted path
+  coverUrl            String? // banner / cover graphic
+  brandPrimaryColor   String? @default("#2563eb")
+  brandSecondaryColor String?
+  socialLinks         Json? // { facebook, instagram, x, linkedin, youtube, tiktok }
+  media               Json? // [{ id, name, type, dataUrl, size, uploadedAt }]
 
   // ── Data governance (§37 retention & legal hold) ──
-  dataRetentionDays    Int?      // days to retain personal data; null = keep indefinitely
-  legalHold            Boolean   @default(false)  // suspend purging while a litigation hold is active
+  dataRetentionDays Int? // days to retain personal data; null = keep indefinitely
+  legalHold         Boolean @default(false) // suspend purging while a litigation hold is active
 
   // ── Register security policy (§37 / §7) ──
   // Minutes of cashier inactivity before the POS locks the drawer; the cashier's
   // own PIN is then required to resume. Owner/manager controlled.
-  registerIdleLockMinutes Int    @default(5)
+  registerIdleLockMinutes Int @default(5)
+
+  // ── Age-restricted sales policy ──
+  // When enabled, any basket containing an ageRestricted product refuses to
+  // settle until a cashier records a verification against the order.
+  ageVerificationEnabled   Boolean @default(false)
+  ageVerificationMinAge    Int     @default(18)
+  ageVerificationRequireId Boolean @default(false)
 
   // ── Structured worldwide address ──
-  streetAddress        String?
-  addressLine2         String?
-  city                 String?
-  state                String?
-  postalCode           String?
-  country              String?   // full country name (e.g. "Nigeria")
-  countryCode          String?   // ISO 3166-1 alpha-2 (e.g. "NG")
-  timezone             String?
-  currency             String?
-  taxId                String?   // VAT / TIN / business registration id
+  streetAddress String?
+  addressLine2  String?
+  city          String?
+  state         String?
+  postalCode    String?
+  country       String? // full country name (e.g. "Nigeria")
+  countryCode   String? // ISO 3166-1 alpha-2 (e.g. "NG")
+  timezone      String?
+  currency      String?
+  taxId         String? // VAT / TIN / business registration id
 
   @@map("store_settings")
 }
@@ -849,14 +895,14 @@ model StoreSettings {
 // Standalone (no relation), scoped by organizationId — mirrors StoreSettings.
 
 model ComplianceRecord {
-  id              String   @id @default(uuid())
-  organizationId  String
-  userId          String?
-  type            String   // CONSENT | COOKIE | DSAR_EXPORT | DSAR_DELETE
-  status          String   @default("RECEIVED") // RECEIVED | FULFILLED | DENIED
-  payload         Json?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(uuid())
+  organizationId String
+  userId         String?
+  type           String // CONSENT | COOKIE | DSAR_EXPORT | DSAR_DELETE
+  status         String   @default("RECEIVED") // RECEIVED | FULFILLED | DENIED
+  payload        Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@index([organizationId, type])
   @@map("compliance_records")
@@ -865,14 +911,14 @@ model ComplianceRecord {
 // ─── EVENT ARCHITECTURE (§27) ─────────────────────────────────
 
 model BusinessEvent {
-  id              String   @id @default(uuid())
-  organizationId  String
-  event           String   // order.created, payment.completed, inventory.changed, etc.
-  data            Json
-  metadata        Json?
-  status          String   @default("PENDING") // PENDING, PROCESSED, FAILED
-  processedAt     DateTime?
-  createdAt       DateTime @default(now())
+  id             String    @id @default(uuid())
+  organizationId String
+  event          String // order.created, payment.completed, inventory.changed, etc.
+  data           Json
+  metadata       Json?
+  status         String    @default("PENDING") // PENDING, PROCESSED, FAILED
+  processedAt    DateTime?
+  createdAt      DateTime  @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -884,20 +930,20 @@ model BusinessEvent {
 // ─── WEBHOOK SYSTEM (§29) ─────────────────────────────────────
 
 model Webhook {
-  id              String   @id @default(uuid())
+  id              String    @id @default(uuid())
   organizationId  String
   url             String
   secret          String
   events          String[] // Array of event types to subscribe to
   description     String?
-  isActive        Boolean  @default(true)
-  successCount    Int      @default(0)
-  failureCount    Int      @default(0)
+  isActive        Boolean   @default(true)
+  successCount    Int       @default(0)
+  failureCount    Int       @default(0)
   lastTriggeredAt DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
-  organization Organization     @relation(fields: [organizationId], references: [id])
+  organization Organization      @relation(fields: [organizationId], references: [id])
   deliveries   WebhookDelivery[]
 
   @@index([organizationId, isActive])
@@ -905,7 +951,7 @@ model Webhook {
 }
 
 model WebhookDelivery {
-  id             String   @id @default(uuid())
+  id             String    @id @default(uuid())
   webhookId      String
   event          String
   payload        Json
@@ -913,8 +959,8 @@ model WebhookDelivery {
   success        Boolean
   errorMessage   String?
   attempts       Int       @default(1) // delivery attempts (scheduler retries with backoff)
-  nextRetryAt    DateTime?             // when the next retry is due; null = not scheduled
-  createdAt      DateTime @default(now())
+  nextRetryAt    DateTime? // when the next retry is due; null = not scheduled
+  createdAt      DateTime  @default(now())
 
   webhook Webhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
 
@@ -925,18 +971,18 @@ model WebhookDelivery {
 // ─── FINANCIAL OS (§31) ───────────────────────────────────────
 
 model AccountingEntry {
-  id              String   @id @default(uuid())
-  organizationId  String
-  type            String   // PAYMENT, REFUND, EXPENSE, ADJUSTMENT, etc.
-  referenceType   String   // ORDER, PAYMENT, EXPENSE, etc.
-  referenceId     String?
-  amount          Decimal  @db.Decimal(12, 2)
-  currency        String   @default("USD")
-  description     String?
-  status          String   @default("POSTED") // DRAFT, POSTED, RECONCILED, VOIDED
-  postedAt        DateTime @default(now())
-  reconciledAt    DateTime?
-  createdAt       DateTime @default(now())
+  id             String    @id @default(uuid())
+  organizationId String
+  type           String // PAYMENT, REFUND, EXPENSE, ADJUSTMENT, etc.
+  referenceType  String // ORDER, PAYMENT, EXPENSE, etc.
+  referenceId    String?
+  amount         Decimal   @db.Decimal(12, 2)
+  currency       String    @default("USD")
+  description    String?
+  status         String    @default("POSTED") // DRAFT, POSTED, RECONCILED, VOIDED
+  postedAt       DateTime  @default(now())
+  reconciledAt   DateTime?
+  createdAt      DateTime  @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -948,18 +994,18 @@ model AccountingEntry {
 // ─── LOYALTY & MARKETING (§19) ───────────────────────────────
 
 model LoyaltyProgram {
-  id              String   @id @default(uuid())
-  organizationId  String
-  name            String
-  description     String?
-  pointsPerDollar Decimal  @default(1) @db.Decimal(5, 2)
-  pointsPerVisit  Int      @default(0)
-  rewardThreshold Int      @default(100) // Points needed for a reward
-  rewardValue     Decimal  @default(10) @db.Decimal(10, 2) // Value of reward
-  pointsExpiryDays Int?    // expire earned points after N days; null = never expire
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id               String   @id @default(uuid())
+  organizationId   String
+  name             String
+  description      String?
+  pointsPerDollar  Decimal  @default(1) @db.Decimal(5, 2)
+  pointsPerVisit   Int      @default(0)
+  rewardThreshold  Int      @default(100) // Points needed for a reward
+  rewardValue      Decimal  @default(10) @db.Decimal(10, 2) // Value of reward
+  pointsExpiryDays Int? // expire earned points after N days; null = never expire
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   organization Organization         @relation(fields: [organizationId], references: [id])
   transactions LoyaltyTransaction[]
@@ -968,19 +1014,19 @@ model LoyaltyProgram {
 }
 
 model LoyaltyTransaction {
-  id              String   @id @default(uuid())
-  organizationId  String
-  customerId      String
-  programId       String
-  points          Int      // Positive = earned, Negative = redeemed
-  reason          String   // EARNED_FROM_PURCHASE, REDEEMED_FOR_REWARD, ADJUSTMENT, EXPIRED
-  referenceType   String?  // ORDER, REWARD, etc.
-  referenceId     String?
-  balanceAfter    Int
-  createdAt       DateTime @default(now())
+  id             String   @id @default(uuid())
+  organizationId String
+  customerId     String
+  programId      String
+  points         Int // Positive = earned, Negative = redeemed
+  reason         String // EARNED_FROM_PURCHASE, REDEEMED_FOR_REWARD, ADJUSTMENT, EXPIRED
+  referenceType  String? // ORDER, REWARD, etc.
+  referenceId    String?
+  balanceAfter   Int
+  createdAt      DateTime @default(now())
 
-  organization Organization @relation(fields: [organizationId], references: [id])
-  customer     Customer     @relation(fields: [customerId], references: [id])
+  organization Organization   @relation(fields: [organizationId], references: [id])
+  customer     Customer       @relation(fields: [customerId], references: [id])
   program      LoyaltyProgram @relation(fields: [programId], references: [id])
 
   @@index([customerId, createdAt])
@@ -997,13 +1043,13 @@ model LoyaltyTransaction {
 // exactly one request can own a key at a time; losers back off.
 model IdempotencyKey {
   id             String   @id @default(uuid())
-  scope          String   // `${organizationId}:${userId}` — the authenticated subject
+  scope          String // `${organizationId}:${userId}` — the authenticated subject
   idempotencyKey String
   method         String
   path           String
   status         String   @default("PROCESSING") // PROCESSING | COMPLETED
   responseStatus Int?
-  responseBody   String?  // JSON-serialized response body
+  responseBody   String? // JSON-serialized response body
   createdAt      DateTime @default(now())
   expiresAt      DateTime
 
@@ -1019,8 +1065,8 @@ model IdempotencyKey {
 // limiter stays in-memory (per-instance) to avoid a DB write on every request.
 model RateLimitCounter {
   id          String   @id @default(uuid())
-  bucket      String   // limiter name, e.g. "auth" | "payment"
-  key         String   // client key, typically the IP address
+  bucket      String // limiter name, e.g. "auth" | "payment"
+  key         String // client key, typically the IP address
   windowStart DateTime // fixed-window boundary (floored to windowSeconds)
   count       Int      @default(0)
   expiresAt   DateTime // windowStart + window, for periodic cleanup
@@ -1033,18 +1079,18 @@ model RateLimitCounter {
 // ─── RESTAURANT ENGINE (§17) ──────────────────────────────────
 
 model RestaurantTable {
-  id              String   @id @default(uuid())
-  organizationId  String
-  number          Int
-  name            String?
-  capacity        Int      @default(4)
-  status          String   @default("AVAILABLE") // AVAILABLE, OCCUPIED, RESERVED, DIRTY
-  color           String? // §17 per-table identity color from the shared palette (null = auto-assigned by number)
-  section         String?
-  notes           String?
-  qrToken         String?  @unique // §17 QR ordering — scan-to-order token for this table
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(uuid())
+  organizationId String
+  number         Int
+  name           String?
+  capacity       Int      @default(4)
+  status         String   @default("AVAILABLE") // AVAILABLE, OCCUPIED, RESERVED, DIRTY
+  color          String? // §17 per-table identity color from the shared palette (null = auto-assigned by number)
+  section        String?
+  notes          String?
+  qrToken        String?  @unique // §17 QR ordering — scan-to-order token for this table
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1055,20 +1101,20 @@ model RestaurantTable {
 // ─── MULTI-LOCATION ENTERPRISE (§23) ─────────────────────────
 
 model Region {
-  id              String   @id @default(uuid())
-  organizationId  String
-  name            String
-  description     String?
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  description    String?
   // GLOBAL regions are provisioned from the UN geoscheme taxonomy and guarantee
   // full worldwide coverage; CUSTOM regions are free-form user-defined groupings.
-  type            String   @default("CUSTOM")
-  continent       String?
-  subregion       String?
-  countries       Json?    // ISO 3166-1 alpha-2 codes covered by this region
-  countryCount    Int?
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  type           String   @default("CUSTOM")
+  continent      String?
+  subregion      String?
+  countries      Json? // ISO 3166-1 alpha-2 codes covered by this region
+  countryCount   Int?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
   locations    Location[]
@@ -1078,15 +1124,15 @@ model Region {
 }
 
 model Warehouse {
-  id              String   @id @default(uuid())
-  organizationId  String
-  name            String
-  address         String?
-  phone           String?
-  manager         String?
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  address        String?
+  phone          String?
+  manager        String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1096,20 +1142,20 @@ model Warehouse {
 // ─── INVENTORY OPERATIONS (§12) ──────────────────────────────
 
 model StockTransfer {
-  id              String   @id @default(uuid())
-  organizationId  String
-  fromLocationId  String
-  toLocationId    String
-  status          String   @default("PENDING") // PENDING, IN_TRANSIT, RECEIVED, CANCELLED
-  notes           String?
-  transferredBy   String?
-  receivedBy      String?
-  transferredAt   DateTime?
-  receivedAt      DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String    @id @default(uuid())
+  organizationId String
+  fromLocationId String
+  toLocationId   String
+  status         String    @default("PENDING") // PENDING, IN_TRANSIT, RECEIVED, CANCELLED
+  notes          String?
+  transferredBy  String?
+  receivedBy     String?
+  transferredAt  DateTime?
+  receivedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  organization Organization              @relation(fields: [organizationId], references: [id])
+  organization Organization        @relation(fields: [organizationId], references: [id])
   items        StockTransferItem[]
 
   @@map("stock_transfers")
@@ -1128,29 +1174,29 @@ model StockTransferItem {
 }
 
 model StockCount {
-  id              String   @id @default(uuid())
-  organizationId  String
-  locationId      String
-  status          String   @default("DRAFT") // DRAFT, IN_PROGRESS, COMPLETED, CANCELLED
-  countedBy       String?
-  countedAt       DateTime?
-  notes           String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String    @id @default(uuid())
+  organizationId String
+  locationId     String
+  status         String    @default("DRAFT") // DRAFT, IN_PROGRESS, COMPLETED, CANCELLED
+  countedBy      String?
+  countedAt      DateTime?
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  organization Organization          @relation(fields: [organizationId], references: [id])
+  organization Organization     @relation(fields: [organizationId], references: [id])
   items        StockCountItem[]
 
   @@map("stock_counts")
 }
 
 model StockCountItem {
-  id         String @id @default(uuid())
-  countId    String
-  productId  String
-  expected   Int
-  counted    Int
-  variance   Int    @default(0)
+  id        String @id @default(uuid())
+  countId   String
+  productId String
+  expected  Int
+  counted   Int
+  variance  Int    @default(0)
 
   count StockCount @relation(fields: [countId], references: [id], onDelete: Cascade)
 
@@ -1160,18 +1206,18 @@ model StockCountItem {
 // ─── PAYMENT SUBSYSTEMS (§10) ────────────────────────────────
 
 model Refund {
-  id              String   @id @default(uuid())
-  organizationId  String
-  orderId         String
-  paymentId       String
-  customerId      String?
-  amount          Decimal  @db.Decimal(10, 2)
-  reason          String?
-  status          String   @default("PENDING") // PENDING, APPROVED, PROCESSED, REJECTED
-  method          String   @default("ORIGINAL") // ORIGINAL, CASH, STORE_CREDIT
-  processedAt     DateTime?
-  processedBy     String?
-  createdAt       DateTime @default(now())
+  id             String    @id @default(uuid())
+  organizationId String
+  orderId        String
+  paymentId      String
+  customerId     String?
+  amount         Decimal   @db.Decimal(10, 2)
+  reason         String?
+  status         String    @default("PENDING") // PENDING, APPROVED, PROCESSED, REJECTED
+  method         String    @default("ORIGINAL") // ORIGINAL, CASH, STORE_CREDIT
+  processedAt    DateTime?
+  processedBy    String?
+  createdAt      DateTime  @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
   order        Order        @relation(fields: [orderId], references: [id])
@@ -1182,54 +1228,54 @@ model Refund {
 }
 
 model Settlement {
-  id              String   @id @default(uuid())
-  organizationId  String
-  batchId         String   @unique
-  totalAmount     Decimal  @db.Decimal(12, 2)
-  transactionCount Int     @default(0)
-  status          String   @default("PENDING") // PENDING, SUBMITTED, SETTLED, FAILED
-  settledAt       DateTime?
-  createdAt       DateTime @default(now())
+  id               String    @id @default(uuid())
+  organizationId   String
+  batchId          String    @unique
+  totalAmount      Decimal   @db.Decimal(12, 2)
+  transactionCount Int       @default(0)
+  status           String    @default("PENDING") // PENDING, SUBMITTED, SETTLED, FAILED
+  settledAt        DateTime?
+  createdAt        DateTime  @default(now())
 
   @@map("settlements")
 }
 
 model Chargeback {
-  id              String   @id @default(uuid())
-  organizationId  String
-  paymentId       String
-  amount          Decimal  @db.Decimal(10, 2)
-  reason          String?
-  status          String   @default("OPEN") // OPEN, UNDER_REVIEW, WON, LOST
-  filedAt         DateTime @default(now())
-  resolvedAt      DateTime?
+  id             String    @id @default(uuid())
+  organizationId String
+  paymentId      String
+  amount         Decimal   @db.Decimal(10, 2)
+  reason         String?
+  status         String    @default("OPEN") // OPEN, UNDER_REVIEW, WON, LOST
+  filedAt        DateTime  @default(now())
+  resolvedAt     DateTime?
 
   @@map("chargebacks")
 }
 
 model Dispute {
-  id              String   @id @default(uuid())
-  organizationId  String
-  paymentId       String
-  amount          Decimal  @db.Decimal(10, 2)
-  reason          String?
-  status          String   @default("OPEN") // OPEN, UNDER_REVIEW, WON, LOST
-  filedAt         DateTime @default(now())
-  resolvedAt      DateTime?
+  id             String    @id @default(uuid())
+  organizationId String
+  paymentId      String
+  amount         Decimal   @db.Decimal(10, 2)
+  reason         String?
+  status         String    @default("OPEN") // OPEN, UNDER_REVIEW, WON, LOST
+  filedAt        DateTime  @default(now())
+  resolvedAt     DateTime?
 
   @@map("disputes")
 }
 
 model Payout {
-  id              String   @id @default(uuid())
-  organizationId  String
-  paymentId       String?
-  amount          Decimal  @db.Decimal(12, 2)
-  currency        String   @default("USD")
-  status          String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
-  scheduledAt     DateTime?
-  completedAt     DateTime?
-  createdAt       DateTime @default(now())
+  id             String    @id @default(uuid())
+  organizationId String
+  paymentId      String?
+  amount         Decimal   @db.Decimal(12, 2)
+  currency       String    @default("USD")
+  status         String    @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
+  scheduledAt    DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime  @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
   payment      Payment?     @relation(fields: [paymentId], references: [id])
@@ -1240,20 +1286,30 @@ model Payout {
 // ─── MARKETING & PROMOTIONS (§19) ────────────────────────────
 
 model Promotion {
-  id              String   @id @default(uuid())
-  organizationId  String
-  name            String
-  description     String?
-  type            String   // PERCENTAGE, FIXED, BOGO, BUNDLE
-  value           Decimal  @db.Decimal(10, 2)
-  minPurchase     Decimal  @default(0) @db.Decimal(10, 2)
-  maxDiscount     Decimal? @db.Decimal(10, 2)
+  id                 String    @id @default(uuid())
+  organizationId     String
+  name               String
+  description        String?
+  type               String // PERCENTAGE, FIXED, BOGO, BUNDLE, MIX_AND_MATCH, QTY_BREAK, DAYPART
+  value              Decimal   @db.Decimal(10, 2)
+  // ── Rule-engine depth beyond a single percentage ──
+  // `rule` carries the type-specific shape: { buyQty, getQty, groupIds[], tiers:[{minQty,value}], ... }
+  rule               Json?
+  autoApply          Boolean   @default(true) // applied by the POS without a coupon
+  priority           Int       @default(0) // higher wins when two promos stack
+  stackable          Boolean   @default(false)
+  daysOfWeek         Int[] // 0=Sunday … 6=Saturday; empty = every day
+  startMinute        Int? // minutes from midnight (daypart / happy hour)
+  endMinute          Int?
+  channels           String[] // IN_STORE, WEBSITE, MOBILE_APP...; empty = all
+  minPurchase        Decimal   @default(0) @db.Decimal(10, 2)
+  maxDiscount        Decimal?  @db.Decimal(10, 2)
   applicableProducts String[] // product IDs
-  startDate       DateTime
-  endDate         DateTime?
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  startDate          DateTime
+  endDate            DateTime?
+  isActive           Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1261,21 +1317,21 @@ model Promotion {
 }
 
 model Coupon {
-  id              String   @id @default(uuid())
-  organizationId  String
-  code            String
-  description     String?
-  type            String   // PERCENTAGE, FIXED, FREE_SHIPPING
-  value           Decimal  @db.Decimal(10, 2)
-  minPurchase     Decimal  @default(0) @db.Decimal(10, 2)
-  maxDiscount     Decimal? @db.Decimal(10, 2)
-  usageLimit      Int?
-  usedCount       Int      @default(0)
-  perCustomerLimit Int     @default(1)
-  startDate       DateTime
-  endDate         DateTime?
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
+  id               String    @id @default(uuid())
+  organizationId   String
+  code             String
+  description      String?
+  type             String // PERCENTAGE, FIXED, FREE_SHIPPING
+  value            Decimal   @db.Decimal(10, 2)
+  minPurchase      Decimal   @default(0) @db.Decimal(10, 2)
+  maxDiscount      Decimal?  @db.Decimal(10, 2)
+  usageLimit       Int?
+  usedCount        Int       @default(0)
+  perCustomerLimit Int       @default(1)
+  startDate        DateTime
+  endDate          DateTime?
+  isActive         Boolean   @default(true)
+  createdAt        DateTime  @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1284,21 +1340,21 @@ model Coupon {
 }
 
 model Campaign {
-  id              String   @id @default(uuid())
-  organizationId  String
-  name            String
-  type            String   // EMAIL, SMS, PUSH, SOCIAL
-  audience        String   // ALL, SEGMENT, INDIVIDUAL
-  segmentFilter   Json?    // customer filter criteria
-  message         String?
-  subject         String?
-  status          String   @default("DRAFT") // DRAFT, SCHEDULED, RUNNING, COMPLETED, CANCELLED
-  scheduledAt     DateTime?
-  sentCount       Int      @default(0)
-  openedCount     Int      @default(0)
-  convertedCount  Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String    @id @default(uuid())
+  organizationId String
+  name           String
+  type           String // EMAIL, SMS, PUSH, SOCIAL
+  audience       String // ALL, SEGMENT, INDIVIDUAL
+  segmentFilter  Json? // customer filter criteria
+  message        String?
+  subject        String?
+  status         String    @default("DRAFT") // DRAFT, SCHEDULED, RUNNING, COMPLETED, CANCELLED
+  scheduledAt    DateTime?
+  sentCount      Int       @default(0)
+  openedCount    Int       @default(0)
+  convertedCount Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1308,20 +1364,20 @@ model Campaign {
 // ─── FINANCIAL OS (§31) ──────────────────────────────────────
 
 model Invoice {
-  id              String   @id @default(uuid())
-  organizationId  String
-  invoiceNumber   String   @unique
-  orderId         String?
-  customerId      String?
-  amount          Decimal  @db.Decimal(12, 2)
-  taxAmount       Decimal  @default(0) @db.Decimal(10, 2)
-  totalAmount     Decimal  @db.Decimal(12, 2)
-  status          String   @default("DRAFT") // DRAFT, SENT, PAID, OVERDUE, CANCELLED
-  dueDate         DateTime?
-  paidAt          DateTime?
-  notes           String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String    @id @default(uuid())
+  organizationId String
+  invoiceNumber  String    @unique
+  orderId        String?
+  customerId     String?
+  amount         Decimal   @db.Decimal(12, 2)
+  taxAmount      Decimal   @default(0) @db.Decimal(10, 2)
+  totalAmount    Decimal   @db.Decimal(12, 2)
+  status         String    @default("DRAFT") // DRAFT, SENT, PAID, OVERDUE, CANCELLED
+  dueDate        DateTime?
+  paidAt         DateTime?
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
   order        Order?       @relation(fields: [orderId], references: [id])
@@ -1331,18 +1387,18 @@ model Invoice {
 }
 
 model Expense {
-  id              String   @id @default(uuid())
-  organizationId  String
-  category        String   // RENT, UTILITIES, PAYROLL, SUPPLIES, MAINTENANCE, MARKETING, OTHER
-  vendor          String?
-  amount          Decimal  @db.Decimal(12, 2)
-  currency        String   @default("USD")
-  description     String?
-  receiptUrl      String?
-  approvedBy      String?
-  status          String   @default("PENDING") // PENDING, APPROVED, REJECTED, PAID
-  incurredAt      DateTime @default(now())
-  createdAt       DateTime @default(now())
+  id             String   @id @default(uuid())
+  organizationId String
+  category       String // RENT, UTILITIES, PAYROLL, SUPPLIES, MAINTENANCE, MARKETING, OTHER
+  vendor         String?
+  amount         Decimal  @db.Decimal(12, 2)
+  currency       String   @default("USD")
+  description    String?
+  receiptUrl     String?
+  approvedBy     String?
+  status         String   @default("PENDING") // PENDING, APPROVED, REJECTED, PAID
+  incurredAt     DateTime @default(now())
+  createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1350,20 +1406,20 @@ model Expense {
 }
 
 model Reconciliation {
-  id              String   @id @default(uuid())
+  id              String    @id @default(uuid())
   organizationId  String
   date            DateTime
-  totalSales      Decimal  @default(0) @db.Decimal(12, 2)
-  totalPayments   Decimal  @default(0) @db.Decimal(12, 2)
-  totalRefunds    Decimal  @default(0) @db.Decimal(12, 2)
-  expectedBalance Decimal  @default(0) @db.Decimal(12, 2)
-  actualBalance   Decimal? @db.Decimal(12, 2)
-  variance        Decimal? @db.Decimal(12, 2)
-  status          String   @default("PENDING") // PENDING, RECONCILED, DISCREPANCY
+  totalSales      Decimal   @default(0) @db.Decimal(12, 2)
+  totalPayments   Decimal   @default(0) @db.Decimal(12, 2)
+  totalRefunds    Decimal   @default(0) @db.Decimal(12, 2)
+  expectedBalance Decimal   @default(0) @db.Decimal(12, 2)
+  actualBalance   Decimal?  @db.Decimal(12, 2)
+  variance        Decimal?  @db.Decimal(12, 2)
+  status          String    @default("PENDING") // PENDING, RECONCILED, DISCREPANCY
   reconciledBy    String?
   reconciledAt    DateTime?
   notes           String?
-  createdAt       DateTime @default(now())
+  createdAt       DateTime  @default(now())
 
   @@unique([organizationId, date])
   @@map("reconciliations")
@@ -1372,17 +1428,17 @@ model Reconciliation {
 // ─── EMPLOYEE OPERATIONS (§15) ───────────────────────────────
 
 model Shift {
-  id              String   @id @default(uuid())
-  organizationId  String
-  employeeId      String
-  locationId      String?
-  startTime       DateTime @default(now())
-  endTime         DateTime?
-  breakStart      DateTime?
-  breakEnd        DateTime?
-  status          String   @default("ACTIVE") // ACTIVE, COMPLETED, ON_BREAK
-  notes           String?
-  createdAt       DateTime @default(now())
+  id             String    @id @default(uuid())
+  organizationId String
+  employeeId     String
+  locationId     String?
+  startTime      DateTime  @default(now())
+  endTime        DateTime?
+  breakStart     DateTime?
+  breakEnd       DateTime?
+  status         String    @default("ACTIVE") // ACTIVE, COMPLETED, ON_BREAK
+  notes          String?
+  createdAt      DateTime  @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
   employee     Employee     @relation(fields: [employeeId], references: [id])
@@ -1391,13 +1447,13 @@ model Shift {
 }
 
 model Tip {
-  id              String   @id @default(uuid())
-  organizationId  String
-  employeeId      String
-  orderId         String?
-  amount          Decimal  @db.Decimal(10, 2)
-  type            String   @default("CASH") // CASH, CARD, DECLARED
-  createdAt       DateTime @default(now())
+  id             String   @id @default(uuid())
+  organizationId String
+  employeeId     String
+  orderId        String?
+  amount         Decimal  @db.Decimal(10, 2)
+  type           String   @default("CASH") // CASH, CARD, DECLARED
+  createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
   employee     Employee     @relation(fields: [employeeId], references: [id])
@@ -1406,14 +1462,14 @@ model Tip {
 }
 
 model Commission {
-  id              String   @id @default(uuid())
-  organizationId  String
-  employeeId      String
-  orderId         String?
-  amount          Decimal  @db.Decimal(10, 2)
-  rate            Decimal  @default(0) @db.Decimal(5, 2) // percentage
-  status          String   @default("PENDING") // PENDING, APPROVED, PAID
-  createdAt       DateTime @default(now())
+  id             String   @id @default(uuid())
+  organizationId String
+  employeeId     String
+  orderId        String?
+  amount         Decimal  @db.Decimal(10, 2)
+  rate           Decimal  @default(0) @db.Decimal(5, 2) // percentage
+  status         String   @default("PENDING") // PENDING, APPROVED, PAID
+  createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
   employee     Employee     @relation(fields: [employeeId], references: [id])
@@ -1424,18 +1480,18 @@ model Commission {
 // ─── PRICE LISTS (§11) ───────────────────────────────────────
 
 model PriceList {
-  id              String   @id @default(uuid())
-  organizationId  String
-  name            String
-  description     String?
-  type            String   @default("RETAIL") // RETAIL, WHOLESALE, VIP, SEASONAL
-  isActive        Boolean  @default(true)
-  startDate       DateTime?
-  endDate         DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String    @id @default(uuid())
+  organizationId String
+  name           String
+  description    String?
+  type           String    @default("RETAIL") // RETAIL, WHOLESALE, VIP, SEASONAL
+  isActive       Boolean   @default(true)
+  startDate      DateTime?
+  endDate        DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  organization Organization     @relation(fields: [organizationId], references: [id])
+  organization Organization    @relation(fields: [organizationId], references: [id])
   items        PriceListItem[]
 
   @@map("price_lists")
@@ -1474,16 +1530,16 @@ model Reservation {
 }
 
 model WaitlistEntry {
-  id              String   @id @default(uuid())
-  organizationId  String
-  customerName    String
-  customerPhone   String?
-  partySize       Int      @default(2)
-  status          String   @default("WAITING") // WAITING, NOTIFIED, SEATED, CANCELLED
-  estimatedWait   Int?     // minutes
-  notifiedAt      DateTime?
-  seatedAt        DateTime?
-  createdAt       DateTime @default(now())
+  id             String    @id @default(uuid())
+  organizationId String
+  customerName   String
+  customerPhone  String?
+  partySize      Int       @default(2)
+  status         String    @default("WAITING") // WAITING, NOTIFIED, SEATED, CANCELLED
+  estimatedWait  Int? // minutes
+  notifiedAt     DateTime?
+  seatedAt       DateTime?
+  createdAt      DateTime  @default(now())
 
   @@map("waitlist_entries")
 }
@@ -1491,28 +1547,28 @@ model WaitlistEntry {
 // ─── PRODUCT CATALOG EXTENSIONS (§11) ────────────────────────
 
 model Bundle {
-  id              String   @id @default(uuid())
-  organizationId  String
-  name            String
-  description     String?
-  price           Decimal  @db.Decimal(10, 2)
-  isActive        Boolean  @default(true)
-  startDate       DateTime?
-  endDate         DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String    @id @default(uuid())
+  organizationId String
+  name           String
+  description    String?
+  price          Decimal   @db.Decimal(10, 2)
+  isActive       Boolean   @default(true)
+  startDate      DateTime?
+  endDate        DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  organization Organization    @relation(fields: [organizationId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
   items        BundleItem[]
 
   @@map("bundles")
 }
 
 model BundleItem {
-  id          String @id @default(uuid())
-  bundleId    String
-  productId   String
-  quantity    Int    @default(1)
+  id        String @id @default(uuid())
+  bundleId  String
+  productId String
+  quantity  Int    @default(1)
 
   bundle Bundle @relation(fields: [bundleId], references: [id], onDelete: Cascade)
 
@@ -1520,25 +1576,25 @@ model BundleItem {
 }
 
 model Kit {
-  id              String   @id @default(uuid())
-  organizationId  String
-  name            String
-  description     String?
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  description    String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  organization Organization @relation(fields: [organizationId], references: [id])
+  organization Organization   @relation(fields: [organizationId], references: [id])
   components   KitComponent[]
 
   @@map("kits")
 }
 
 model KitComponent {
-  id          String @id @default(uuid())
-  kitId       String
-  productId   String
-  quantity    Int    @default(1)
+  id        String @id @default(uuid())
+  kitId     String
+  productId String
+  quantity  Int    @default(1)
 
   kit Kit @relation(fields: [kitId], references: [id], onDelete: Cascade)
 
@@ -1546,40 +1602,40 @@ model KitComponent {
 }
 
 model CompositeProduct {
-  id              String   @id @default(uuid())
-  organizationId  String
-  name            String
-  description     String?
-  baseProductId   String?
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  description    String?
+  baseProductId  String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  organization Organization              @relation(fields: [organizationId], references: [id])
+  organization Organization             @relation(fields: [organizationId], references: [id])
   options      CompositeProductOption[]
 
   @@map("composite_products")
 }
 
 model CompositeProductOption {
-  id              String @id @default(uuid())
-  compositeId     String
-  name            String // e.g. "Size", "Color", "Topping"
-  required        Boolean @default(false)
-  minSelect       Int    @default(1)
-  maxSelect       Int    @default(1)
+  id          String  @id @default(uuid())
+  compositeId String
+  name        String // e.g. "Size", "Color", "Topping"
+  required    Boolean @default(false)
+  minSelect   Int     @default(1)
+  maxSelect   Int     @default(1)
 
-  compositeProduct CompositeProduct          @relation(fields: [compositeId], references: [id], onDelete: Cascade)
+  compositeProduct CompositeProduct              @relation(fields: [compositeId], references: [id], onDelete: Cascade)
   composite        CompositeProductOptionValue[]
 
   @@map("composite_product_options")
 }
 
 model CompositeProductOptionValue {
-  id          String  @id @default(uuid())
-  optionId    String
-  productId   String
-  priceAdj    Decimal @default(0) @db.Decimal(10, 2)
+  id        String  @id @default(uuid())
+  optionId  String
+  productId String
+  priceAdj  Decimal @default(0) @db.Decimal(10, 2)
 
   option CompositeProductOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
 
@@ -1589,34 +1645,38 @@ model CompositeProductOptionValue {
 // ─── PURCHASE ORDERS (§12/§18) ───────────────────────────────
 
 model PurchaseOrder {
-  id              String   @id @default(uuid())
-  organizationId  String
-  supplierId      String
-  locationId      String? // where the delivery lands; defaults to the org's main location
+  id                 String    @id @default(uuid())
+  organizationId     String
+  supplierId         String
+  locationId         String? // where the delivery lands; defaults to the org's main location
   replenishmentRunId String? // set when the buying agent's approved draft created this PO
-  status          String   @default("DRAFT") // DRAFT, SENT, PARTIAL, RECEIVED, CANCELLED
-  orderDate       DateTime @default(now())
-  expectedDate    DateTime?
-  receivedDate    DateTime?
-  totalAmount     Decimal  @default(0) @db.Decimal(12, 2)
-  notes           String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  status             String    @default("DRAFT") // DRAFT, SENT, PARTIAL, RECEIVED, CANCELLED
+  orderDate          DateTime  @default(now())
+  expectedDate       DateTime?
+  receivedDate       DateTime?
+  totalAmount        Decimal   @default(0) @db.Decimal(12, 2)
+  notes              String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
-  organization Organization  @relation(fields: [organizationId], references: [id])
-  location     Location?     @relation(fields: [locationId], references: [id])
+  organization Organization        @relation(fields: [organizationId], references: [id])
+  location     Location?           @relation(fields: [locationId], references: [id])
   items        PurchaseOrderItem[]
 
   @@map("purchase_orders")
 }
 
 model PurchaseOrderItem {
-  id          String  @id @default(uuid())
+  id              String    @id @default(uuid())
   purchaseOrderId String
-  productId   String
-  quantity    Int
-  unitCost    Decimal @db.Decimal(10, 2)
-  receivedQty Int     @default(0)
+  productId       String
+  quantity        Int
+  unitCost        Decimal   @db.Decimal(10, 2)
+  receivedQty     Int       @default(0)
+  // Short-shipped units stay open on the PO as a backorder instead of being
+  // silently closed by a partial receipt.
+  backorderedQty  Int       @default(0)
+  backorderedAt   DateTime?
 
   purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
 
@@ -1626,15 +1686,15 @@ model PurchaseOrderItem {
 // ─── PAYMENT TRANSACTIONS (§10) ──────────────────────────────
 
 model PaymentTransaction {
-  id              String   @id @default(uuid())
-  organizationId  String
-  paymentId       String
-  type            String   // AUTHORIZED, CAPTURED, SETTLED, REFUNDED, VOIDED, FAILED
-  amount          Decimal  @db.Decimal(10, 2)
-  reference       String?  // processor reference
-  status          String   @default("COMPLETED") // COMPLETED, FAILED, PENDING
-  metadata        Json?
-  createdAt       DateTime @default(now())
+  id             String   @id @default(uuid())
+  organizationId String
+  paymentId      String
+  type           String // AUTHORIZED, CAPTURED, SETTLED, REFUNDED, VOIDED, FAILED
+  amount         Decimal  @db.Decimal(10, 2)
+  reference      String? // processor reference
+  status         String   @default("COMPLETED") // COMPLETED, FAILED, PENDING
+  metadata       Json?
+  createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
   payment      Payment      @relation(fields: [paymentId], references: [id])
@@ -1646,16 +1706,16 @@ model PaymentTransaction {
 // ─── ROLES & PERMISSIONS (§15) ───────────────────────────────
 
 model Role {
-  id              String   @id @default(uuid())
-  organizationId  String
-  name            String   // OWNER, ADMIN, MANAGER, CASHIER, CUSTOM
-  description     String?
-  isSystem        Boolean  @default(false) // system roles cannot be deleted
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String // OWNER, ADMIN, MANAGER, CASHIER, CUSTOM
+  description    String?
+  isSystem       Boolean  @default(false) // system roles cannot be deleted
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  organization Organization    @relation(fields: [organizationId], references: [id])
+  organization Organization     @relation(fields: [organizationId], references: [id])
   permissions  RolePermission[]
   employees    Employee[]
 
@@ -1664,7 +1724,7 @@ model Role {
 }
 
 model Permission {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   resource    String // ORDER, PAYMENT, PRODUCT, INVENTORY, CUSTOMER, EMPLOYEE, REPORT, SETTINGS, etc.
   action      String // CREATE, READ, UPDATE, DELETE, REFUND, DISCOUNT, VOID, etc.
   description String?
@@ -1690,31 +1750,36 @@ model RolePermission {
 // ─── CUSTOMER 360 EXTENSIONS (§14) ──────────────────────────
 
 model CustomerProfile {
-  id              String   @id @default(uuid())
-  organizationId  String
-  customerId      String
-  favoriteProducts String[] // product IDs
-  dietaryNotes    String?
-  allergies       String[]
-  preferredContact String?  // EMAIL, SMS, PHONE
+  id                String   @id @default(uuid())
+  organizationId    String
+  customerId        String
+  favoriteProducts  String[] // product IDs
+  dietaryNotes      String?
+  allergies         String[]
+  preferredContact  String? // EMAIL, SMS, PHONE
   preferredLanguage String?
-  notes           String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
   customer     Customer     @relation(fields: [customerId], references: [id])
+
+  // Loyalty tier the customer currently holds (recomputed on every earn).
+  tierId         String?
+  tierSince      DateTime?
+  lifetimePoints Int       @default(0)
 
   @@unique([organizationId, customerId])
   @@map("customer_profiles")
 }
 
 model CustomerPreference {
-  id              String  @id @default(uuid())
-  organizationId  String
-  customerId      String
-  key             String  // e.g. "notification_email", "receipt_format"
-  value           String  // e.g. "true", "digital"
+  id             String @id @default(uuid())
+  organizationId String
+  customerId     String
+  key            String // e.g. "notification_email", "receipt_format"
+  value          String // e.g. "true", "digital"
 
   organization Organization @relation(fields: [organizationId], references: [id])
   customer     Customer     @relation(fields: [customerId], references: [id])
@@ -1724,12 +1789,12 @@ model CustomerPreference {
 }
 
 model CustomerEvent {
-  id              String   @id @default(uuid())
-  organizationId  String
-  customerId      String
-  event           String   // PURCHASE, REFUND, VISIT, LOYALTY_EARNED, CAMPAIGN_SENT, etc.
-  data            Json?
-  createdAt       DateTime @default(now())
+  id             String   @id @default(uuid())
+  organizationId String
+  customerId     String
+  event          String // PURCHASE, REFUND, VISIT, LOYALTY_EARNED, CAMPAIGN_SENT, etc.
+  data           Json?
+  createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
   customer     Customer     @relation(fields: [customerId], references: [id])
@@ -1741,19 +1806,19 @@ model CustomerEvent {
 // ─── RETAIL ENGINE EXTENSIONS (§18) ─────────────────────────
 
 model GiftCard {
-  id              String   @id @default(uuid())
-  organizationId  String
-  cardNumber      String   @unique
-  customerId      String?
-  balance         Decimal  @default(0) @db.Decimal(10, 2)
-  originalAmount  Decimal  @db.Decimal(10, 2)
-  status          String   @default("ACTIVE") // ACTIVE, DEPLETED, VOIDED, EXPIRED
-  expiresAt       DateTime?
-  activatedAt     DateTime?
-  lastUsedAt      DateTime?
-  notes           String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String    @id @default(uuid())
+  organizationId String
+  cardNumber     String    @unique
+  customerId     String?
+  balance        Decimal   @default(0) @db.Decimal(10, 2)
+  originalAmount Decimal   @db.Decimal(10, 2)
+  status         String    @default("ACTIVE") // ACTIVE, DEPLETED, VOIDED, EXPIRED
+  expiresAt      DateTime?
+  activatedAt    DateTime?
+  lastUsedAt     DateTime?
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
   customer     Customer?    @relation(fields: [customerId], references: [id])
@@ -1762,20 +1827,20 @@ model GiftCard {
 }
 
 model StoreCredit {
-  id              String   @id @default(uuid())
-  organizationId  String
-  customerId      String
-  balance         Decimal  @default(0) @db.Decimal(10, 2)
-  originalAmount  Decimal  @db.Decimal(10, 2)
-  reason          String?  // RETURN, EXCHANGE, COMPENSATION, ADJUSTMENT
-  referenceType   String?  // ORDER, REFUND, etc.
-  referenceId     String?
-  status          String   @default("ACTIVE") // ACTIVE, DEPLETED, VOIDED
-  expiresAt       DateTime?
-  lastUsedAt      DateTime?
-  notes           String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String    @id @default(uuid())
+  organizationId String
+  customerId     String
+  balance        Decimal   @default(0) @db.Decimal(10, 2)
+  originalAmount Decimal   @db.Decimal(10, 2)
+  reason         String? // RETURN, EXCHANGE, COMPENSATION, ADJUSTMENT
+  referenceType  String? // ORDER, REFUND, etc.
+  referenceId    String?
+  status         String    @default("ACTIVE") // ACTIVE, DEPLETED, VOIDED
+  expiresAt      DateTime?
+  lastUsedAt     DateTime?
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
   customer     Customer     @relation(fields: [customerId], references: [id])
@@ -1784,22 +1849,22 @@ model StoreCredit {
 }
 
 model Layaway {
-  id              String   @id @default(uuid())
+  id              String    @id @default(uuid())
   organizationId  String
   customerId      String
-  orderNumber     String   @unique
-  status          String   @default("ACTIVE") // ACTIVE, COMPLETED, CANCELLED, EXPIRED
-  totalAmount     Decimal  @db.Decimal(10, 2)
-  paidAmount      Decimal  @default(0) @db.Decimal(10, 2)
-  depositAmount   Decimal  @default(0) @db.Decimal(10, 2)
-  items           Json     // [{productId, name, quantity, price}]
+  orderNumber     String    @unique
+  status          String    @default("ACTIVE") // ACTIVE, COMPLETED, CANCELLED, EXPIRED
+  totalAmount     Decimal   @db.Decimal(10, 2)
+  paidAmount      Decimal   @default(0) @db.Decimal(10, 2)
+  depositAmount   Decimal   @default(0) @db.Decimal(10, 2)
+  items           Json // [{productId, name, quantity, price}]
   dueDate         DateTime
   completedAt     DateTime?
   cancelledAt     DateTime?
-  cancellationFee Decimal  @default(0) @db.Decimal(10, 2)
+  cancellationFee Decimal   @default(0) @db.Decimal(10, 2)
   notes           String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1809,13 +1874,13 @@ model Layaway {
 // ─── MARKETING EXTENSIONS (§19) ─────────────────────────────
 
 model MarketingEvent {
-  id              String   @id @default(uuid())
-  organizationId  String
-  customerId      String?
-  campaignId      String?
-  event           String   // EMAIL_SENT, EMAIL_OPENED, CLICK, CONVERSION, ABANDONED_CART, etc.
-  data            Json?
-  createdAt       DateTime @default(now())
+  id             String   @id @default(uuid())
+  organizationId String
+  customerId     String?
+  campaignId     String?
+  event          String // EMAIL_SENT, EMAIL_OPENED, CLICK, CONVERSION, ABANDONED_CART, etc.
+  data           Json?
+  createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1824,16 +1889,16 @@ model MarketingEvent {
 }
 
 model Reward {
-  id              String   @id @default(uuid())
-  organizationId  String
-  name            String
-  description     String?
-  pointsRequired  Int
-  value           Decimal  @db.Decimal(10, 2)
-  type            String   @default("DISCOUNT") // DISCOUNT, FREE_PRODUCT, FREE_SHIPPING, CUSTOM
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  description    String?
+  pointsRequired Int
+  value          Decimal  @db.Decimal(10, 2)
+  type           String   @default("DISCOUNT") // DISCOUNT, FREE_PRODUCT, FREE_SHIPPING, CUSTOM
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1843,19 +1908,19 @@ model Reward {
 // ─── INTEGRATION PLATFORM (§30) ──────────────────────────────
 
 model IntegrationConnection {
-  id              String   @id @default(uuid())
-  organizationId  String
-  provider        String   // stripe, quickbooks, xero, shopify, etc.
-  type            String   // PAYMENT, ACCOUNTING, ECOMMERCE, CRM, MARKETING, etc.
-  name            String
-  status          String   @default("DISCONNECTED") // CONNECTED, DISCONNECTED, ERROR, SUSPENDED
-  config          Json?    // encrypted connection config
-  credentials     Json?    // encrypted OAuth tokens
-  lastSyncAt      DateTime?
-  syncStatus      String?  // IDLE, SYNCING, ERROR
-  errorMessage    String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String    @id @default(uuid())
+  organizationId String
+  provider       String // stripe, quickbooks, xero, shopify, etc.
+  type           String // PAYMENT, ACCOUNTING, ECOMMERCE, CRM, MARKETING, etc.
+  name           String
+  status         String    @default("DISCONNECTED") // CONNECTED, DISCONNECTED, ERROR, SUSPENDED
+  config         Json? // encrypted connection config
+  credentials    Json? // encrypted OAuth tokens
+  lastSyncAt     DateTime?
+  syncStatus     String? // IDLE, SYNCING, ERROR
+  errorMessage   String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1866,17 +1931,17 @@ model IntegrationConnection {
 // ─── COMMERCE HUB (§13 Omnichannel / §48 Phase 3) ─────────────
 
 model SalesChannel {
-  id              String   @id @default(uuid())
-  organizationId  String
-  key             String   // WEBSITE, MOBILE_APP, SOCIAL, MARKETPLACE, PHONE, POP_UP
-  name            String
-  channelType     String   @default("ONLINE") // ONLINE, IN_STORE, MARKETPLACE, SOCIAL, MOBILE
-  platform        String?  // shopify, amazon, ebay, etsy, instagram, custom
-  url             String?
-  isActive        Boolean  @default(true)
-  config          Json?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(uuid())
+  organizationId String
+  key            String // WEBSITE, MOBILE_APP, SOCIAL, MARKETPLACE, PHONE, POP_UP
+  name           String
+  channelType    String   @default("ONLINE") // ONLINE, IN_STORE, MARKETPLACE, SOCIAL, MOBILE
+  platform       String? // shopify, amazon, ebay, etsy, instagram, custom
+  url            String?
+  isActive       Boolean  @default(true)
+  config         Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1885,19 +1950,19 @@ model SalesChannel {
 }
 
 model DeliveryZone {
-  id              String   @id @default(uuid())
-  organizationId  String
-  locationId      String?
-  name            String
-  radiusMiles     Decimal  @default(5) @db.Decimal(6, 2)
-  baseFee         Decimal  @default(0) @db.Decimal(10, 2)
-  perMileFee      Decimal  @default(0) @db.Decimal(10, 2)
-  minOrder        Decimal  @default(0) @db.Decimal(10, 2)
-  maxDistance     Decimal  @default(10) @db.Decimal(6, 2)
-  zipCodes        Json?    // array of eligible zip codes
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(uuid())
+  organizationId String
+  locationId     String?
+  name           String
+  radiusMiles    Decimal  @default(5) @db.Decimal(6, 2)
+  baseFee        Decimal  @default(0) @db.Decimal(10, 2)
+  perMileFee     Decimal  @default(0) @db.Decimal(10, 2)
+  minOrder       Decimal  @default(0) @db.Decimal(10, 2)
+  maxDistance    Decimal  @default(10) @db.Decimal(6, 2)
+  zipCodes       Json? // array of eligible zip codes
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
   location     Location?    @relation(fields: [locationId], references: [id])
@@ -1908,17 +1973,22 @@ model DeliveryZone {
 // ─── RESTAURANT EXTENSIONS (§17) ─────────────────────────────
 
 model KitchenOrder {
-  id              String   @id @default(uuid())
-  organizationId  String
-  orderId         String
-  tableId         String?
-  status          String   @default("RECEIVED") // RECEIVED, PREPARING, READY, SERVED, CANCELLED
-  course          Int      @default(1) // 1=appetizer, 2=main, 3=dessert
-  priority        Int      @default(0)
-  notes           String?
-  createdAt       DateTime @default(now())
-  readyAt         DateTime?
-  servedAt        DateTime?
+  id             String    @id @default(uuid())
+  organizationId String
+  orderId        String
+  tableId        String?
+  status         String    @default("RECEIVED") // RECEIVED, PREPARING, READY, SERVED, CANCELLED
+  course         Int       @default(1) // 1=appetizer, 2=main, 3=dessert
+  priority       Int       @default(0)
+  // Course pacing: items are held until the ticket is fired, and a fire can be
+  // issued per course so mains wait until appetisers are cleared.
+  firedAt        DateTime?
+  heldUntil      DateTime?
+  firedCourse    Int?
+  notes          String?
+  createdAt      DateTime  @default(now())
+  readyAt        DateTime?
+  servedAt       DateTime?
 
   items KitchenOrderItem[]
 
@@ -1927,14 +1997,21 @@ model KitchenOrder {
 }
 
 model KitchenOrderItem {
-  id          String  @id @default(uuid())
-  kitchenOrderId String
-  productId   String
-  productName String
-  quantity    Int
-  modifiers   Json?   // [{name, priceAdj}]
-  notes       String?
-  status      String  @default("PENDING") // PENDING, PREPARING, READY, CANCELLED
+  id                String    @id @default(uuid())
+  kitchenOrderId    String
+  productId         String
+  productName       String
+  quantity          Int
+  modifiers         Json? // [{name, priceAdj}]
+  notes             String?
+  status            String    @default("PENDING") // PENDING, PREPARING, READY, CANCELLED
+  // Kitchen routing: which station owns this line, when it started, and how long
+  // it is allowed to take before the KDS flags it red.
+  stationId         String?
+  stationName       String?
+  startedAt         DateTime?
+  readyAt           DateTime?
+  targetPrepMinutes Int?
 
   kitchenOrder KitchenOrder @relation(fields: [kitchenOrderId], references: [id], onDelete: Cascade)
 
@@ -1942,13 +2019,13 @@ model KitchenOrderItem {
 }
 
 model MenuCategory {
-  id              String   @id @default(uuid())
-  organizationId  String
-  name            String
-  description     String?
-  sortOrder       Int      @default(0)
-  isActive        Boolean  @default(true)
-  displayTime     String?  // ALL_DAY, BREAKFAST, LUNCH, DINNER
+  id             String  @id @default(uuid())
+  organizationId String
+  name           String
+  description    String?
+  sortOrder      Int     @default(0)
+  isActive       Boolean @default(true)
+  displayTime    String? // ALL_DAY, BREAKFAST, LUNCH, DINNER
 
   items MenuCategoryItem[]
 
@@ -1956,12 +2033,12 @@ model MenuCategory {
 }
 
 model MenuCategoryItem {
-  id          String @id @default(uuid())
-  categoryId  String
-  productId   String
+  id           String   @id @default(uuid())
+  categoryId   String
+  productId    String
   displayPrice Decimal? @db.Decimal(10, 2) // override price for menu
-  sortOrder   Int    @default(0)
-  isAvailable Boolean @default(true)
+  sortOrder    Int      @default(0)
+  isAvailable  Boolean  @default(true)
 
   category MenuCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
@@ -1977,21 +2054,21 @@ model OrderSplit {
   splitNumber Int
   amount      Decimal @db.Decimal(10, 2)
   status      String  @default("PENDING") // PENDING, PAID
-  items       Json?   // [{orderItemId, quantity, amount}]
+  items       Json? // [{orderItemId, quantity, amount}]
 
   @@unique([orderId, splitNumber])
   @@map("order_splits")
 }
 
 model SuspendedCart {
-  id              String   @id @default(uuid())
-  organizationId  String
-  employeeId      String?
-  reference       String   // customer name, order number, etc.
-  items           Json     // cart items
-  totalAmount     Decimal  @default(0) @db.Decimal(10, 2)
-  notes           String?
-  createdAt       DateTime @default(now())
+  id             String   @id @default(uuid())
+  organizationId String
+  employeeId     String?
+  reference      String // customer name, order number, etc.
+  items          Json // cart items
+  totalAmount    Decimal  @default(0) @db.Decimal(10, 2)
+  notes          String?
+  createdAt      DateTime @default(now())
 
   @@map("suspended_carts")
 }
@@ -2003,15 +2080,15 @@ model SuspendedCart {
 model SyncTransaction {
   id              String   @id @default(uuid())
   organizationId  String
-  deviceId        String   // DEVICE UUID
-  transactionId   String   // client-generated immutable UUID (idempotency key)
-  sequenceNo      Int      // LOCAL SEQUENCE
-  type            String   // SALE, REFUND, PAYMENT, INVENTORY_ADJUSTMENT, ORDER
-  payload         Json     // the offline transaction body
+  deviceId        String // DEVICE UUID
+  transactionId   String // client-generated immutable UUID (idempotency key)
+  sequenceNo      Int // LOCAL SEQUENCE
+  type            String // SALE, REFUND, PAYMENT, INVENTORY_ADJUSTMENT, ORDER
+  payload         Json // the offline transaction body
   status          String   @default("SYNCED") // SYNCED, DUPLICATE, CONFLICT, FAILED
   deviceTimestamp DateTime // DEVICE TIMESTAMP
   syncedAt        DateTime @default(now())
-  result          Json?    // server result returned to the device
+  result          Json? // server result returned to the device
   conflictReason  String?
 
   organization Organization @relation(fields: [organizationId], references: [id])
@@ -2027,22 +2104,22 @@ model SyncTransaction {
 // it and pays via the PSP (Stripe Elements), so card data never touches us.
 // Standalone and org-scoped — mirrors the BreachIncident/ComplianceRecord pattern.
 model PaymentLink {
-  id              String    @id @default(uuid())
-  organizationId  String
-  token           String    @unique
-  amount          Decimal   @db.Decimal(12, 2)
-  currency        String    @default("USD")
-  description     String?
-  customerId      String?
-  orderId         String?
-  status          String    @default("ACTIVE") // ACTIVE, PAID, EXPIRED, CANCELLED
-  maxPayments     Int       @default(1)        // >1 makes the link reusable
-  paymentCount    Int       @default(0)
-  expiresAt       DateTime?
-  paidAt          DateTime?
-  createdBy       String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id             String    @id @default(uuid())
+  organizationId String
+  token          String    @unique
+  amount         Decimal   @db.Decimal(12, 2)
+  currency       String    @default("USD")
+  description    String?
+  customerId     String?
+  orderId        String?
+  status         String    @default("ACTIVE") // ACTIVE, PAID, EXPIRED, CANCELLED
+  maxPayments    Int       @default(1) // >1 makes the link reusable
+  paymentCount   Int       @default(0)
+  expiresAt      DateTime?
+  paidAt         DateTime?
+  createdBy      String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@index([organizationId, status])
   @@map("payment_links")
@@ -2050,7 +2127,7 @@ model PaymentLink {
 
 // ─── CATERING (§17) ───────────────────────────────────────────
 model CateringOrder {
-  id              String    @id @default(uuid())
+  id              String   @id @default(uuid())
   organizationId  String
   customerId      String?
   orderId         String?
@@ -2059,16 +2136,16 @@ model CateringOrder {
   contactPhone    String?
   contactEmail    String?
   eventDate       DateTime
-  guests          Int       @default(1)
+  guests          Int      @default(1)
   menuPackage     String?
-  items           Json?     // [{productId, name, quantity, price}]
-  total           Decimal   @default(0) @db.Decimal(12, 2)
-  deposit         Decimal   @default(0) @db.Decimal(12, 2)
-  status          String    @default("PENDING") // PENDING, CONFIRMED, PREPARING, DELIVERED, CANCELLED
+  items           Json? // [{productId, name, quantity, price}]
+  total           Decimal  @default(0) @db.Decimal(12, 2)
+  deposit         Decimal  @default(0) @db.Decimal(12, 2)
+  status          String   @default("PENDING") // PENDING, CONFIRMED, PREPARING, DELIVERED, CANCELLED
   deliveryAddress String?
   notes           String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@index([organizationId, status])
   @@index([organizationId, eventDate])
@@ -2077,21 +2154,21 @@ model CateringOrder {
 
 // ─── FRAUD DETECTION (§37) ────────────────────────────────────
 model FraudAlert {
-  id              String    @id @default(uuid())
-  organizationId  String
-  paymentId       String?
-  orderId         String?
-  customerId      String?
-  rule            String    // VELOCITY, LARGE_AMOUNT, RAPID_REFUNDS, GIFT_CARD_ABUSE, DEVICE_VELOCITY
-  severity        String    @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
-  score           Int       @default(0)
-  status          String    @default("OPEN") // OPEN, REVIEWING, RESOLVED, DISMISSED
-  message         String?
-  metadata        Json?
-  resolvedAt      DateTime?
-  resolvedBy      String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id             String    @id @default(uuid())
+  organizationId String
+  paymentId      String?
+  orderId        String?
+  customerId     String?
+  rule           String // VELOCITY, LARGE_AMOUNT, RAPID_REFUNDS, GIFT_CARD_ABUSE, DEVICE_VELOCITY
+  severity       String    @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  score          Int       @default(0)
+  status         String    @default("OPEN") // OPEN, REVIEWING, RESOLVED, DISMISSED
+  message        String?
+  metadata       Json?
+  resolvedAt     DateTime?
+  resolvedBy     String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@index([organizationId, status])
   @@index([organizationId, rule])
@@ -2100,14 +2177,14 @@ model FraudAlert {
 
 // ─── WEB PUSH (VAPID) SUBSCRIPTIONS (§19 PUSH channel) ────────
 model PushSubscription {
-  id              String    @id @default(uuid())
-  organizationId  String
-  userId          String?
-  endpoint        String    @unique
-  p256dh          String
-  auth            String
-  userAgent       String?
-  createdAt       DateTime  @default(now())
+  id             String   @id @default(uuid())
+  organizationId String
+  userId         String?
+  endpoint       String   @unique
+  p256dh         String
+  auth           String
+  userAgent      String?
+  createdAt      DateTime @default(now())
 
   @@index([organizationId, userId])
   @@map("push_subscriptions")
@@ -2130,20 +2207,20 @@ model JobRun {
 
 // ─── MEDIA LIBRARY / OBJECT STORAGE (branding + product media) ─
 model MediaAsset {
-  id              String    @id @default(uuid())
-  organizationId  String
-  storage         String    @default("DB") // DB (base64 dataUrl) | S3 (key/url)
-  key             String?   // S3 object key when storage = S3
-  url             String?   // public/signed URL when storage = S3
-  dataUrl         String?   // base64 data URL when storage = DB
-  mimeType        String
-  size            Int       @default(0)
-  width           Int?
-  height          Int?
-  folder          String?   // BRAND | PRODUCT | RECEIPT | OTHER
-  name            String?
-  uploadedBy      String?
-  createdAt       DateTime  @default(now())
+  id             String   @id @default(uuid())
+  organizationId String
+  storage        String   @default("DB") // DB (base64 dataUrl) | S3 (key/url)
+  key            String? // S3 object key when storage = S3
+  url            String? // public/signed URL when storage = S3
+  dataUrl        String? // base64 data URL when storage = DB
+  mimeType       String
+  size           Int      @default(0)
+  width          Int?
+  height         Int?
+  folder         String? // BRAND | PRODUCT | RECEIPT | OTHER
+  name           String?
+  uploadedBy     String?
+  createdAt      DateTime @default(now())
 
   @@index([organizationId, folder])
   @@map("media_assets")
@@ -2158,9 +2235,9 @@ model FiscalDevice {
   id             String    @id @default(uuid())
   organizationId String
   locationId     String?
-  profileCode    String   // DE_TSE, FR_TSE, IT_SDI, SA_ZATCA, NG_EINV, KE_ETIMS, SIMPLE
+  profileCode    String // DE_TSE, FR_TSE, IT_SDI, SA_ZATCA, NG_EINV, KE_ETIMS, SIMPLE
   serialNumber   String
-  activationCode String?  // stored encrypted via services/crypto
+  activationCode String? // stored encrypted via services/crypto
   publicKeyRef   String?
   lastSequence   Int       @default(0)
   lastSignedAt   DateTime?
@@ -2185,9 +2262,9 @@ model FiscalDocument {
   total          Decimal   @db.Decimal(12, 2)
   vatTotal       Decimal   @default(0) @db.Decimal(12, 2)
   currency       String    @default("USD")
-  payloadHash    String   // sha256 over the canonical fiscal payload
-  previousHash   String?  // hash-chain link to the document before it
-  signedHash     String?  // seal = hash(previousHash + payloadHash + salt)
+  payloadHash    String // sha256 over the canonical fiscal payload
+  previousHash   String? // hash-chain link to the document before it
+  signedHash     String? // seal = hash(previousHash + payloadHash + salt)
   qrPayload      String?
   status         String    @default("SEALED") // SEALED, PENDING, TRANSMITTED, REJECTED, FAILED
   attempts       Int       @default(0)
@@ -2214,9 +2291,9 @@ model RailAccount {
   organizationId String
   locationId     String?
   countryCode    String   @default("US")
-  railCode       String   // SEPA, FPS, PIX, UPI, ACH, SWIFT, CVM, MOMO, BVN, ...
+  railCode       String // SEPA, FPS, PIX, UPI, ACH, SWIFT, CVM, MOMO, BVN, ...
   label          String
-  identifier     String   // IBAN / virtual account / till number / VPA
+  identifier     String // IBAN / virtual account / till number / VPA
   holderName     String?
   verification   String   @default("UNVERIFIED") // UNVERIFIED, VERIFIED, FAILED
   isValid        Boolean  @default(true)
@@ -2260,18 +2337,18 @@ model SettlementBatch {
 }
 
 model SettlementLine {
-  id                String   @id @default(uuid())
+  id                String    @id @default(uuid())
   batchId           String
   organizationId    String
   externalReference String?
   paymentId         String?
   orderId           String?
-  amount            Decimal  @default(0) @db.Decimal(14, 2)
-  fee               Decimal  @default(0) @db.Decimal(14, 2)
+  amount            Decimal   @default(0) @db.Decimal(14, 2)
+  fee               Decimal   @default(0) @db.Decimal(14, 2)
   valueDate         DateTime?
-  status            String   @default("UNMATCHED_PROVIDER") // MATCHED, UNMATCHED_PROVIDER, UNMATCHED_INTERNAL, FEE_MISMATCH
+  status            String    @default("UNMATCHED_PROVIDER") // MATCHED, UNMATCHED_PROVIDER, UNMATCHED_INTERNAL, FEE_MISMATCH
   note              String?
-  createdAt         DateTime @default(now())
+  createdAt         DateTime  @default(now())
 
   @@index([batchId, status])
   @@index([organizationId, externalReference])
@@ -2282,21 +2359,21 @@ model SettlementLine {
 // A replenishment run is the plan the buying agent drafts from the demand
 // forecast; it stays a DRAFT until a human approves it into purchase orders.
 model ReplenishmentRun {
-  id              String    @id @default(uuid())
-  organizationId  String
-  trigger         String    @default("MANUAL") // MANUAL, AUTO
-  horizonDays     Int       @default(14)
-  itemCount       Int       @default(0)
-  supplierCount   Int       @default(0)
-  estimatedCost   Decimal   @default(0) @db.Decimal(14, 2)
-  status          String    @default("DRAFT") // DRAFT, APPROVED, ORDERED, DISCARDED
-  plan            Json?    // [{supplierId, productId, onHand, projected, quantity, unitCost, cost}]
-  guardrails      Json?    // {maxSpend, excludedSuppliers, minQuantity}
-  approvedBy      String?
-  approvedAt      DateTime?
+  id               String    @id @default(uuid())
+  organizationId   String
+  trigger          String    @default("MANUAL") // MANUAL, AUTO
+  horizonDays      Int       @default(14)
+  itemCount        Int       @default(0)
+  supplierCount    Int       @default(0)
+  estimatedCost    Decimal   @default(0) @db.Decimal(14, 2)
+  status           String    @default("DRAFT") // DRAFT, APPROVED, ORDERED, DISCARDED
+  plan             Json? // [{supplierId, productId, onHand, projected, quantity, unitCost, cost}]
+  guardrails       Json? // {maxSpend, excludedSuppliers, minQuantity}
+  approvedBy       String?
+  approvedAt       DateTime?
   purchaseOrderIds Json?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   @@index([organizationId, status])
   @@map("replenishment_runs")
@@ -2309,21 +2386,21 @@ model ReplenishmentRun {
 // web can never oversell the shop floor. Orders carry a claimCode so the
 // customer can check status without logging in.
 model Storefront {
-  id              String   @id @default(uuid())
-  organizationId  String
-  locationId      String?
-  slug            String   @unique // public URL: /shop/:slug
-  name            String   // e.g. "Downtown Counter"
-  isEnabled       Boolean  @default(false)
-  fulfillmentTypes Json?   // ["PICKUP","DELIVERY",...] subset offered to customers
-  pickupSlotsJson Json?    // [{day, slots:["10:00","12:30"]}] — null = during trading hours
-  deliveryFee     Decimal? @db.Decimal(10, 2)
-  minOrderAmount  Decimal? @db.Decimal(10, 2)
-  payOnPickup     Boolean  @default(true) // false = card online required before submit
-  headerText      String?
-  themeColor      String?  // brand accent for the public page
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id               String   @id @default(uuid())
+  organizationId   String
+  locationId       String?
+  slug             String   @unique // public URL: /shop/:slug
+  name             String // e.g. "Downtown Counter"
+  isEnabled        Boolean  @default(false)
+  fulfillmentTypes Json? // ["PICKUP","DELIVERY",...] subset offered to customers
+  pickupSlotsJson  Json? // [{day, slots:["10:00","12:30"]}] — null = during trading hours
+  deliveryFee      Decimal? @db.Decimal(10, 2)
+  minOrderAmount   Decimal? @db.Decimal(10, 2)
+  payOnPickup      Boolean  @default(true) // false = card online required before submit
+  headerText       String?
+  themeColor       String? // brand accent for the public page
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
   location     Location?    @relation(fields: [locationId], references: [id])
@@ -2339,10 +2416,10 @@ model VerticalInstallation {
   solutionCode   String
   version        String   @default("1.0.0")
   status         String   @default("INSTALLED") // INSTALLED, RETIRED
-  features       Json?    // capability flags the solution switched on
-  config         Json?    // per-solution overrides
-  posHints       Json?    // what the POS screen should surface for this vertical
-  appliedDelta   Json?    // settings changes made at install time (for rollback)
+  features       Json? // capability flags the solution switched on
+  config         Json? // per-solution overrides
+  posHints       Json? // what the POS screen should surface for this vertical
+  appliedDelta   Json? // settings changes made at install time (for rollback)
   enabledBy      String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -2356,47 +2433,47 @@ model VerticalInstallation {
 // Working-capital lending underwritten from the tenant's own settlement
 // history, repaid by a daily sweep of card sales.
 model CreditFacility {
-  id               String    @id @default(uuid())
-  organizationId   String
-  status           String    @default("PENDING") // PENDING, APPROVED, DECLINED, ACTIVE, CLOSED, DEFAULTED
-  requestedAmount  Decimal   @default(0) @db.Decimal(14, 2)
-  approvedLimit    Decimal   @default(0) @db.Decimal(14, 2)
-  drawnAmount      Decimal   @default(0) @db.Decimal(14, 2)
-  outstanding      Decimal   @default(0) @db.Decimal(14, 2)
-  rate             Decimal   @default(0) @db.Decimal(6, 3) // annual percentage
-  termMonths       Int       @default(6)
-  installmentAmount Decimal  @default(0) @db.Decimal(14, 2)
-  sweepPercent     Decimal   @default(0) @db.Decimal(5, 2) // share of daily net sales swept
-  score            Int       @default(0)
-  scoreBand        String?
-  underwriting     Json?     // factor-by-factor breakdown of the decision
-  eligibility      Json?
-  nextDueDate      DateTime?
-  lastSweepAt      DateTime?
-  openedAt         DateTime?
-  closedAt         DateTime?
-  decidedBy        String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                String    @id @default(uuid())
+  organizationId    String
+  status            String    @default("PENDING") // PENDING, APPROVED, DECLINED, ACTIVE, CLOSED, DEFAULTED
+  requestedAmount   Decimal   @default(0) @db.Decimal(14, 2)
+  approvedLimit     Decimal   @default(0) @db.Decimal(14, 2)
+  drawnAmount       Decimal   @default(0) @db.Decimal(14, 2)
+  outstanding       Decimal   @default(0) @db.Decimal(14, 2)
+  rate              Decimal   @default(0) @db.Decimal(6, 3) // annual percentage
+  termMonths        Int       @default(6)
+  installmentAmount Decimal   @default(0) @db.Decimal(14, 2)
+  sweepPercent      Decimal   @default(0) @db.Decimal(5, 2) // share of daily net sales swept
+  score             Int       @default(0)
+  scoreBand         String?
+  underwriting      Json? // factor-by-factor breakdown of the decision
+  eligibility       Json?
+  nextDueDate       DateTime?
+  lastSweepAt       DateTime?
+  openedAt          DateTime?
+  closedAt          DateTime?
+  decidedBy         String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   @@index([organizationId, status])
   @@map("credit_facilities")
 }
 
 model LoanRepayment {
-  id           String    @id @default(uuid())
-  facilityId   String
+  id             String    @id @default(uuid())
+  facilityId     String
   organizationId String
-  period       Int
-  dueDate      DateTime
-  principal    Decimal   @default(0) @db.Decimal(14, 2)
-  interest     Decimal   @default(0) @db.Decimal(14, 2)
-  total        Decimal   @default(0) @db.Decimal(14, 2)
-  paidAmount   Decimal   @default(0) @db.Decimal(14, 2)
-  status       String    @default("DUE") // DUE, PARTIAL, PAID, OVERDUE
-  paidAt       DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  period         Int
+  dueDate        DateTime
+  principal      Decimal   @default(0) @db.Decimal(14, 2)
+  interest       Decimal   @default(0) @db.Decimal(14, 2)
+  total          Decimal   @default(0) @db.Decimal(14, 2)
+  paidAmount     Decimal   @default(0) @db.Decimal(14, 2)
+  status         String    @default("DUE") // DUE, PARTIAL, PAID, OVERDUE
+  paidAt         DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@unique([facilityId, period])
   @@index([organizationId, status, dueDate])
@@ -2414,7 +2491,7 @@ model AgentMandate {
   agentName      String?
   principalEmail String?
   mandateType    String    @default("PURCHASE") // PURCHASE, GIFT, REPLENISH
-  items          Json     // [{productId | sku, quantity, maxUnitPrice}]
+  items          Json // [{productId | sku, quantity, maxUnitPrice}]
   ceilingAmount  Decimal   @default(0) @db.Decimal(14, 2)
   amount         Decimal   @default(0) @db.Decimal(14, 2)
   currency       String    @default("USD")
@@ -2440,18 +2517,18 @@ model AgentMandate {
 // was issued under so a partitioned ex-leader can never overwrite committed
 // state with a stale write (classic fencing token).
 model MeshFence {
-  id              String    @id @default(uuid())
-  organizationId  String
-  locationId      String
-  epoch           Int       @default(1)
-  leaderDeviceId  String?
-  previousLeaderId String?
-  committedSequence Int     @default(0)
-  leaseSeconds    Int       @default(30)
-  lastCommitAt    DateTime?
-  reason          String?  // BOOTSTRAP, HEARTBEAT_TIMEOUT, MANUAL_FAILOVER, RENEWED
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id                String    @id @default(uuid())
+  organizationId    String
+  locationId        String
+  epoch             Int       @default(1)
+  leaderDeviceId    String?
+  previousLeaderId  String?
+  committedSequence Int       @default(0)
+  leaseSeconds      Int       @default(30)
+  lastCommitAt      DateTime?
+  reason            String? // BOOTSTRAP, HEARTBEAT_TIMEOUT, MANUAL_FAILOVER, RENEWED
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   @@unique([organizationId, locationId])
   @@map("mesh_fences")
@@ -2459,26 +2536,26 @@ model MeshFence {
 
 // ═══ FRANCHISE / MULTI-ENTITY ═══
 model FranchiseAgreement {
-  id                   String    @id @default(uuid())
-  organizationId       String
-  entityCode           String
-  franchiseeName       String
-  locationId           String?
-  royaltyModel         String    @default("PERCENT") // PERCENT, TIERED, PER_ITEM, FIXED
-  royaltyPercent       Decimal   @default(0) @db.Decimal(5, 2)
-  tiers                Json?    // [{upTo, percent}] ascending
-  perItemFee           Decimal   @default(0) @db.Decimal(12, 2)
-  fixedMonthly         Decimal   @default(0) @db.Decimal(14, 2)
-  minimumMonthly       Decimal   @default(0) @db.Decimal(14, 2)
-  marketingFundPercent Decimal   @default(0) @db.Decimal(5, 2)
-  transferMarkupPercent Decimal  @default(0) @db.Decimal(5, 2) // cost-plus for inter-entity stock
-  exclusions           Json?    // non-refundable taxes, vouchers, tips …
-  currency             String    @default("USD")
-  status               String    @default("ACTIVE") // DRAFT, ACTIVE, SUSPENDED, TERMINATED
-  startDate            DateTime
-  endDate              DateTime?
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+  id                    String    @id @default(uuid())
+  organizationId        String
+  entityCode            String
+  franchiseeName        String
+  locationId            String?
+  royaltyModel          String    @default("PERCENT") // PERCENT, TIERED, PER_ITEM, FIXED
+  royaltyPercent        Decimal   @default(0) @db.Decimal(5, 2)
+  tiers                 Json? // [{upTo, percent}] ascending
+  perItemFee            Decimal   @default(0) @db.Decimal(12, 2)
+  fixedMonthly          Decimal   @default(0) @db.Decimal(14, 2)
+  minimumMonthly        Decimal   @default(0) @db.Decimal(14, 2)
+  marketingFundPercent  Decimal   @default(0) @db.Decimal(5, 2)
+  transferMarkupPercent Decimal   @default(0) @db.Decimal(5, 2) // cost-plus for inter-entity stock
+  exclusions            Json? // non-refundable taxes, vouchers, tips …
+  currency              String    @default("USD")
+  status                String    @default("ACTIVE") // DRAFT, ACTIVE, SUSPENDED, TERMINATED
+  startDate             DateTime
+  endDate               DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   @@unique([organizationId, entityCode])
   @@index([organizationId, status])
@@ -2498,7 +2575,7 @@ model RoyaltyAccrual {
   royaltyAmount       Decimal  @default(0) @db.Decimal(14, 2)
   marketingFundAmount Decimal  @default(0) @db.Decimal(14, 2)
   minimumApplied      Boolean  @default(false)
-  calculation         Json?   // step-by-step audit of how the number was derived
+  calculation         Json? // step-by-step audit of how the number was derived
   status              String   @default("CALCULATED") // CALCULATED, INVOICED, PAID, DISPUTED
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -2516,7 +2593,7 @@ model AppInstallation {
   appName        String
   publisher      String?
   categories     Json?
-  scopes         Json    // grant list, validated against the app manifest
+  scopes         Json // grant list, validated against the app manifest
   config         Json?
   tokenHash      String? // sha256 of the issued API token (never the token)
   status         String   @default("INSTALLED") // INSTALLED, DISABLED, UNINSTALLED
@@ -2538,8 +2615,8 @@ model CustomFieldDefinition {
   dataType       String   @default("TEXT") // TEXT, NUMBER, MONEY, PERCENT, DATE, BOOLEAN, SELECT
   required       Boolean  @default(false)
   defaultValue   String?
-  options        Json?   // SELECT choices
-  validation     Json?   // {min, max, pattern, maxLength}
+  options        Json? // SELECT choices
+  validation     Json? // {min, max, pattern, maxLength}
   active         Boolean  @default(true)
   sortOrder      Int      @default(0)
   createdAt      DateTime @default(now())
@@ -2551,17 +2628,17 @@ model CustomFieldDefinition {
 }
 
 model CustomFieldValue {
-  id           String    @id @default(uuid())
+  id             String    @id @default(uuid())
   organizationId String
-  fieldId      String
-  entityUuid   String
-  textValue    String?
-  numberValue  Decimal?  @db.Decimal(14, 4)
-  boolValue    Boolean?
-  dateValue    DateTime?
-  updatedBy    String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  fieldId        String
+  entityUuid     String
+  textValue      String?
+  numberValue    Decimal?  @db.Decimal(14, 4)
+  boolValue      Boolean?
+  dateValue      DateTime?
+  updatedBy      String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@unique([fieldId, entityUuid])
   @@index([organizationId, entityUuid])
@@ -2589,7 +2666,7 @@ model BenchmarkSnapshot {
   p75            Decimal? @db.Decimal(14, 4)
   p90            Decimal? @db.Decimal(14, 4)
   noiseApplied   Decimal  @default(0) @db.Decimal(14, 4)
-  distribution   Json?   // {members: [...], min, max} without re-identifying detail
+  distribution   Json? // {members: [...], min, max} without re-identifying detail
   generatedAt    DateTime @default(now())
   createdAt      DateTime @default(now())
 
@@ -2634,7 +2711,7 @@ model SubscriptionPlan {
   amount         Decimal  @db.Decimal(14, 2)
   currency       String   @default("USD")
   trialDays      Int      @default(0)
-  features       Json?   // free-form entitlement list
+  features       Json? // free-form entitlement list
   active         Boolean  @default(true)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -2656,7 +2733,7 @@ model Subscription {
   cancelAt           DateTime?
   canceledAt         DateTime?
   trialEnd           DateTime?
-  externalId         String?  // PSP subscription id (Stripe, etc.)
+  externalId         String? // PSP subscription id (Stripe, etc.)
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
@@ -2670,7 +2747,7 @@ model SubscriptionInvoice {
   id             String    @id @default(uuid())
   organizationId String
   subscriptionId String
-  number         String?  // human invoice reference
+  number         String? // human invoice reference
   amount         Decimal   @db.Decimal(14, 2)
   currency       String    @default("USD")
   periodStart    DateTime
@@ -2699,11 +2776,11 @@ model SsoConnection {
   providerType    String   @default("OIDC") // OIDC, SAML
   label           String   @default("")
   clientId        String?
-  clientSecret    String?  // encrypted at rest (v1: AES-GCM)
+  clientSecret    String? // encrypted at rest (v1: AES-GCM)
   issuer          String?
   metadataUrl     String?
-  domainWhitelist Json?   // ["acme.com", ...]
-  config          Json?   // discovered endpoints / IdP cert / ACS path
+  domainWhitelist Json? // ["acme.com", ...]
+  config          Json? // discovered endpoints / IdP cert / ACS path
   enabled         Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -2711,4 +2788,556 @@ model SsoConnection {
   @@unique([organizationId, providerType, label])
   @@index([organizationId, enabled])
   @@map("sso_connections")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// OPERATIONAL DEPTH — parity with Square / Shopify POS / Toast / Lightspeed /
+// Erply / Clover / Revel / Oracle MICROS / Zoho POS / Aloha.
+//
+// These models follow the same discipline as the Global Expansion group: every
+// record carries `organizationId` and is joined in memory where a Prisma
+// relation is not strictly needed, so they migrate onto a live database cleanly.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── RECIPE / BILL OF MATERIALS (§17 food cost, ingredient depletion) ───────
+// A Recipe turns ONE sellable product into a list of components. Costing walks
+// the lines (with waste uplift) to produce a plate cost; depletion explodes the
+// same lines into inventory movements when the product is sold. Sub-recipes are
+// supported (a component may itself have a recipe) with cycle detection in
+// services/recipes.ts.
+model Recipe {
+  id                String   @id @default(uuid())
+  organizationId    String
+  productId         String   @unique
+  name              String
+  yieldQty          Float    @default(1)
+  yieldUnit         String   @default("EACH")
+  targetFoodCostPct Decimal? @db.Decimal(5, 2)
+  notes             String?
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  lines RecipeLine[]
+
+  @@index([organizationId])
+  @@map("recipes")
+}
+
+model RecipeLine {
+  id                 String  @id @default(uuid())
+  recipeId           String
+  componentProductId String
+  quantity           Float    @default(0)
+  unit               String  @default("EACH")
+  wastePct           Decimal @default(0) @db.Decimal(5, 2)
+  sortOrder          Int     @default(0)
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@index([recipeId])
+  @@index([componentProductId])
+  @@map("recipe_lines")
+}
+
+// ─── AGE VERIFICATION AUDIT ─────────────────────────────────────────────────
+model AgeVerification {
+  id             String    @id @default(uuid())
+  organizationId String
+  orderId        String?
+  customerId     String?
+  employeeId     String?
+  deviceId       String?
+  method         String // MANUAL_DOB, ID_SCAN, SUPERVISOR_OVERRIDE
+  minAge         Int
+  birthDate      DateTime?
+  documentType   String? // DRIVING_LICENCE, PASSPORT, NATIONAL_ID
+  documentLast4  String?
+  passed         Boolean   @default(true)
+  notes          String?
+  verifiedAt     DateTime  @default(now())
+
+  @@index([organizationId, verifiedAt])
+  @@index([orderId])
+  @@map("age_verifications")
+}
+
+// ─── LABOR: ROSTER, AVAILABILITY, TIME OFF, SWAPS ───
+model ShiftSchedule {
+  id                  String    @id @default(uuid())
+  organizationId      String
+  locationId          String?
+  employeeId          String
+  position            String?
+  startAt             DateTime
+  endAt               DateTime
+  breakMinutes        Int       @default(0)
+  status              String    @default("DRAFT") // DRAFT, PUBLISHED, CANCELLED
+  publishedAt         DateTime?
+  notes               String?
+  createdByEmployeeId String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([organizationId, startAt])
+  @@index([employeeId, startAt])
+  @@map("shift_schedules")
+}
+
+model ShiftSwapRequest {
+  id                  String    @id @default(uuid())
+  organizationId      String
+  scheduleId          String
+  fromEmployeeId      String
+  toEmployeeId        String?
+  reason              String?
+  status              String    @default("PENDING") // PENDING, APPROVED, DECLINED, WITHDRAWN
+  decidedByEmployeeId String?
+  decidedAt           DateTime?
+  createdAt           DateTime  @default(now())
+
+  @@index([organizationId, status])
+  @@map("shift_swap_requests")
+}
+
+model EmployeeAvailability {
+  id             String    @id @default(uuid())
+  organizationId String
+  employeeId     String
+  weekday        Int // 0=Sunday … 6=Saturday
+  startMinute    Int // minutes from midnight
+  endMinute      Int
+  effectiveFrom  DateTime?
+  effectiveTo    DateTime?
+
+  @@index([employeeId, weekday])
+  @@map("employee_availability")
+}
+
+model TimeOffRequest {
+  id                  String    @id @default(uuid())
+  organizationId      String
+  employeeId          String
+  startDate           DateTime
+  endDate             DateTime
+  type                String    @default("VACATION") // VACATION, SICK, UNPAID, OTHER
+  status              String    @default("PENDING") // PENDING, APPROVED, DECLINED
+  reason              String?
+  decidedByEmployeeId String?
+  decidedAt           DateTime?
+  createdAt           DateTime  @default(now())
+
+  @@index([organizationId, status])
+  @@map("time_off_requests")
+}
+
+// ─── TIP POOLING ────────────────────────────────────────────────────────────
+// `method` decides the weight each employee carries: EQUAL (one share each),
+// HOURS (worked hours), SALES (net sales they rang), POINTS (role point table
+// such as server=10, busser=6, host=4). Allocation rounds with largest
+// remainder so the distributed total always equals the pool to the cent.
+model TipPoolRule {
+  id               String   @id @default(uuid())
+  organizationId   String
+  name             String
+  method           String   @default("HOURS") // EQUAL, HOURS, SALES, POINTS
+  roles            String[]
+  rolePoints       Json? // { CASHIER: 6, SERVER: 10, BUSSER: 4 }
+  includeCashTips  Boolean  @default(true)
+  includeCardTips  Boolean  @default(true)
+  minHoursPerShift Decimal? @db.Decimal(10, 2)
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+
+  @@index([organizationId])
+  @@map("tip_pool_rules")
+}
+
+model TipDistribution {
+  id             String   @id @default(uuid())
+  organizationId String
+  ruleId         String?
+  periodStart    DateTime
+  periodEnd      DateTime
+  employeeId     String
+  method         String
+  hours          Decimal  @default(0) @db.Decimal(10, 2)
+  points         Decimal  @default(0) @db.Decimal(10, 2)
+  sales          Decimal  @default(0) @db.Decimal(10, 2)
+  tips           Decimal  @default(0) @db.Decimal(10, 2)
+  computedAt     DateTime @default(now())
+
+  @@index([organizationId, periodStart])
+  @@map("tip_distributions")
+}
+
+// ─── PAYROLL (export, not a payroll bureau) ─────────────────────────────────
+model PayrollRun {
+  id                  String   @id @default(uuid())
+  organizationId      String
+  periodStart         DateTime
+  periodEnd           DateTime
+  status              String   @default("DRAFT") // DRAFT, EXPORTED
+  currency            String   @default("USD")
+  totalHours          Decimal  @default(0) @db.Decimal(10, 2)
+  totalOvertimeHours  Decimal  @default(0) @db.Decimal(10, 2)
+  totalTips           Decimal  @default(0) @db.Decimal(10, 2)
+  totalGross          Decimal  @default(0) @db.Decimal(10, 2)
+  csv                 String?  @db.Text
+  createdByEmployeeId String?
+  createdAt           DateTime @default(now())
+
+  @@index([organizationId, periodStart])
+  @@map("payroll_runs")
+}
+
+// ─── CARD-PRESENT (Stripe Terminal) ────────────────────────────────────────
+model TerminalReader {
+  id             String    @id @default(uuid())
+  organizationId String
+  locationId     String?
+  label          String
+  provider       String    @default("stripe")
+  stripeReaderId String?   @unique
+  deviceType     String    @default("CHIPPER_2X") // CHIPPER_2X, STRIPE_S700, STRIPE_M2, WISEPOS_E, VERIFONE_P400
+  serialNumber   String?
+  status         String    @default("UNREGISTERED") // ONLINE, OFFLINE, UNREGISTERED, DISABLED
+  ipAddress      String?
+  lastSeenAt     DateTime?
+  metadata       Json?
+  createdAt      DateTime  @default(now())
+
+  @@index([organizationId, status])
+  @@map("terminal_readers")
+}
+
+// ─── SALES CHANNELS (real connectors, not a catalogue of names) ────────────
+model ChannelConnection {
+  id                     String    @id @default(uuid())
+  organizationId         String
+  provider               String // SHOPIFY, WOOCOMMERCE, BIGCOMMERCE
+  label                  String
+  shopDomain             String
+  accessTokenEncrypted   String? // AES-256-GCM via services/crypto
+  webhookSecretEncrypted String?
+  apiVersion             String?
+  scopes                 String[]
+  locationMap            Json? // { [localLocationId]: externalLocationId }
+  status                 String    @default("PENDING") // CONNECTED, ERROR, DISABLED, PENDING
+  lastSyncAt             DateTime?
+  lastError              String?
+  cursor                 String?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  @@unique([organizationId, provider, shopDomain])
+  @@index([organizationId])
+  @@map("channel_connections")
+}
+
+model ExternalProductMapping {
+  id                String    @id @default(uuid())
+  organizationId    String
+  channelId         String
+  productId         String
+  externalId        String
+  externalSku       String?
+  externalVariantId String?
+  lastPushedAt      DateTime?
+  syncHash          String?
+
+  @@unique([channelId, productId])
+  @@index([organizationId, productId])
+  @@map("external_product_mappings")
+}
+
+model ChannelSyncLog {
+  id             String    @id @default(uuid())
+  organizationId String
+  channelId      String
+  direction      String // PUSH, PULL
+  entity         String // PRODUCTS, ORDERS, INVENTORY
+  status         String // OK, PARTIAL, FAILED
+  processed      Int       @default(0)
+  failed         Int       @default(0)
+  message        String?
+  startedAt      DateTime  @default(now())
+  finishedAt     DateTime?
+
+  @@index([organizationId, startedAt])
+  @@map("channel_sync_logs")
+}
+
+// ─── QUOTES / ESTIMATES ────────────────────────────────────────────────────
+model Quote {
+  id               String    @id @default(uuid())
+  organizationId   String
+  quoteNumber      String    @unique
+  customerId       String?
+  employeeId       String?
+  validUntil       DateTime?
+  status           String    @default("DRAFT") // DRAFT, SENT, ACCEPTED, DECLINED, EXPIRED, CONVERTED
+  currency         String    @default("USD")
+  subtotal         Decimal   @default(0) @db.Decimal(10, 2)
+  discountAmount   Decimal   @default(0) @db.Decimal(10, 2)
+  taxAmount        Decimal   @default(0) @db.Decimal(10, 2)
+  totalAmount      Decimal   @default(0) @db.Decimal(10, 2)
+  notes            String?
+  convertedOrderId String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  lines QuoteLine[]
+
+  @@index([organizationId, status])
+  @@map("quotes")
+}
+
+model QuoteLine {
+  id          String  @id @default(uuid())
+  quoteId     String
+  productId   String
+  productName String
+  quantity    Float   @default(1)
+  uom         String  @default("EACH")
+  unitPrice   Decimal @db.Decimal(10, 2)
+  discountAmt Decimal @default(0) @db.Decimal(10, 2)
+  taxAmt      Decimal @default(0) @db.Decimal(10, 2)
+  totalAmount Decimal @db.Decimal(10, 2)
+
+  quote Quote @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  @@index([quoteId])
+  @@map("quote_lines")
+}
+
+// ─── KITCHEN STATIONS (KDS routing) ────────────────────────────────────────
+model KitchenStation {
+  id                String   @id @default(uuid())
+  organizationId    String
+  name              String
+  kind              String   @default("HOT") // GRILL, FRY, HOT, COLD, BAR, PASS, EXPO, DESSERT
+  categoryIds       String[]
+  printerTarget     String?
+  targetPrepMinutes Int      @default(10)
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+
+  @@index([organizationId])
+  @@map("kitchen_stations")
+}
+
+// ─── LOYALTY TIERS ─────────────────────────────────────────────────────────
+model LoyaltyTier {
+  id                String  @id @default(uuid())
+  organizationId    String
+  programId         String
+  name              String
+  minLifetimePoints Int     @default(0)
+  pointsMultiplier  Decimal @default(1) @db.Decimal(5, 2)
+  perks             Json?
+  sortOrder         Int     @default(0)
+
+  @@index([organizationId, programId])
+  @@map("loyalty_tiers")
+}
+
+// ─── CUSTOM REPORT DEFINITIONS ─────────────────────────────────────────────
+model ReportDefinition {
+  id             String    @id @default(uuid())
+  organizationId String
+  name           String
+  source         String // SALES, ORDERS, PRODUCTS, INVENTORY, PAYMENTS, LABOR, TIPS, CUSTOMERS, LOYALTY
+  columns        String[]
+  filters        Json?
+  groupBy        String?
+  sortBy         String?
+  sortDir        String    @default("desc")
+  scheduleCron   String? // e.g. "0 7 * * 1" — emailed by the scheduler
+  recipients     String[]
+  lastRunAt      DateTime?
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([organizationId])
+  @@map("report_definitions")
+}
+
+model ReportRun {
+  id                    String   @id @default(uuid())
+  organizationId        String
+  definitionId          String?
+  name                  String
+  rowCount              Int      @default(0)
+  durationMs            Int      @default(0)
+  status                String   @default("OK") // OK, FAILED
+  error                 String?
+  requestedByEmployeeId String?
+  createdAt             DateTime @default(now())
+
+  @@index([organizationId, createdAt])
+  @@map("report_runs")
+}
+
+// ─── SERVICE VERTICALS: APPOINTMENTS, WORK ORDERS, RENTALS ─────────────────
+model Appointment {
+  id               String   @id @default(uuid())
+  organizationId   String
+  locationId       String?
+  customerId       String?
+  employeeId       String?
+  serviceProductId String?
+  title            String
+  startAt          DateTime
+  endAt            DateTime
+  status           String   @default("BOOKED") // BOOKED, CONFIRMED, IN_PROGRESS, COMPLETED, CANCELLED, NO_SHOW
+  depositPaymentId String?
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([organizationId, startAt])
+  @@index([employeeId, startAt])
+  @@map("appointments")
+}
+
+model WorkOrder {
+  id                 String    @id @default(uuid())
+  organizationId     String
+  locationId         String?
+  number             String    @unique
+  customerId         String?
+  assignedEmployeeId String?
+  type               String    @default("REPAIR") // REPAIR, SERVICE, INSTALL
+  status             String    @default("OPEN") // OPEN, IN_PROGRESS, WAITING_PARTS, READY, COMPLETED, CANCELLED
+  deviceLabel        String?
+  problem            String?
+  diagnosis          String?
+  warrantyUntil      DateTime?
+  laborTotal         Decimal   @default(0) @db.Decimal(10, 2)
+  partsTotal         Decimal   @default(0) @db.Decimal(10, 2)
+  totalAmount        Decimal   @default(0) @db.Decimal(10, 2)
+  currency           String    @default("USD")
+  notes              String?
+  completedAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  lines WorkOrderLine[]
+
+  @@index([organizationId, status])
+  @@map("work_orders")
+}
+
+model WorkOrderLine {
+  id          String  @id @default(uuid())
+  workOrderId String
+  kind        String  @default("LABOR") // LABOR, PART, FEE
+  productId   String?
+  description String
+  quantity    Float   @default(1)
+  unitPrice   Decimal @db.Decimal(10, 2)
+  totalAmount Decimal @db.Decimal(10, 2)
+
+  workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+
+  @@index([workOrderId])
+  @@map("work_order_lines")
+}
+
+model RentalAgreement {
+  id             String    @id @default(uuid())
+  organizationId String
+  locationId     String?
+  number         String    @unique
+  customerId     String?
+  status         String    @default("RESERVED") // RESERVED, OUT, PARTIALLY_RETURNED, RETURNED, OVERDUE, CANCELLED
+  startAt        DateTime
+  dueAt          DateTime
+  returnedAt     DateTime?
+  currency       String    @default("USD")
+  depositAmount  Decimal   @default(0) @db.Decimal(10, 2)
+  rateAmount     Decimal   @default(0) @db.Decimal(10, 2)
+  lateFeeAmount  Decimal   @default(0) @db.Decimal(10, 2)
+  totalAmount    Decimal   @default(0) @db.Decimal(10, 2)
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  lines RentalLine[]
+
+  @@index([organizationId, status])
+  @@map("rental_agreements")
+}
+
+model RentalLine {
+  id          String  @id @default(uuid())
+  agreementId String
+  productId   String
+  productName String
+  quantity    Float   @default(1)
+  rateUnit    String  @default("DAY") // HOUR, DAY, WEEK
+  rate        Decimal @db.Decimal(10, 2)
+  returnedQty Float   @default(0)
+  condition   String? // OK, DAMAGED, LOST
+
+  agreement RentalAgreement @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+
+  @@index([agreementId])
+  @@map("rental_lines")
+}
+
+// ─── KIOSK / CUSTOMER DISPLAY SESSIONS ─────────────────────────────────────
+// A kiosk or a customer-facing display pairs once with a long-lived token, so
+// the device never needs a cashier login. KIOSK sessions can place orders;
+// CUSTOMER_DISPLAY sessions are read-only and follow a register's cart.
+model KioskSession {
+  id             String    @id @default(uuid())
+  organizationId String
+  registerId     String?
+  deviceId       String?
+  mode           String    @default("KIOSK") // KIOSK, CUSTOMER_DISPLAY
+  token          String    @unique
+  label          String
+  status         String    @default("ACTIVE") // ACTIVE, REVOKED
+  // A CUSTOMER_DISPLAY pair follows one live basket; the cashier pushes the
+  // snapshot on every cart change so the pole display never reads the DB.
+  displayOrderId String?
+  lastCart       Json?
+  lastSeenAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([organizationId, mode])
+  @@map("kiosk_sessions")
+}
+
+// ─── BACKORDERS (special order / out-of-stock commitment) ─────────────────
+// Selling something that is not on the shelf is a promise, not a sale. The
+// customer commits, the store owes them the unit, and this row keeps the
+// promise auditable until it is fulfilled (whole or in part) or cancelled.
+model Backorder {
+  id             String    @id @default(uuid())
+  organizationId String
+  locationId     String?
+  orderId        String?
+  customerId     String?
+  productId      String
+  productName    String
+  quantity       Float     @default(1)
+  uom            String    @default("EACH")
+  unitPrice      Decimal   @db.Decimal(10, 2)
+  depositAmount  Decimal   @default(0) @db.Decimal(10, 2)
+  status         String    @default("OPEN") // OPEN, PARTIALLY_FULFILLED, FULFILLED, CANCELLED
+  fulfilledQty   Float     @default(0)
+  expectedAt     DateTime?
+  notifiedAt     DateTime?
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([organizationId, status])
+  @@index([organizationId, productId])
+  @@index([customerId])
+  @@map("backorders")
 }

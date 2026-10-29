@@ -92,13 +92,19 @@ docker compose up --build -d
 
 ## 5. Database & migrations
 
-- A committed baseline migration lives at
-  `packages/server/prisma/migrations/20260907000000_init/`.
+- Ten committed migrations live in `packages/server/prisma/migrations/`
+  (`20260907000000_init` … `20261028130000_platform_billing`). The chain has been
+  applied in order to an empty PostgreSQL 16 database and then diffs empty against
+  `schema.prisma`.
 - **On container boot**, `docker-entrypoint.sh` runs `prisma migrate deploy`
   (idempotent) unless `SKIP_MIGRATIONS=true` or the migrations folder is absent.
 
+Migration files must be **UTF-8**. A `migration.sql` saved as UTF-16LE makes
+`migrate deploy` abort with P3015 ("could not find the migration file"), which reads
+like a missing file rather than a bad encoding.
+
 **Fresh database (normal deploy):** nothing to do — the entrypoint applies the
-baseline on first boot.
+whole chain on first boot.
 
 **Multi-replica (recommended):** decouple migrations from boot so replicas never
 race each other:

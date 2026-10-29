@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { useCartStore } from '../stores/cartStore';
 import { useAuthStore } from '../stores/authStore';
 import { attachBarcodeScanner } from '../services/hardware';
+import { posOffline } from '../services/posOffline';
 import RegisterLockScreen from '../components/RegisterLockScreen';
 import { useRegisterLock } from '../hooks/useRegisterLock';
 import { 
@@ -11,7 +12,8 @@ import {
   User, Pause, ShoppingCart, Percent, Clock,
   MapPin, Monitor, UserCircle, CheckCircle, Lock, KeyRound,
   Wallet, Zap, QrCode, Landmark, BadgeDollarSign, Bitcoin, Gift,
-  Receipt, FileText, ChevronDown, ChevronUp, Archive
+  Receipt, FileText, ChevronDown, ChevronUp, Archive,
+  Scale, WifiOff, RefreshCw, ShieldCheck, X
 } from 'lucide-react';
 import clsx from 'clsx';
 import {
@@ -64,6 +66,36 @@ export default function POSPage() {
   const [storeCreditTotal, setStoreCreditTotal] = useState<number | null>(null);
   const [loadingCredit, setLoadingCredit] = useState(false);
 
+  // ── Offline selling (§26) ──
+  // A queue that only exists in memory is not offline-first: these counts are
+  // read back from localStorage so a reload shows the same un-synced sales.
+  const [offlineCount, setOfflineCount] = useState(0);
+  const [offlineError, setOfflineError] = useState('');
+  const [flushing, setFlushing] = useState(false);
+  const [onLine, setOnLine] = useState<boolean>(typeof navigator === 'undefined' ? true : navigator.onLine);
+
+  // ── Weighed / PLU entry (§6) ──
+  const [scaleOpen, setScaleOpen] = useState(false);
+  const [scaleCode, setScaleCode] = useState('');
+  const [scaleBusy, setScaleBusy] = useState(false);
+  const [scaleError, setScaleError] = useState('');
+  /** A PLU lookup that needs a decimal amount before it can be added. */
+  const [weightProduct, setWeightProduct] = useState<any>(null);
+  const [weightInput, setWeightInput] = useState('');
+
+  // ── Age verification (§6) ──
+  // `pending` holds the exact order body that was refused, so clearing the gate
+  // replays the same sale rather than a re-derived (and possibly different) one.
+  const [agePrompt, setAgePrompt] = useState<{ pending: any; minAge: number; items: any[] } | null>(null);
+  const [ageForm, setAgeForm] = useState({ birthDate: '', documentType: 'DRIVING_LICENCE', documentLast4: '', override: false });
+  const [ageError, setAgeError] = useState('');
+  const [ageBusy, setAgeBusy] = useState(false);
+
+  // ── Customer-facing display (§17) ──
+  // The pairing token is a device secret; it lives on this till, not in the app.
+  const [displayToken, setDisplayToken] = useState(() => localStorage.getItem('pos_display_token') || '');
+  const lastPushRef = useRef<string>('');
+
   const { items, addItem, removeItem, updateQuantity, clearCart, getSubtotal, setCustomer, discount, discountType, setDiscount, restoreCart } = useCartStore();
   const { user, organization, logout } = useAuthStore();
   const navigate = useNavigate();
@@ -85,9 +117,24 @@ export default function POSPage() {
     return () => clearInterval(timer);
   }, []);
 
+  // Offline queue: show what is still on the till, then try to drain it as soon
+  // as the browser has a session and a network.
+  useEffect(() => {
+    setOfflineCount(posOffline.count());
+    void flushOffline(true);
+    const goOnline = () => { setOnLine(true); void flushOffline(true); };
+    const goOffline = () => setOnLine(false);
+    window.addEventListener('online', goOnline);
+    window.addEventListener('offline', goOffline);
+    return () => {
+      window.removeEventListener('online', goOnline);
+      window.removeEventListener('offline', goOffline);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Barcode scanner (keyboard-wedge): a scan drops the code into product search.
   useEffect(() => attachBarcodeScanner((code) => setSearch(code)), []);
-
   useEffect(() => {
     loadData();
   }, [search, selectedCategory]);
@@ -158,39 +205,93 @@ export default function POSPage() {
       : inStoreMethods,
   );
 
+  /**
+   * The exact POST /orders body for the current basket.
+   *
+   * Built once and reused: a sale refused by the age gate must be replayed
+   * byte-for-byte after the ID check, and a sale queued offline must survive a
+   * reload. `uom`/`weighed` travel with every line so the server validates a
+   * 0.375 kg line as a weight instead of rounding it away.
+   */
+  function buildOrderPayload(paymentMethod: string, giftCard?: string) {
+    return {
+      items: items.map((i) => ({
+        productId: i.productId,
+        variantId: i.variantId,
+        quantity: i.quantity,
+        unitPrice: i.price,
+        discountAmt: i.discount,
+        notes: i.notes,
+        uom: i.uom,
+        weighed: i.weighed,
+      })),
+      customerId: selectedCustomerId || undefined,
+      paymentMethod,
+      amountPaid: Number(total.toFixed(2)),
+      giftCardNumber: giftCard || undefined,
+      couponCode: couponApplied?.code || undefined,
+      discount: discount || undefined,
+      discountType: discount ? discountType : undefined,
+    };
+  }
+
+  /** Clear every piece of basket state once a sale is committed or queued. */
+  function finishSale() {
+    clearCart();
+    setCheckoutOpen(false);
+    setSelectedCustomerId('');
+    setCouponCode('');
+    setCouponApplied(null);
+    setCouponError('');
+    setShowAllMethods(false);
+    setMethodSearch('');
+    resetStoredValueStep();
+    loadData();
+  }
+
+  /**
+   * Replay the offline queue.
+   *
+   * Sequential and stoppable: the service keeps a sale when the failure was a
+   * transport problem or an expired session, and parks it for a human when the
+   * server actually rejected it. Nothing here retries forever behind the
+   * cashier's back.
+   */
+  async function flushOffline(silent = false) {
+    if (flushing || posOffline.count() === 0) return;
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      if (!silent) setOfflineError('This till is offline. Queued sales sync when the network returns.');
+      return;
+    }
+    setFlushing(true);
+    setOfflineError('');
+    try {
+      const result = await posOffline.flush();
+      setOfflineCount(result.remaining);
+      if (result.rejected > 0) {
+        const last = posOffline.rejected().slice(-1)[0];
+        setOfflineError(
+          `${result.rejected} queued sale(s) were refused by the server and need a manager — ${last?.reason ?? 'no reason given'}`,
+        );
+      } else if (result.accepted > 0) {
+        await loadData();
+      }
+    } catch (err: any) {
+      setOfflineError(err?.message || 'Could not reach the server.');
+    } finally {
+      setFlushing(false);
+    }
+  }
+
   async function handleCheckout(paymentMethod: string, giftCard?: string) {
     if (items.length === 0) return;
     setProcessing(true);
 
-    try {
-      await api.createOrder({
-        items: items.map((i) => ({
-          productId: i.productId,
-          variantId: i.variantId,
-          quantity: i.quantity,
-          unitPrice: i.price,
-          discountAmt: i.discount,
-          notes: i.notes,
-        })),
-        customerId: selectedCustomerId || undefined,
-        paymentMethod,
-        amountPaid: Number(total.toFixed(2)),
-        giftCardNumber: giftCard || undefined,
-        couponCode: couponApplied?.code || undefined,
-        discount: discount || undefined,
-        discountType: discount ? discountType : undefined,
-      });
+    const pending = buildOrderPayload(paymentMethod, giftCard);
 
-      clearCart();
-      setCheckoutOpen(false);
-      setSelectedCustomerId('');
-      setCouponCode('');
-      setCouponApplied(null);
-      setCouponError('');
-      setShowAllMethods(false);
-      setMethodSearch('');
-      resetStoredValueStep();
-      loadData();
+    try {
+      await api.createOrder(pending);
+      finishSale();
     } catch (err: any) {
       console.error('Checkout failed:', err);
       // A locked drawer is not an error to shout about: the overlay is the fix, so
@@ -199,6 +300,36 @@ export default function POSPage() {
         await registerLock.refresh();
         return;
       }
+
+      // Something in the basket is age-restricted. Hold the exact sale and ask
+      // for ID; the retry reuses `pending` so the basket cannot drift while the
+      // cashier is reading a document.
+      if (err?.code === 'AGE_VERIFICATION_REQUIRED') {
+        const detail = err?.body ?? {};
+        setAgePrompt({
+          pending,
+          minAge: Number(detail.minAge ?? 18),
+          items: Array.isArray(detail.items) ? detail.items : [],
+        });
+        setAgeForm({ birthDate: '', documentType: 'DRIVING_LICENCE', documentLast4: '', override: false });
+        setAgeError('');
+        setCheckoutOpen(false);
+        return;
+      }
+
+      // No HTTP status at all means the request never reached the server. That is
+      // the only case where queuing is unambiguous: the sale is written locally
+      // and replayed under the same Idempotency-Key, so it cannot double-charge.
+      if (!err?.status) {
+        const queued = posOffline.enqueue(pending);
+        setOfflineCount(posOffline.count());
+        finishSale();
+        alert(
+          `Network unavailable — sale ${queued.clientOrderId.slice(0, 8)} is saved on this till and will sync automatically.`,
+        );
+        return;
+      }
+
       const msg = err?.message || 'Checkout failed. Please try again.';
       // Surface backend stored-value errors inside the redemption step when open.
       if (pendingMethod === 'GIFT_CARD') setGiftCardError(msg);
@@ -207,6 +338,160 @@ export default function POSPage() {
       setProcessing(false);
     }
   }
+
+  /**
+   * Record the ID check and replay the held sale.
+   *
+   * The verification is created first so the order can reference a real audit
+   * row; a failed check returns 422 and leaves the basket untouched.
+   */
+  async function confirmAgeGate() {
+    if (!agePrompt) return;
+    setAgeBusy(true);
+    setAgeError('');
+    try {
+      const restricted = agePrompt.items.length
+        ? agePrompt.items
+        : items
+            .filter((i) => i.ageRestricted)
+            .map((i) => ({ productId: i.productId, name: i.name, ageRestricted: true, minAge: i.minAge ?? null }));
+
+      const verification = await api.createAgeVerification({
+        method: ageForm.override ? 'SUPERVISOR_OVERRIDE' : 'ID_SCAN',
+        birthDate: ageForm.birthDate || null,
+        documentType: ageForm.documentType as any,
+        documentLast4: ageForm.documentLast4 || null,
+        customerId: selectedCustomerId || null,
+        items: restricted,
+      });
+
+      await api.createOrder({ ...agePrompt.pending, ageVerificationId: verification.data.ageVerificationId });
+      setAgePrompt(null);
+      finishSale();
+    } catch (err: any) {
+      setAgeError(err?.message || 'Verification failed');
+    } finally {
+      setAgeBusy(false);
+    }
+  }
+
+  /**
+   * Put a resolved scan/PLU into the basket, asking for an amount only when the
+   * item is sold by weight or by another divisible unit.
+   */
+  function addScannedProduct(product: any, quantity?: number) {
+    const weighed = Boolean(product.isWeighed ?? product.weighed);
+    if (weighed && (quantity === undefined || Number.isNaN(Number(quantity)))) {
+      setWeightProduct(product);
+      setWeightInput('');
+      return;
+    }
+    addItem(
+      {
+        id: product.id,
+        name: product.name,
+        price: Number(product.price),
+        unitOfMeasure: product.unitOfMeasure ?? product.uom,
+        isWeighed: weighed,
+        ageRestricted: Boolean(product.ageRestricted),
+        minAge: product.minAge ?? null,
+      },
+      quantity,
+    );
+  }
+
+  /**
+   * Resolve whatever the keypad or scanner produced.
+   *
+   * A scale label (EAN-13 beginning with 2) carries the weight or the price, and
+   * the server decodes it against the PLU, so it can be added straight away. A
+   * bare PLU falls back to a catalogue lookup and then asks for the amount.
+   */
+  async function handleScaleSubmit() {
+    const code = scaleCode.replace(/\s/g, '');
+    if (!code) return;
+    setScaleBusy(true);
+    setScaleError('');
+    try {
+      if (code.length >= 8 && /^\d+$/.test(code)) {
+        try {
+          const scan = await api.scanCode(code, 'WEIGHT');
+          if (scan?.source === 'SCALE' || scan?.data?.scan) {
+            setScaleOpen(false);
+            setScaleCode('');
+            addScannedProduct(scan.data, Number(scan.data.quantity));
+            return;
+          }
+        } catch {
+          /* not a scale label — fall through to the PLU lookup */
+        }
+      }
+
+      const lookup = await api.lookupPlu(code);
+      setScaleOpen(false);
+      setScaleCode('');
+      addScannedProduct(lookup.data);
+    } catch (err: any) {
+      setScaleError(err?.message || 'No product matches that code');
+    } finally {
+      setScaleBusy(false);
+    }
+  }
+
+  function confirmWeight() {
+    if (!weightProduct) return;
+    const amount = Number(weightInput);
+    if (!amount || amount <= 0) return;
+    addItem(
+      {
+        id: weightProduct.id,
+        name: weightProduct.name,
+        price: Number(weightProduct.price),
+        unitOfMeasure: weightProduct.unitOfMeasure ?? weightProduct.uom,
+        isWeighed: true,
+        ageRestricted: Boolean(weightProduct.ageRestricted),
+        minAge: weightProduct.minAge ?? null,
+      },
+      amount,
+    );
+    setWeightProduct(null);
+    setWeightInput('');
+  }
+
+  /**
+   * Mirror the basket onto a paired customer display. Best-effort by design: a
+   * pole display that is unplugged must never be able to stop a sale.
+   */
+  async function pushToDisplay() {
+    if (!displayToken) return;
+    const signature = JSON.stringify({ items: items.map((i) => [i.productId, i.quantity]), total: total.toFixed(2) });
+    if (signature === lastPushRef.current) return;
+    try {
+      await api.kioskPushCart(displayToken, {
+        lines: items.map((i) => ({
+          productName: i.name,
+          quantity: i.quantity,
+          unitPrice: i.price,
+          totalAmount: Number((i.price * i.quantity).toFixed(2)),
+        })),
+        subtotal: Number(subtotal.toFixed(2)),
+        discount: Number(discountAmount.toFixed(2)),
+        tax: Number(tax.toFixed(2)),
+        total: Number(total.toFixed(2)),
+        customerName: customers.find((c: any) => c.id === selectedCustomerId)?.name ?? null,
+      });
+      lastPushRef.current = signature;
+    } catch {
+      /* a display is a courtesy, never a dependency */
+    }
+  }
+
+  // Keep a paired customer display in step with the basket (§17).
+  useEffect(() => {
+    void pushToDisplay();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items, total, displayToken]);
+
 
   function resetStoredValueStep() {
     setPendingMethod(null);
@@ -457,9 +742,51 @@ export default function POSPage() {
                 Lock register
               </button>
             )}
-            <div className="flex items-center gap-2 text-green-600">
-              <CheckCircle size={18} />
-              <span className="font-medium">Online</span>
+            {/* Customer-facing display (§17): the token is pasted once per till. */}
+            <button
+              onClick={() => {
+                const next = window.prompt(
+                  'Paste the customer-display token from Kiosk & Displays (leave blank to unlink this till):',
+                  displayToken,
+                );
+                if (next === null) return;
+                const token = next.trim();
+                if (token) localStorage.setItem('pos_display_token', token);
+                else localStorage.removeItem('pos_display_token');
+                setDisplayToken(token);
+              }}
+              title={displayToken ? 'This till mirrors its basket to a display' : 'Link a customer display to this till'}
+              className={clsx(
+                'flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium',
+                displayToken
+                  ? 'border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+                  : 'border-gray-300 text-gray-700 hover:bg-gray-50',
+              )}
+            >
+              <Monitor size={16} />
+              {displayToken ? 'Display linked' : 'Link display'}
+            </button>
+            {/* A till that cannot take money offline is not a till. The badge
+                says plainly whether sales are reaching the server, and how many
+                are still parked on this device when they are not. */}
+            {offlineCount > 0 && (
+              <button
+                onClick={() => void flushOffline()}
+                disabled={flushing}
+                title={
+                  offlineError ||
+                  'Sales queued on this till are retried automatically. Click to retry now.'
+                }
+                className="flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-800 hover:bg-amber-100 disabled:opacity-50"
+              >
+                <WifiOff size={16} />
+                {flushing ? 'Syncing…' : `${offlineCount} queued`}
+                <RefreshCw size={14} className={flushing ? 'animate-spin' : ''} />
+              </button>
+            )}
+            <div className={clsx('flex items-center gap-2', onLine ? 'text-green-600' : 'text-amber-600')}>
+              {onLine ? <CheckCircle size={18} /> : <WifiOff size={18} />}
+              <span className="font-medium">{onLine ? 'Online' : 'Offline'}</span>
             </div>
             <div className="flex items-center gap-2 text-gray-600">
               <Clock size={18} />
@@ -483,6 +810,15 @@ export default function POSPage() {
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
+            {/* Deli / bulk keypad: a PLU or a scale label (§6). */}
+            <button
+              onClick={() => { setScaleOpen(true); setScaleCode(''); setScaleError(''); }}
+              className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              title="Enter a PLU or scan a scale label"
+            >
+              <Scale size={18} />
+              Scale / PLU
+            </button>
           </div>
 
           {/* Categories */}
@@ -515,16 +851,39 @@ export default function POSPage() {
             {products.map((product) => (
               <button
                 key={product.id}
-                onClick={() => addItem({
-                  id: product.id,
-                  name: product.name,
-                  price: Number(product.price),
-                })}
+                onClick={() => {
+                  // A weighed item cannot be "added once": the price is unknown
+                  // until the amount is. Ask for it instead of guessing 1.
+                  if (product.isWeighed) {
+                    setWeightProduct(product);
+                    setWeightInput('');
+                    return;
+                  }
+                  addItem({
+                    id: product.id,
+                    name: product.name,
+                    price: Number(product.price),
+                    unitOfMeasure: product.unitOfMeasure,
+                    isWeighed: false,
+                    ageRestricted: Boolean(product.ageRestricted),
+                    minAge: product.minAge ?? null,
+                  });
+                }}
                 className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4 text-start"
               >
                 <h3 className="font-semibold text-sm mb-1">{product.name}</h3>
                 <p className="text-xs text-gray-500 mb-2">{product.sku}</p>
-                <p className="text-lg font-bold text-blue-600">${Number(product.price).toFixed(2)}</p>
+                <p className="text-lg font-bold text-blue-600">
+                  ${Number(product.price).toFixed(2)}
+                  {product.isWeighed && (
+                    <span className="text-xs font-normal text-gray-500"> / {String(product.unitOfMeasure || 'KG').toLowerCase()}</span>
+                  )}
+                </p>
+                {product.ageRestricted && (
+                  <span className="mt-1 inline-flex items-center gap-1 rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-medium text-rose-700">
+                    <ShieldCheck size={10} /> {product.minAge ?? 18}+
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -548,35 +907,52 @@ export default function POSPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {items.map((item) => (
-                  <div key={item.productId} className="flex items-center gap-3">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{item.name}</p>
-                      <p className="text-xs text-gray-500">${item.price.toFixed(2)} each</p>
+                {items.map((item) => {
+                  // Whole units step by 1; a weighed line steps by 100 g so the
+                  // cashier can trim an over-pour without re-keying the item.
+                  const step = item.weighed ? 0.1 : 1;
+                  const decimals = item.weighed ? 3 : 0;
+                  return (
+                    <div key={item.productId} className="flex items-center gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">
+                          {item.name}
+                          {item.ageRestricted && (
+                            <span className="ms-1 rounded bg-rose-100 px-1 py-0.5 text-[10px] font-medium text-rose-700">
+                              {item.minAge ?? 18}+
+                            </span>
+                          )}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          ${item.price.toFixed(2)} / {String(item.uom || 'EACH').toLowerCase()}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => updateQuantity(item.productId, Math.round((item.quantity - step) * 1000) / 1000)}
+                          className="p-1 hover:bg-gray-100 rounded"
+                        >
+                          <Minus size={16} />
+                        </button>
+                        <span className="w-14 text-center font-medium tabular-nums">
+                          {item.quantity.toFixed(decimals)}
+                        </span>
+                        <button
+                          onClick={() => updateQuantity(item.productId, Math.round((item.quantity + step) * 1000) / 1000)}
+                          className="p-1 hover:bg-gray-100 rounded"
+                        >
+                          <Plus size={16} />
+                        </button>
+                        <button
+                          onClick={() => removeItem(item.productId)}
+                          className="p-1 text-red-600 hover:bg-red-50 rounded ml-2"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                        className="p-1 hover:bg-gray-100 rounded"
-                      >
-                        <Minus size={16} />
-                      </button>
-                      <span className="w-8 text-center font-medium">{item.quantity}</span>
-                      <button
-                        onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                        className="p-1 hover:bg-gray-100 rounded"
-                      >
-                        <Plus size={16} />
-                      </button>
-                      <button
-                        onClick={() => removeItem(item.productId)}
-                        className="p-1 text-red-600 hover:bg-red-50 rounded ml-2"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -878,6 +1254,175 @@ export default function POSPage() {
                 Processing payment...
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Scale / PLU keypad (§6) ─────────────────────────────────────── */}
+      {scaleOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-[24rem] max-w-[92vw]">
+            <div className="flex items-start justify-between mb-3">
+              <h2 className="text-lg font-bold flex items-center gap-2">
+                <Scale size={18} /> Scale / PLU entry
+              </h2>
+              <button onClick={() => setScaleOpen(false)} className="text-gray-400 hover:text-gray-600">
+                <X size={18} />
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 mb-3">
+              Scan a scale label, or type the PLU from the shelf edge. A weighed item asks for its amount next.
+            </p>
+            <input
+              autoFocus
+              value={scaleCode}
+              onChange={(e) => { setScaleCode(e.target.value); setScaleError(''); }}
+              onKeyDown={(e) => { if (e.key === 'Enter') void handleScaleSubmit(); }}
+              placeholder="PLU or scale barcode"
+              inputMode="numeric"
+              className="w-full px-3 py-2 border rounded-lg font-mono text-lg tracking-wider focus:ring-2 focus:ring-blue-500"
+            />
+            {scaleError && <p className="mt-2 text-sm text-red-600">{scaleError}</p>}
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={() => setScaleOpen(false)}
+                className="flex-1 p-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => void handleScaleSubmit()}
+                disabled={scaleBusy || !scaleCode.trim()}
+                className="flex-1 p-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50"
+              >
+                {scaleBusy ? 'Looking up…' : 'Add to sale'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Weight entry (§6) ───────────────────────────────────────────── */}
+      {weightProduct && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-[24rem] max-w-[92vw]">
+            <h2 className="text-lg font-bold mb-1">{weightProduct.name}</h2>
+            <p className="text-xs text-gray-500 mb-3">
+              ${Number(weightProduct.price).toFixed(2)} / {String(weightProduct.unitOfMeasure || weightProduct.uom || 'kg').toLowerCase()}
+            </p>
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              Amount ({String(weightProduct.unitOfMeasure || weightProduct.uom || 'KG').toLowerCase()})
+            </label>
+            <input
+              autoFocus
+              type="number"
+              step="0.001"
+              min="0"
+              value={weightInput}
+              onChange={(e) => setWeightInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') confirmWeight(); }}
+              className="w-full px-3 py-2 border rounded-lg text-2xl font-mono text-end focus:ring-2 focus:ring-blue-500"
+              placeholder="0.000"
+            />
+            {Number(weightInput) > 0 && (
+              <p className="mt-2 text-sm text-gray-600">
+                Line total:{' '}
+                <strong>${(Number(weightProduct.price) * Number(weightInput)).toFixed(2)}</strong>
+              </p>
+            )}
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={() => { setWeightProduct(null); setWeightInput(''); }}
+                className="flex-1 p-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmWeight}
+                disabled={!(Number(weightInput) > 0)}
+                className="flex-1 p-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50"
+              >
+                Add weighed item
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Age verification (§6) ─────────────────────────────────────────
+          The sale is already built and waiting: this modal records the evidence
+          and replays it. A refusal keeps the basket exactly as it was. */}
+      {agePrompt && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-[26rem] max-w-[92vw]">
+            <h2 className="text-lg font-bold flex items-center gap-2 mb-1">
+              <ShieldCheck size={18} className="text-rose-600" /> ID check required
+            </h2>
+            <p className="text-sm text-gray-600 mb-4">
+              This basket contains an age-restricted item ({agePrompt.minAge}+). Record the check before taking payment.
+            </p>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Date of birth</label>
+                <input
+                  type="date"
+                  value={ageForm.birthDate}
+                  onChange={(e) => setAgeForm({ ...ageForm, birthDate: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Document</label>
+                  <select
+                    value={ageForm.documentType}
+                    onChange={(e) => setAgeForm({ ...ageForm, documentType: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="DRIVING_LICENCE">Driving licence</option>
+                    <option value="PASSPORT">Passport</option>
+                    <option value="NATIONAL_ID">National ID</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Last 4 characters</label>
+                  <input
+                    value={ageForm.documentLast4}
+                    onChange={(e) => setAgeForm({ ...ageForm, documentLast4: e.target.value })}
+                    maxLength={8}
+                    className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+              <label className="flex items-start gap-2 text-xs text-gray-600">
+                <input
+                  type="checkbox"
+                  checked={ageForm.override}
+                  onChange={(e) => setAgeForm({ ...ageForm, override: e.target.checked })}
+                  className="mt-0.5"
+                />
+                <span>
+                  Supervisor override — no document was produced. Recorded against this sale and your name; only a
+                  manager may use it.
+                </span>
+              </label>
+              {ageError && <p className="text-sm text-red-600">{ageError}</p>}
+            </div>
+            <div className="mt-5 flex gap-2">
+              <button
+                onClick={() => { setAgePrompt(null); setAgeError(''); }}
+                className="flex-1 p-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+              >
+                Cancel sale
+              </button>
+              <button
+                onClick={() => void confirmAgeGate()}
+                disabled={ageBusy || (!ageForm.birthDate && !ageForm.override)}
+                className="flex-1 p-2 bg-rose-600 text-white rounded-lg font-medium hover:bg-rose-700 disabled:opacity-50"
+              >
+                {ageBusy ? 'Recording…' : 'Verify & take payment'}
+              </button>
+            </div>
           </div>
         </div>
       )}

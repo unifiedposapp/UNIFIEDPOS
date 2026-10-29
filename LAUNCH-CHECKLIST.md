@@ -12,8 +12,10 @@ Legend: `[ ]` open · `[x]` done · Owner = who must act · Lead = realistic lea
 | Area | State | Evidence |
 | --- | --- | --- |
 | Feature completeness | All blueprint + hardening modules implemented | `IMPLEMENTATION_STATUS.md` |
-| Unit/integration tests | 496 passed / 16 skipped; tenant-isolation suite 16/16 against real Postgres | `npx vitest run`, `packages/server/test/` |
+| Unit/integration tests | 745 passed / 19 DB-gated skipped across 44 suites; tenant-isolation suite 16/16 against real Postgres | `npx vitest run`, `packages/server/test/` |
 | Typechecks & build | Server + web `tsc` clean, production Vite build green | CI `ci.yml` |
+| Schema migrations | Ten migrations apply to an empty PostgreSQL 16 database, then `migrate diff` exits 0 (no drift); CI `db-validate` re-proves it on every push | `packages/server/prisma/migrations/`, `DEPLOYMENT.md` §5 |
+| Competitor parity | Weighed selling/PLU, recipes + depletion, promotions, loyalty tiers, labour + payroll, tip pooling, quotes/backorders, field service, KDS routing, kiosks, card-present, report builder, retailer connectors — each with unit tests | `docs/COMPETITOR-PARITY.md`, `parityServices.test.ts`, `posOffline.test.ts` |
 | Security review | L3 deep review 0 findings on `main` | pre-push gate, Qoder security |
 | Production config gate | Boot **refuses** with `STRICT_PROD_CONFIG=true` on weak/missing config (proved 2026-09-22: 2 errors → exit 1; clean config → boots) | `packages/server/src/services/productionConfig.ts` |
 | Load capacity (single instance, prod mode) | 3,000/3,000 requests, 0 failures, ~725 req/s; floor-plan API p95 ≈ 102 ms under 50-way concurrency | `node scripts/load-test.mjs --base http://<host> --concurrency 50 --requests 60` |
@@ -30,6 +32,8 @@ Legend: `[ ]` open · `[x]` done · Owner = who must act · Lead = realistic lea
 - [ ] Cloud account (pick ONE to start: Fly.io/Render/Railway single region, or AWS ECS per `deploy/aws/`).
 - [ ] Managed Postgres (RDS/Neon/Supabase) + **PgBouncer** pooler; set the kit's `POSTGRES_PASSWORD`; nightly automated snapshots ON.
 - [ ] Stripe **live-mode approval** (business registration needed first) + `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`.
+- [ ] Stripe **Terminal** enabled on the account (card-present is a separate activation) and at least one reader per register; the register's tip-adjust flow is capped at Stripe's 20% over-authorisation limit. Without keys the module runs a simulator, so `GET /api/terminal/provider` must read `stripe` before card-present goes live.
+- [ ] Storefront/channel credentials per connector — Shopify (admin token + webhook secret), WooCommerce (key/secret), BigCommerce (token) — plus the HMAC secret used to verify `POST /api/channels/webhooks/:connectionId`.
 - [ ] Local rails per launch market (Flutterwave/DPO/Paystack/M-Pesa/…): partner contracts and API credentials. **Code validates the identifiers; only a signed agreement moves the money.**
 - [ ] Transactional email: Resend/SendGrid account + verified sending domain (SPF/DKIM/DMARC) → `RESEND_API_KEY`/`SMTP_*`, `EMAIL_FROM`, `APP_BASE_URL`.
 - [ ] S3-compatible bucket + keys for media (`AWS_S3_*`) or accept DB-stored media at first.
